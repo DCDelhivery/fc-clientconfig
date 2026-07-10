@@ -35,7 +35,9 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      animation: slideInFromRight 0.3s ease;
     }
+    @keyframes slideInFromRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
     /* ===== Creation Module Header ===== */
     .creation-header {

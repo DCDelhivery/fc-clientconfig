@@ -9,7 +9,8 @@
   <style>
     :root{--primary:#E31E24;--primary-light:#FDE8E9;--surface:#FFFFFF;--bg:#FFFFFF;--border:#E0E0E0;--border-light:#F0F0F0;--t1:#1A1A1A;--t2:#666666;--t3:#999999;--success:#0D7A3F;--success-bg:#E6F5ED;--warning:#D97706;--warning-bg:#FEF3E2;--radius:8px;--radius-sm:4px;}
     *{margin:0;padding:0;box-sizing:border-box;}
-    body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--t1);height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+    body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--t1);height:100vh;overflow:hidden;display:flex;flex-direction:column;animation:slideInFromRight 0.3s ease;}
+    @keyframes slideInFromRight{from{transform:translateX(100%)}to{transform:translateX(0)}}
 
     /* Header */
     .header{display:flex;align-items:flex-start;justify-content:space-between;padding:20px 104px;border-bottom:1px solid var(--border-light);flex-shrink:0;}
