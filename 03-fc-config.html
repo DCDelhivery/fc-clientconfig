@@ -58,9 +58,9 @@
     .content-count{font-size:12px;color:var(--t3);}
 
     /* Section Divider */
-    .section-divider{margin:28px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--border-light);}
-    .section-divider-title{font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:0.5px;}
-    .section-divider-desc{font-size:12px;color:var(--t3);margin-top:2px;}
+    .section-divider{margin:28px 0 16px;padding:10px 14px;border-left:3px solid var(--t1);background:#FAFAFA;border-radius:0 4px 4px 0;}
+    .section-divider-title{font-size:13px;font-weight:700;color:var(--t1);}
+    .section-divider-desc{font-size:11px;color:var(--t3);margin-top:2px;}
 
     /* Config Row */
     .cfg-row{display:flex;align-items:flex-start;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--border-light);}
@@ -335,7 +335,7 @@
 
     // ===== INBOUND PAGE =====
     function getInboundPage(){
-      return `<div class="content-header"><div><div class="content-title">Inbound</div><div class="content-subtitle">Receiving, QC, POD</div></div><div class="content-count">7 settings</div></div>
+      return `<div class="content-header"><div><div class="content-title">Inbound</div><div class="content-subtitle">Receiving, QC</div></div><div class="content-count">7 settings</div></div>
         <div class="section-divider"><div class="section-divider-title">Receiving Rules</div><div class="section-divider-desc">How operators receive stock against an AGN.</div></div>
         <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;">
