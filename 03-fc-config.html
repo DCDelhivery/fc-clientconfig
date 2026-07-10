@@ -58,10 +58,9 @@
     .content-count{font-size:12px;color:var(--t3);}
 
     /* Section Divider */
-    .section-divider{margin:24px 0 12px;display:flex;align-items:center;gap:10px;}
-    .section-divider-pill{display:inline-flex;align-items:center;padding:4px 12px;background:#F5F5F7;border-radius:100px;font-size:12px;font-weight:600;color:var(--t1);}
-    .section-divider-count{font-size:11px;font-weight:500;color:var(--t3);}
-    .section-divider-line{flex:1;height:1px;background:var(--border-light);}
+    .section-divider{margin:28px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--border-light);}
+    .section-divider-title{font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:0.5px;}
+    .section-divider-desc{font-size:12px;color:var(--t3);margin-top:2px;}
 
     /* Config Row */
     .cfg-row{display:flex;align-items:flex-start;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--border-light);}
@@ -336,8 +335,8 @@
 
     // ===== INBOUND PAGE =====
     function getInboundPage(){
-      return `<div class="content-header"><div><div class="content-title">Inbound</div><div class="content-subtitle">Receiving, QC</div></div><div class="content-count">7 settings</div></div>
-        <div class="section-divider"><span class="section-divider-pill">Receiving Rules</span><span class="section-divider-count">3 settings</span><div class="section-divider-line"></div></div>
+      return `<div class="content-header"><div><div class="content-title">Inbound</div><div class="content-subtitle">Receiving, QC, POD</div></div><div class="content-count">7 settings</div></div>
+        <div class="section-divider"><div class="section-divider-title">Receiving Rules</div><div class="section-divider-desc">How operators receive stock against an AGN.</div></div>
         <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;">
             <div class="cfg-row-left"><div class="cfg-label">Enable excess receiving</div><div class="cfg-desc">Operators can receive more than the expected AGN quantity.</div><span class="cfg-badge badge-client">Client</span></div>
@@ -364,7 +363,7 @@
           </div>
           <div id="rejChips" style="display:flex;flex-wrap:wrap;gap:6px;padding:6px 0 0;"></div>
         </div>
-        <div class="section-divider"><span class="section-divider-pill">Quality Check</span><span class="section-divider-count">4 settings</span><div class="section-divider-line"></div></div>
+        <div class="section-divider"><div class="section-divider-title">Quality Check</div><div class="section-divider-desc">Inspection performed during inbound.</div></div>
         <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Enable QC</div><div class="cfg-desc">Turn on the QC process for this client.</div><span class="cfg-badge badge-client">Client</span></div>
           <div class="cfg-row-right"><div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">No</button></div></div></div>
         <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label" style="display:flex;align-items:center;gap:6px;">QC instructions <span style="position:relative;display:inline-flex;" class="info-wrap"><span class="material-icons-outlined" style="font-size:15px;color:var(--t3);cursor:help;">info</span><span class="info-tip" style="position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);padding:8px 12px;background:var(--t1);color:#fff;font-size:11px;border-radius:4px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity 0.15s;z-index:200;">SKU level QC instructions can be set up in the product catalog</span></span></div><div class="cfg-desc">Show QC instructions to operators during receiving.</div><span class="cfg-badge badge-client">Client</span></div>
@@ -755,10 +754,10 @@
     let zonesData = JSON.parse(sessionStorage.getItem('zonesData')||'[]');
     function getInventoryPage(){
       return `<div class="content-header"><div><div class="content-title">Inventory</div><div class="content-subtitle">Zones, expiry, cycle count</div></div><div class="content-count">9 settings</div></div>
-        <div class="section-divider"><span class="section-divider-pill">Zone and Locations</span><span class="section-divider-count">FC level</span><div class="section-divider-line"></div></div>
+        <div class="section-divider"><div class="section-divider-title">Zone and Locations</div><div class="section-divider-desc">Configure warehouse zones and their locations.</div></div>
         <div style="display:flex;justify-content:flex-end;margin-bottom:8px;"><button class="btn-bulk" onclick="openUploadModal('Upload locations','bulk_locations')">Bulk upload</button></div>
         <div class="zones-wrap"><table class="zones-table"><thead><tr><th style="width:40px">S.No.</th><th style="width:160px">Zones</th><th>Locations</th><th style="width:80px;text-align:center">Action</th></tr></thead><tbody id="zonesBody"></tbody></table></div>
-        <div class="section-divider"><span class="section-divider-pill">Expiry Management</span><span class="section-divider-count">5 settings</span><div class="section-divider-line"></div></div>
+        <div class="section-divider"><div class="section-divider-title">Expiry Management</div><div class="section-divider-desc">How near-expiry and expired stock are handled.</div></div>
         <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Shelf-life check</div><div class="cfg-desc">System checks shelf life before moving items from Reserve to Prime.</div><span class="cfg-badge badge-fc">FC</span></div>
           <div class="cfg-row-right"><div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">No</button></div></div></div>
         <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
@@ -775,7 +774,7 @@
           </div>
           <div class="cfg-reveal" id="near-bucket"><span class="cfg-reveal-label">Near-expiry external bucket</span><select class="tds-select"><option value="">Select bucket</option><option>Expired stock</option><option>Damaged</option><option>Do not sell</option></select></div>
         </div>
-        <div class="section-divider"><span class="section-divider-pill">Cycle Count</span><span class="section-divider-count">2 settings</span><div class="section-divider-line"></div></div>
+        <div class="section-divider"><div class="section-divider-title">Cycle Count</div><div class="section-divider-desc">Thresholds for supervisory approval during cycle counts.</div></div>
         <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Shortage threshold</div><div class="cfg-desc">Units short above which supervisory approval is needed.</div><span class="cfg-badge badge-fc">FC</span></div>
           <div class="cfg-row-right"><input class="tds-input" placeholder="Add and press enter"></div></div>
         <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Overage threshold</div><div class="cfg-desc">Units extra above which supervisory approval is needed.</div><span class="cfg-badge badge-fc">FC</span></div>
@@ -804,7 +803,7 @@
     // ===== OUTBOUND PAGE =====
     function getOutboundPage(){
       return `<div class="content-header"><div><div class="content-title">Outbound</div><div class="content-subtitle">Allocation, picking, dispatch</div></div><div class="content-count">8 settings</div></div>
-        <div class="section-divider"><span class="section-divider-pill">Order Processing</span><span class="section-divider-count">3 settings</span><div class="section-divider-line"></div></div>
+        <div class="section-divider"><div class="section-divider-title">Order Processing</div><div class="section-divider-desc">How orders are allocated and picked.</div></div>
         <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Ship by date</div><div class="cfg-desc">Configure SBD courier offset and cutoff times per priority.</div><span class="cfg-badge badge-fc">FC</span></div>
           <div class="cfg-row-right"><button class="btn-bulk" onclick="openSBDModal()">Configure</button></div></div>
         ${['Pickwave Automation','Enable LR consolidation'].map(s=>{
@@ -848,7 +847,7 @@
           }
           return '';
         }).join('')}
-        <div class="section-divider"><span class="section-divider-pill">Packing &amp; Dispatch</span><span class="section-divider-count">5 settings</span><div class="section-divider-line"></div></div>
+        <div class="section-divider"><div class="section-divider-title">Packing & Dispatch</div><div class="section-divider-desc">Rules for packing, MOQ, and serviceability.</div></div>
         <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Enable parallel pick pack</div><div class="cfg-desc">Allows packing to begin while picking is still in progress for the same order.</div><span class="cfg-badge badge-fc">FC</span></div>
           <div class="cfg-row-right"><div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">No</button></div></div></div>
         <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
