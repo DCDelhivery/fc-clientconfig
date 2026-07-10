@@ -237,8 +237,7 @@
     /* Side Drawer */
     .drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;display:none;justify-content:flex-end}
     .drawer-overlay.open{display:flex}
-    .drawer{width:360px;max-width:90vw;background:var(--surface);height:100%;display:flex;flex-direction:column;box-shadow:-4px 0 24px rgba(0,0,0,0.1);animation:slideIn .2s ease}
-    @keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+    .drawer{width:360px;max-width:90vw;background:var(--surface);height:100%;display:flex;flex-direction:column;box-shadow:-4px 0 24px rgba(0,0,0,0.1)}
     .drawer-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border-light)}
     .drawer-title{font-size:16px;font-weight:600}
     .drawer-close{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;border-radius:var(--radius-sm);color:var(--t2)}
@@ -354,13 +353,13 @@
                       <span class="material-icons-outlined" style="font-size:16px;color:var(--t3);margin-left:auto">expand_more</span>
                     </div>
                     <div class="days-menu" id="daysMenu">
-                      <div class="days-option" data-value="Monday" onclick="toggleDayCheck(this)"><div class="days-check"></div><span>Monday</span></div>
-                      <div class="days-option" data-value="Tuesday" onclick="toggleDayCheck(this)"><div class="days-check"></div><span>Tuesday</span></div>
-                      <div class="days-option" data-value="Wednesday" onclick="toggleDayCheck(this)"><div class="days-check"></div><span>Wednesday</span></div>
-                      <div class="days-option" data-value="Thursday" onclick="toggleDayCheck(this)"><div class="days-check"></div><span>Thursday</span></div>
-                      <div class="days-option" data-value="Friday" onclick="toggleDayCheck(this)"><div class="days-check"></div><span>Friday</span></div>
-                      <div class="days-option" data-value="Saturday" onclick="toggleDayCheck(this)"><div class="days-check"></div><span>Saturday</span></div>
-                      <div class="days-option" data-value="Sunday" onclick="toggleDayCheck(this)"><div class="days-check"></div><span>Sunday</span></div>
+                      <div class="days-option" data-value="Mon" onclick="toggleDayCheck(this)"><div class="days-check"></div><span>Mon</span></div>
+                      <div class="days-option" data-value="Tue" onclick="toggleDayCheck(this)"><div class="days-check"></div><span>Tue</span></div>
+                      <div class="days-option" data-value="Wed" onclick="toggleDayCheck(this)"><div class="days-check"></div><span>Wed</span></div>
+                      <div class="days-option" data-value="Thu" onclick="toggleDayCheck(this)"><div class="days-check"></div><span>Thu</span></div>
+                      <div class="days-option" data-value="Fri" onclick="toggleDayCheck(this)"><div class="days-check"></div><span>Fri</span></div>
+                      <div class="days-option" data-value="Sat" onclick="toggleDayCheck(this)"><div class="days-check"></div><span>Sat</span></div>
+                      <div class="days-option" data-value="Sun" onclick="toggleDayCheck(this)"><div class="days-check"></div><span>Sun</span></div>
                       <div class="days-menu-footer">
                         <button class="days-apply-btn" id="daysApplyBtn" disabled onclick="applyDays()">Apply</button>
                       </div>

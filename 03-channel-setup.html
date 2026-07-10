@@ -518,39 +518,13 @@
     }
 
     function updateTriggerDisplay() {
-      const trigger = document.querySelector('.dropdown-trigger');
-      const placeholder = document.getElementById('ddPlaceholder');
       const btn = document.getElementById('btnAdd');
-
-      trigger.querySelectorAll('.tag, .tag-more').forEach(t => t.remove());
-
       if (selectedChannels.length === 0) {
-        placeholder.style.display = '';
         btn.disabled = true;
-        return;
-      }
-
-      placeholder.style.display = 'none';
-      btn.disabled = false;
-
-      const show = selectedChannels.slice(0, 2);
-      const overflow = selectedChannels.length - 2;
-
-      show.forEach(c => {
-        const tag = document.createElement('span');
-        tag.className = 'tag';
-        tag.innerHTML = `${c.name}<button class="tag-remove" onclick="event.stopPropagation(); removeTag('${c.name}')">&times;</button>`;
-        trigger.insertBefore(tag, trigger.querySelector('.chevron'));
-      });
-
-      if (overflow > 0) {
-        const more = document.createElement('span');
-        more.className = 'tag-more';
-        more.textContent = `+${overflow}`;
-        trigger.insertBefore(more, trigger.querySelector('.chevron'));
+      } else {
+        btn.disabled = false;
       }
     }
-
     function removeTag(name) {
       selectedChannels = selectedChannels.filter(c => c.name !== name);
       document.querySelectorAll('.dropdown-option').forEach(opt => {

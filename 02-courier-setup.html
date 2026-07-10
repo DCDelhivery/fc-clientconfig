@@ -730,7 +730,7 @@
                 <th class="col-days">Operating days</th>
                 <th class="col-capacity">Daily order capacity</th>
                 <th class="col-capacity">Daily orderline capacity</th>
-                <th class="col-capacity">Daily quantity cap</th>
+                <th class="col-capacity">Daily quantity capacity</th>
                 <th class="col-action">Action</th>
               </tr>
             </thead>
@@ -1044,15 +1044,8 @@
 
     function renderTriggerPills(type) {
       const pillsContainer = document.getElementById(type + 'Pills');
-      if (state.items[type].length === 0) {
-        const placeholders = { courier: 'Select courier(s)', channel: 'Select channel(s)', fc: 'Select FC(s)' };
-        pillsContainer.innerHTML = `<span class="trigger-placeholder">${placeholders[type]}</span>`;
-      } else {
-        pillsContainer.innerHTML = state.items[type].map(item => {
-          const display = type === 'courier' ? formatCourierName(item) : item;
-          return `<span class="trigger-pill">${display}<span class="material-icons-outlined remove-pill" onclick="event.stopPropagation(); confirmDelete('${type}', '${item}')">close</span></span>`;
-        }).join('');
-      }
+      const placeholders = { courier: 'Select courier(s)', channel: 'Select channel(s)', fc: 'Select FC(s)' };
+      pillsContainer.innerHTML = `<span class="trigger-placeholder">${placeholders[type]}</span>`;
     }
 
     function formatCourierName(name) {
@@ -1066,7 +1059,7 @@
       if (state.items.fc.includes(name)) return;
       state.items.fc.push(name);
       fcData[name] = {
-        days: ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri'],
+        days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
         orderCap: 100,
         orderlineCap: 100,
         qtyCap: 100
@@ -1104,7 +1097,7 @@
         empty.style.display = 'block';
       } else {
         empty.style.display = 'none';
-        const allDays = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];
+        const allDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
         tbody.innerHTML = state.items.fc.map((fc, idx) => {
           const data = fcData[fc];
           const dayPillsHtml = allDays.map(d =>
@@ -1174,7 +1167,7 @@
         // Rebuild fcData for existing FCs
         state.items.fc.forEach(name => {
           if (!fcData[name]) {
-            fcData[name] = { days: ['Mon','Tues','Wed','Thurs','Fri'], orderCap: 100, orderlineCap: 100, qtyCap: 100 };
+            fcData[name] = { days: ['Mon','Tue','Wed','Thu','Fri'], orderCap: 100, orderlineCap: 100, qtyCap: 100 };
           }
         });
         renderFCTable();
