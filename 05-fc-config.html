@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FC Configuration - Delhi North FC</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <style>
+    :root {
+      --primary:#E31E24;--primary-dark:#B71820;--primary-light:#FDE8E9;
+      --surface:#FFFFFF;--bg:#F5F5F7;--border:#E0E0E0;--border-light:#F0F0F0;
+      --t1:#1A1A1A;--t2:#666666;--t3:#999999;
+      --success:#0D7A3F;--success-bg:#E6F5ED;
+      --info:#0066CC;--info-bg:#E6F0FA;
+      --warning:#D97706;--warning-bg:#FEF3E2;
+      --radius:8px;--radius-sm:4px;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',-apple-system,sans-serif;background:var(--surface);color:var(--t1);min-height:100vh;display:flex;flex-direction:column}
+
+    /* Page Header */
+    .page-topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 32px;border-bottom:1px solid var(--border-light);flex-shrink:0}
+    .page-topbar-left{display:flex;flex-direction:column;gap:4px}
+    .page-topbar-title{font-size:18px;font-weight:700}
+    .page-topbar-meta{display:flex;align-items:center;gap:8px}
+    .page-topbar-fc{font-size:13px;color:var(--t2)}
+    .pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:10px;font-weight:600}
+    .pill-active{background:var(--success-bg);color:var(--success)}
+    .page-topbar-right{display:flex;align-items:center;gap:12px}
+    .btn-draft{padding:8px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);font-family:inherit;font-size:13px;font-weight:500;color:var(--t1);cursor:pointer}
+    .btn-draft:hover{background:var(--bg)}
+    .btn-close{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);cursor:pointer}
+    .btn-close:hover{background:var(--bg)}
+    .btn-close .material-icons-outlined{font-size:18px;color:var(--t2)}
+
+    /* Layout */
+    .layout{display:flex;flex:1;overflow:hidden}
+
+    /* Left Panel: Active Clients (Vertical Tabs) */
+    .client-panel{width:240px;min-width:240px;background:var(--surface);border-right:1px solid var(--border-light);padding:24px 0;overflow-y:auto}
+    .client-panel-title{font-size:13px;font-weight:600;padding:0 20px;margin-bottom:16px}
+    .client-tab{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;cursor:pointer;transition:background .15s;border-left:3px solid transparent}
+    .client-tab:hover{background:var(--bg)}
+    .client-tab.active{background:var(--bg);border-left-color:var(--t1)}
+    .client-tab-name{font-size:13px;font-weight:500}
+    .client-tab.active .client-tab-name{font-weight:600}
+    .client-tab-status{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+    .client-tab-status.live{background:var(--success);color:white}
+    .client-tab-status.live .material-icons-outlined{font-size:14px}
+    .client-tab-status.in-progress{background:var(--warning);color:white}
+    .client-tab-status.in-progress .material-icons-outlined{font-size:14px}
+
+    /* Right Panel: Content */
+    .config-panel{flex:1;overflow-y:auto;padding:24px 32px 100px}
+    .config-panel-title{font-size:16px;font-weight:600;margin-bottom:16px}
+
+    /* Horizontal Tabs */
+    .tab-bar{display:flex;gap:0;margin-bottom:20px}
+    .tab{padding:8px 16px;border:none;background:transparent;font-family:inherit;font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;border-radius:100px;transition:all .15s}
+    .tab:hover{background:var(--bg);color:var(--t1)}
+    .tab.active{background:var(--t1);color:white;font-weight:600}
+    .tab-panel{display:none}.tab-panel.active{display:block}
+
+    /* Accordion */
+    .accordion{background:var(--surface);border:1px solid var(--border-light);border-radius:var(--radius);margin-bottom:12px}
+    .accordion-header{display:flex;align-items:center;gap:10px;padding:16px 20px;cursor:pointer;transition:background .15s;user-select:none}
+    .accordion-header:hover{background:#FAFBFC}
+    .accordion-arrow{font-size:20px;color:var(--t3);transition:transform .2s}
+    .accordion.open .accordion-arrow{transform:rotate(180deg)}
+    .accordion-title{flex:1;font-size:14px;font-weight:600}
+    .accordion-status{font-size:10px;font-weight:600;padding:3px 8px;border-radius:100px}
+    .status-pending{background:var(--warning-bg);color:var(--warning)}
+    .status-completed{background:var(--success-bg);color:var(--success)}
+    .accordion-body{display:none;border-top:1px solid var(--border-light);overflow:visible}
+    .accordion.open .accordion-body{display:block}
+
+    /* Config rows */
+    .cfg-row{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border-light);position:relative}
+    .cfg-row:last-child{border-bottom:none}
+    .cfg-left{flex:1;min-width:0;padding-right:20px}
+    .cfg-name{font-size:13px;font-weight:600;display:block}
+    .cfg-desc{font-size:11px;color:var(--t3);display:block;margin-top:2px}
+    .cfg-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+    .cfg-select{height:36px;padding:0 32px 0 36px;min-width:200px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:12px;font-weight:500;color:var(--t1);background:var(--surface);appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%23999' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;cursor:pointer}
+    .cfg-select:focus{outline:none;border-color:var(--t1)}
+    .select-with-icon{position:relative}
+    .select-with-icon .material-icons-outlined{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--t3);pointer-events:none}
+
+    /* Footer */
+    .footer-bar{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:flex-end;padding:0 32px;gap:12px;z-index:50}
+    .btn-set-active{padding:10px 24px;border-radius:var(--radius-sm);border:none;font-family:inherit;font-size:13px;font-weight:600;color:var(--success);cursor:pointer;background:var(--success-bg);transition:all .15s}
+    .btn-set-active:hover{background:var(--success);color:white}
+
+    /* TDS Multi-select Dropdown (Days) */
+    .days-dropdown-wrap{position:relative;width:220px}
+    .days-trigger{display:flex;align-items:center;gap:6px;height:36px;padding:0 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);cursor:pointer;transition:border-color .15s}
+    .days-trigger:hover{border-color:var(--t3)}
+    .days-dropdown-wrap.open .days-trigger{border-color:var(--t1)}
+    .days-trigger-text{font-size:12px;color:var(--t3);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .days-trigger-text.has-value{color:var(--t1);font-weight:500}
+    .days-menu{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 4px 16px rgba(0,0,0,0.08);z-index:60;display:none;flex-direction:column;max-height:320px;overflow:visible}
+    .days-dropdown-wrap.open .days-menu{display:flex}
+    .days-option{display:flex;align-items:center;gap:8px;padding:9px 14px;font-size:12px;cursor:pointer;transition:background .1s}
+    .days-option:hover{background:var(--bg)}
+    .days-check{width:16px;height:16px;min-width:16px;border:1.5px solid var(--border);border-radius:3px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+    .days-option.selected .days-check{background:var(--t1);border-color:var(--t1)}
+    .days-option.selected .days-check::after{content:'';width:8px;height:5px;border-left:2px solid white;border-bottom:2px solid white;transform:rotate(-45deg);margin-top:-2px}
+    .days-menu-footer{padding:10px 14px;border-top:1px solid var(--border-light);display:flex;justify-content:flex-end}
+    .days-apply-btn{padding:6px 16px;border-radius:var(--radius-sm);border:none;background:var(--t1);font-family:inherit;font-size:11px;font-weight:600;color:white;cursor:pointer}
+    .days-apply-btn:hover{background:#333}
+    .days-apply-btn:disabled{background:var(--border);color:var(--t3);cursor:not-allowed}
+
+    /* TDS Table Column Component */
+    .tds-table{width:100%;border-collapse:collapse;margin-top:0}
+    .tds-table thead{background:#F7F8FA}
+    .tds-table th{padding:10px 16px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;text-transform:uppercase;letter-spacing:0.3px;border-bottom:1px solid var(--border)}
+    .tds-table td{padding:12px 16px;font-size:13px;border-bottom:1px solid var(--border-light);vertical-align:top}
+    .tds-table tbody tr:last-child td{border-bottom:none}
+    .tds-table tbody tr:hover{background:#FAFBFC}
+    .tds-table .link{color:var(--info);font-weight:500;cursor:pointer;text-decoration:none}
+    .tds-table .link:hover{text-decoration:underline}
+    .tds-table .actions{display:flex;align-items:center;gap:8px}
+    .tds-table .td-sub{font-size:11px;color:var(--t3);margin-top:2px}
+    .btn-table{padding:5px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);font-family:inherit;font-size:11px;font-weight:500;color:var(--t1);cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:all .15s}
+    .btn-table:hover{border-color:var(--t1)}
+    .btn-table-danger{border-color:var(--border);color:var(--t2)}
+    .btn-table-danger:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
+    .btn-table-danger .material-icons-outlined{font-size:13px}
+
+    /* Table Title Bar */
+    .table-title-bar{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;background:#F7F8FA;color:var(--t1);font-size:12px;font-weight:600;border-bottom:1px solid var(--border)}
+    .table-title-bar .material-icons-outlined{font-size:15px;cursor:pointer;color:var(--t2)}
+    .table-title-bar .material-icons-outlined:hover{color:var(--t1)}
+
+    /* Pickwave Complex Table */
+    .pw-table{width:100%;border-collapse:collapse}
+    .pw-table th,.pw-table td{padding:10px 12px;font-size:11px;text-align:center;border-bottom:1px solid var(--border-light);vertical-align:middle}
+    .pw-table thead th{font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:0.3px;background:#F7F8FA}
+    .pw-table .group-header{background:#F7F8FA;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:var(--t1);border-bottom:1px solid var(--border)}
+    .pw-table .col-divider{border-left:1px solid var(--border)}
+    .pw-table tbody td{font-size:12px;color:var(--t1)}
+    .pw-table tbody tr:last-child td{border-bottom:none}
+    .pw-table tbody tr:hover{background:#FAFBFC}
+    .pw-table .td-sub{font-size:10px;color:var(--t3);margin-top:2px}
+
+    /* TDS Input Field */
+    .tds-input{width:100%;height:36px;padding:0 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;color:var(--t1);background:var(--surface);transition:border-color .15s}
+    .tds-input:focus{outline:none;border-color:var(--t1);box-shadow:0 0 0 2px rgba(26,26,26,0.06)}
+    .tds-input::placeholder{color:var(--t3)}
+
+    /* Param Tags */
+    .param-tag{display:inline-block;padding:2px 8px;margin:2px 3px;border-radius:var(--radius-sm);background:#E8F5E9;color:#2E7D32;font-size:10px;font-weight:500}
+
+    /* Icon Button Small */
+    .icon-btn-sm{width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);cursor:pointer;transition:all .15s;color:var(--t2)}
+    .icon-btn-sm:hover{border-color:var(--t1);color:var(--t1)}
+    .icon-btn-sm .material-icons-outlined{font-size:16px}
+
+    /* Drawer Tabs */
+    .drawer-tabs{display:flex;border-bottom:2px solid var(--border-light);padding:0 24px}
+    .drawer-tab{padding:10px 16px;border:none;background:none;font-family:inherit;font-size:13px;font-weight:500;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}
+    .drawer-tab:hover{color:var(--t1)}
+    .drawer-tab.active{color:var(--t1);font-weight:600;border-bottom-color:var(--t1)}
+    .drawer-tab-panel{display:none;padding:20px 24px}
+    .drawer-tab-panel.active{display:block}
+
+    /* Pod Drawer Multi-select */
+    .pod-field{margin-bottom:20px}
+    .pod-label{font-size:12px;font-weight:500;color:var(--t1);margin-bottom:6px;display:block}
+    .pod-label .req{color:var(--primary)}
+    .pod-multiselect{position:relative}
+    .pod-trigger{display:flex;align-items:center;flex-wrap:wrap;gap:4px;min-height:38px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:border-color .15s}
+    .pod-trigger:hover{border-color:var(--t3)}
+    .pod-multiselect.open .pod-trigger{border-color:var(--t1)}
+    .pod-tag{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);font-size:11px;font-weight:500}
+    .pod-tag-more{font-size:10px;font-weight:600;color:var(--t2);padding:2px 6px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg)}
+    .pod-chevron{margin-left:auto;font-size:16px;color:var(--t3)}
+    .pod-menu{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 4px 16px rgba(0,0,0,0.08);z-index:70;display:none;max-height:200px;overflow-y:auto}
+    .pod-multiselect.open .pod-menu{display:block}
+    .pod-menu-search{display:flex;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid var(--border-light)}
+    .pod-menu-search .material-icons-outlined{font-size:14px;color:var(--t3)}
+    .pod-menu-search input{border:none;outline:none;font-family:inherit;font-size:12px;width:100%;background:transparent}
+    .pod-menu-search input::placeholder{color:var(--t3)}
+    .pod-opt{display:flex;align-items:center;gap:8px;padding:8px 12px;font-size:12px;cursor:pointer;transition:background .1s}
+    .pod-opt:hover{background:var(--bg)}
+    .pod-opt-check{width:15px;height:15px;min-width:15px;border:1.5px solid var(--border);border-radius:3px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+    .pod-opt.selected .pod-opt-check{background:var(--t1);border-color:var(--t1)}
+    .pod-opt.selected .pod-opt-check::after{content:'';width:7px;height:4px;border-left:1.5px solid white;border-bottom:1.5px solid white;transform:rotate(-45deg);margin-top:-1px}
+
+    /* Block conditions accordion in drawer */
+    .block-acc{border:1px solid var(--border-light);border-radius:var(--radius);margin-bottom:10px;overflow:visible}
+    .block-acc-header{display:flex;align-items:center;padding:12px 14px;cursor:pointer;transition:background .1s}
+    .block-acc-header:hover{background:#FAFBFC}
+    .block-acc-title{flex:1;font-size:13px;font-weight:600}
+    .block-acc-status{font-size:10px;font-weight:600;padding:2px 7px;border-radius:100px;background:var(--success-bg);color:var(--success)}
+    .block-acc-arrow{font-size:18px;color:var(--t3);transition:transform .2s;margin-left:6px}
+    .block-acc.open .block-acc-arrow{transform:rotate(180deg)}
+    .block-acc-body{display:none;padding:12px 14px;border-top:1px solid var(--border-light)}
+    .block-acc.open .block-acc-body{display:block}
+    .block-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .block-row:last-child{margin-bottom:0}
+    .block-label{font-size:12px;font-weight:500}
+
+    /* TDS Yes/No Toggle (consistent) */
+    .yn-toggle{display:flex;align-items:center;gap:0;border-radius:6px;overflow:hidden;border:1px solid var(--border)}
+    .yn{padding:6px 16px;font-family:inherit;font-size:12px;font-weight:500;border:none;cursor:pointer;background:var(--surface);color:var(--t3);transition:all .15s}
+    .yn:first-child{border-right:1px solid var(--border)}
+    .yn.yes-active{background:var(--success-bg);color:var(--success);font-weight:600}
+    .yn.no-active{background:#FEE2E2;color:#DC2626;font-weight:600}
+
+    /* Pickwave Drawer specifics */
+    .pw-radio-group{display:flex;align-items:center;gap:24px;margin-bottom:20px}
+    .pw-radio{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--t1)}
+    .pw-radio input[type="radio"]{appearance:none;-webkit-appearance:none;width:18px;height:18px;border:2px solid var(--border);border-radius:50%;position:relative;cursor:pointer;transition:all .15s}
+    .pw-radio input[type="radio"]:checked{border-color:var(--t1)}
+    .pw-radio input[type="radio"]:checked::after{content:'';position:absolute;top:3px;left:3px;width:8px;height:8px;border-radius:50%;background:var(--t1)}
+    .pw-radio input[type="radio"]:hover{border-color:var(--t3)}
+    .pw-field{margin-bottom:16px}
+    .pw-field-label{font-size:12px;font-weight:500;color:var(--t1);margin-bottom:6px;display:block}
+    .pw-field-label .req{color:var(--primary)}
+    .pw-field-row{display:flex;gap:12px}
+    .pw-field-col{flex:1;display:flex;flex-direction:column;gap:4px}
+    .pw-field-col label{font-size:11px;font-weight:500;color:var(--t2)}
+    .pw-divider{border:none;border-top:1px solid var(--border-light);margin:20px 0}
+    .pw-type-badge{display:inline-block;padding:2px 8px;border-radius:var(--radius-sm);font-size:11px;font-weight:600}
+    .pw-type-badge.simple{background:var(--info-bg);color:var(--info)}
+    .pw-type-badge.complex{background:var(--warning-bg);color:var(--warning)}
+    .pw-type-badge.bulk{background:var(--primary-light);color:var(--primary)}
+    .pw-note{font-size:11px;color:var(--primary);margin-top:8px}
+    .time-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border:1px solid var(--border);border-radius:100px;font-size:11px;font-weight:500;margin:4px 4px 4px 0}
+    .time-chip .material-icons-outlined{font-size:13px;color:var(--t3)}
+
+    /* Empty state for tabs */
+    .tab-empty{padding:40px;text-align:center;color:var(--t3);font-size:13px}
+
+    /* Side Drawer */
+    .drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;display:none;justify-content:flex-end}
+    .drawer-overlay.open{display:flex}
+    .drawer{width:360px;max-width:90vw;background:var(--surface);height:100%;display:flex;flex-direction:column;box-shadow:-4px 0 24px rgba(0,0,0,0.1);animation:slideIn .2s ease}
+    @keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+    .drawer-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border-light)}
+    .drawer-title{font-size:16px;font-weight:600}
+    .drawer-close{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;border-radius:var(--radius-sm);color:var(--t2)}
+    .drawer-close:hover{background:var(--bg)}
+    .drawer-body{flex:1;overflow-y:auto;padding:16px 24px}
+    .drawer-search{display:flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:16px}
+    .drawer-search .material-icons-outlined{font-size:16px;color:var(--t3)}
+    .drawer-search input{border:none;outline:none;background:transparent;font-family:inherit;font-size:12px;width:100%;color:var(--t1)}
+    .drawer-search input::placeholder{color:var(--t3)}
+    .drawer-table-header{padding:8px 0;font-size:11px;font-weight:600;color:var(--t2);border-bottom:1px solid var(--border-light);margin-bottom:8px}
+    .drawer-option{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--border-light);cursor:pointer}
+    .drawer-option:last-child{border-bottom:none}
+    .drawer-option:hover{background:var(--bg);margin:0 -24px;padding:12px 24px}
+    .drawer-checkbox{width:18px;height:18px;min-width:18px;border:1.5px solid var(--border);border-radius:3px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+    .drawer-option.selected .drawer-checkbox{background:var(--t1);border-color:var(--t1)}
+    .drawer-option.selected .drawer-checkbox::after{content:'';width:9px;height:5px;border-left:2px solid white;border-bottom:2px solid white;transform:rotate(-45deg);margin-top:-2px}
+    .drawer-opt-text{font-size:13px;color:var(--t1)}
+    .drawer-footer{padding:16px 24px;border-top:1px solid var(--border-light);display:flex;justify-content:flex-end;gap:10px}
+    .btn-cancel{padding:8px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);font-family:inherit;font-size:12px;font-weight:500;color:var(--t1);cursor:pointer}
+    .btn-cancel:hover{background:var(--bg)}
+    .btn-save{padding:8px 18px;border-radius:var(--radius-sm);border:none;background:var(--t1);font-family:inherit;font-size:12px;font-weight:600;color:white;cursor:pointer}
+    .btn-save:hover{background:#333}
+    .btn-save:disabled{background:var(--border);color:var(--t3);cursor:not-allowed}
+    /* TDS Snackbar */
+    .snackbar{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--success);color:white;padding:12px 24px;border-radius:var(--radius);font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,0.2);z-index:500;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;transform:translateX(-50%) translateY(-10px)}
+    .snackbar.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+    .snackbar .material-icons-outlined{font-size:18px}
+
+    /* TDS Confirmation Modal */
+    .confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:none;align-items:center;justify-content:center;z-index:300}
+    .confirm-overlay.open{display:flex}
+    .confirm-modal{background:var(--surface);border-radius:var(--radius);padding:24px 28px;width:380px;max-width:90vw;box-shadow:0 8px 32px rgba(0,0,0,0.12);text-align:center}
+    .confirm-modal-title{font-size:15px;font-weight:600;margin-bottom:8px}
+    .confirm-modal-desc{font-size:13px;color:var(--t2);margin-bottom:20px}
+    .confirm-modal-actions{display:flex;justify-content:center;gap:12px}
+    .btn-confirm-cancel{padding:8px 20px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);font-family:inherit;font-size:12px;font-weight:500;color:var(--t1);cursor:pointer}
+    .btn-confirm-cancel:hover{background:var(--bg)}
+    .btn-confirm-yes{padding:8px 20px;border-radius:var(--radius-sm);border:none;background:var(--primary);font-family:inherit;font-size:12px;font-weight:600;color:white;cursor:pointer}
+    .btn-confirm-yes:hover{background:var(--primary-dark)}
+  </style>
+</head>
+<body>
+
+  <!-- Page Header -->
+  <header class="page-topbar">
+    <div class="page-topbar-left">
+      <h1 class="page-topbar-title">FC configuration</h1>
+      <div class="page-topbar-meta">
+        <span class="page-topbar-fc">Delhi North FC</span>
+        <span class="pill pill-active">Active</span>
+      </div>
+    </div>
+    <div class="page-topbar-right">
+      <button class="btn-draft" onclick="showDraftSnackbar()">Save as draft</button>
+      <button class="btn-close" onclick="showExitConfirm()"><span class="material-icons-outlined">close</span></button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- Left: Active Clients (Vertical Tabs) -->
+    <aside class="client-panel">
+      <div class="client-panel-title">Active clients</div>
+      <div class="client-tab active" onclick="selectClient(this, 'Mamaearth Ltd')">
+        <span class="client-tab-name">Mamaearth Ltd</span>
+        <span class="client-tab-status in-progress"><span class="material-icons-outlined">hourglass_top</span></span>
+      </div>
+      <div class="client-tab" onclick="selectClient(this, 'VIP Bags India Ltd')">
+        <span class="client-tab-name">VIP Bags India Ltd</span>
+        <span class="client-tab-status live"><span class="material-icons-outlined">check</span></span>
+      </div>
+      <div class="client-tab" onclick="selectClient(this, 'Zudio Retail Pvt Ltd')">
+        <span class="client-tab-name">Zudio Retail Pvt Ltd</span>
+        <span class="client-tab-status live"><span class="material-icons-outlined">check</span></span>
+      </div>
+      <div class="client-tab" onclick="selectClient(this, 'Nykaa E-Retail Ltd')">
+        <span class="client-tab-name">Nykaa E-Retail Ltd</span>
+        <span class="client-tab-status live"><span class="material-icons-outlined">check</span></span>
+      </div>
+    </aside>
+
+    <!-- Right: Config Content -->
+    <main class="config-panel">
+      <div class="config-panel-title" id="clientTitle">Mamaearth Ltd</div>
+
+      <!-- Horizontal Tabs -->
+      <div class="tab-bar">
+        <button class="tab active" data-panel="fc-tab-ops">Operational configs</button>
+        <button class="tab" data-panel="fc-tab-zones">Zone details</button>
+        <button class="tab" data-panel="fc-tab-inbound">Inbound</button>
+        <button class="tab" data-panel="fc-tab-outbound">Outbound</button>
+        <button class="tab" data-panel="fc-tab-inventory">Inventory</button>
+        <button class="tab" data-panel="fc-tab-dispatch">Dispatch</button>
+      </div>
+
+      <!-- ===== Operational Configs Tab ===== -->
+      <div class="tab-panel active" id="fc-tab-ops">
+        <div class="accordion open" id="acc-fc-ops">
+          <div class="accordion-header" onclick="toggleAcc(this)">
+            <span class="accordion-title">FC operations</span>
+            <span class="accordion-status status-pending" id="status-fc-ops">Pending</span>
+            <span class="material-icons-outlined accordion-arrow">expand_more</span>
+          </div>
+          <div class="accordion-body">
+            <!-- FC Working Days with multi-select dropdown -->
+            <div class="cfg-row" style="flex-direction:column;align-items:stretch;gap:12px">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div class="cfg-left"><span class="cfg-name">FC working days</span><span class="cfg-desc">The days this FC operates. Non-working days are excluded from SBD calculations.</span></div>
+                <div class="cfg-right">
+                  <div class="days-dropdown-wrap" id="daysDropdownWrap">
+                    <div class="days-trigger" onclick="toggleDaysDropdown()">
+                      <span class="material-icons-outlined" style="font-size:16px;color:var(--t3)">search</span>
+                      <span class="days-trigger-text" id="daysTriggerText">Select days</span>
+                      <span class="material-icons-outlined" style="font-size:16px;color:var(--t3);margin-left:auto">expand_more</span>
+                    </div>
+                    <div class="days-menu" id="daysMenu">
+                      <div class="days-option" data-value="Monday" onclick="toggleDayCheck(this)"><div class="days-check"></div><span>Monday</span></div>
+                      <div class="days-option" data-value="Tuesday" onclick="toggleDayCheck(this)"><div class="days-check"></div><span>Tuesday</span></div>
+                      <div class="days-option" data-value="Wednesday" onclick="toggleDayCheck(this)"><div class="days-check"></div><span>Wednesday</span></div>
+                      <div class="days-option" data-value="Thursday" onclick="toggleDayCheck(this)"><div class="days-check"></div><span>Thursday</span></div>
+                      <div class="days-option" data-value="Friday" onclick="toggleDayCheck(this)"><div class="days-check"></div><span>Friday</span></div>
+                      <div class="days-option" data-value="Saturday" onclick="toggleDayCheck(this)"><div class="days-check"></div><span>Saturday</span></div>
+                      <div class="days-option" data-value="Sunday" onclick="toggleDayCheck(this)"><div class="days-check"></div><span>Sunday</span></div>
+                      <div class="days-menu-footer">
+                        <button class="days-apply-btn" id="daysApplyBtn" disabled onclick="applyDays()">Apply</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div id="selectedDaysList" style="display:none;padding:8px 12px;background:#F9FAFB;border-radius:4px;font-size:12px;color:var(--t2)">
+                <strong style="font-size:11px;color:var(--t1)">Selected days:</strong>
+                <ul id="selectedDaysItems" style="margin:4px 0 0 16px;list-style:disc"></ul>
+              </div>
+            </div>
+
+            <!-- FC Start Time -->
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">FC Start Time</span><span class="cfg-desc">When operations begin at this FC.</span></div>
+              <div class="cfg-right">
+                <div class="select-with-icon">
+                  <span class="material-icons-outlined">schedule</span>
+                  <select class="cfg-select" onchange="checkFcOpsComplete()">
+                    <option value="">Search</option>
+                    <option>5:00 am</option>
+                    <option>6:00 am</option>
+                    <option>7:00 am</option>
+                    <option>8:00 am</option>
+                    <option>9:00 am</option>
+                    <option>10:00 am</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- FC End Time -->
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">FC End Time</span><span class="cfg-desc">When operations end at this FC.</span></div>
+              <div class="cfg-right">
+                <div class="select-with-icon">
+                  <span class="material-icons-outlined">schedule</span>
+                  <select class="cfg-select" onchange="checkFcOpsComplete()">
+                    <option value="">Search</option>
+                    <option>5:00 pm</option>
+                    <option>6:00 pm</option>
+                    <option>7:00 pm</option>
+                    <option>8:00 pm</option>
+                    <option>9:00 pm</option>
+                    <option>10:00 pm</option>
+                    <option>11:00 pm</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Zone Details Tab ===== -->
+      <div class="tab-panel" id="fc-tab-zones">
+
+        <!-- Stocked Area -->
+        <div class="accordion open">
+          <div class="accordion-header" onclick="toggleAcc(this)">
+            <span class="accordion-title">Stocked area</span>
+            <span class="accordion-status status-pending">Pending</span>
+            <span class="material-icons-outlined accordion-arrow">expand_more</span>
+          </div>
+          <div class="accordion-body" style="padding:0">
+            <table class="tds-table">
+              <thead><tr><th>Zone name</th><th>No. of locations</th><th>Actions</th></tr></thead>
+              <tbody>
+                <tr><td>Rejected</td><td><a class="link">147</a></td><td><div class="actions"><button class="btn-table">Download</button><button class="btn-table btn-table-danger">Delete zone <span class="material-icons-outlined">info</span></button></div></td></tr>
+                <tr><td>Pallets Rack</td><td><a class="link">288</a></td><td><div class="actions"><button class="btn-table">Download</button><button class="btn-table btn-table-danger">Delete zone <span class="material-icons-outlined">info</span></button></div></td></tr>
+                <tr><td>CG-Cage</td><td><a class="link">60</a></td><td><div class="actions"><button class="btn-table">Download</button><button class="btn-table btn-table-danger">Delete zone <span class="material-icons-outlined">info</span></button></div></td></tr>
+                <tr><td>Temp</td><td><a class="link">12</a></td><td><div class="actions"><button class="btn-table">Download</button><button class="btn-table btn-table-danger">Delete zone <span class="material-icons-outlined">info</span></button></div></td></tr>
+                <tr><td>Zone - 1</td><td><a class="link">390</a></td><td><div class="actions"><button class="btn-table">Download</button><button class="btn-table btn-table-danger">Delete zone <span class="material-icons-outlined">info</span></button></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Drop Zone -->
+        <div class="accordion open">
+          <div class="accordion-header" onclick="toggleAcc(this)">
+            <span class="accordion-title">Drop zone</span>
+            <span class="accordion-status status-pending">Pending</span>
+            <span class="material-icons-outlined accordion-arrow">expand_more</span>
+          </div>
+          <div class="accordion-body">
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">Zone name</span><span class="cfg-desc">Mention the name of the zone</span></div>
+              <div class="cfg-right"><input type="text" class="tds-input" style="width:220px" placeholder="Add & press enter"></div>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">No. of Drop locations</span><span class="cfg-desc">Mention the number of drop locations</span></div>
+              <div class="cfg-right"><input type="text" class="tds-input" style="width:220px" placeholder="Add & press enter"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Staging Zone -->
+        <div class="accordion open">
+          <div class="accordion-header" onclick="toggleAcc(this)">
+            <span class="accordion-title">Staging zone</span>
+            <span class="accordion-status status-pending">Pending</span>
+            <span class="material-icons-outlined accordion-arrow">expand_more</span>
+          </div>
+          <div class="accordion-body" style="padding:0">
+            <table class="tds-table">
+              <thead><tr><th>Zone name</th><th>No. of locations</th><th>Actions</th></tr></thead>
+              <tbody>
+                <tr><td>Rejected</td><td><a class="link">147</a></td><td><div class="actions"><button class="btn-table">Download</button><button class="btn-table btn-table-danger">Delete zone <span class="material-icons-outlined">info</span></button></div></td></tr>
+                <tr><td>Pallets Rack</td><td><a class="link">288</a></td><td><div class="actions"><button class="btn-table">Download</button><button class="btn-table btn-table-danger">Delete zone <span class="material-icons-outlined">info</span></button></div></td></tr>
+                <tr><td>CG-Cage</td><td><a class="link">60</a></td><td><div class="actions"><button class="btn-table">Download</button><button class="btn-table btn-table-danger">Delete zone <span class="material-icons-outlined">info</span></button></div></td></tr>
+                <tr><td>Temp</td><td><a class="link">12</a></td><td><div class="actions"><button class="btn-table">Download</button><button class="btn-table btn-table-danger">Delete zone <span class="material-icons-outlined">info</span></button></div></td></tr>
+                <tr><td>Zone - 1</td><td><a class="link">390</a></td><td><div class="actions"><button class="btn-table">Download</button><button class="btn-table btn-table-danger">Delete zone <span class="material-icons-outlined">info</span></button></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Shelf Life Check -->
+        <div class="accordion open">
+          <div class="accordion-header" onclick="toggleAcc(this)">
+            <span class="accordion-title">Shelf life check</span>
+            <span class="accordion-status status-pending">Pending</span>
+            <span class="material-icons-outlined accordion-arrow">expand_more</span>
+          </div>
+          <div class="accordion-body">
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">Shelf life check on transfer</span><span class="cfg-desc">Check shelf life before moving inventory to Prime zone.</span></div>
+              <div class="cfg-right"><div class="yn-toggle"><button class="yn">Yes</button><button class="yn">No</button></div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ===== Inbound Tab ===== -->
+      <div class="tab-panel" id="fc-tab-inbound">
+        <div class="accordion open">
+          <div class="accordion-header" onclick="toggleAcc(this)">
+            <span class="accordion-title">POD Validation</span>
+            <span class="accordion-status status-completed">Completed</span>
+            <span class="material-icons-outlined accordion-arrow">expand_more</span>
+          </div>
+          <div class="accordion-body" style="padding:0">
+            <table class="tds-table">
+              <thead><tr><th>Document type</th><th>Mandatory parameters</th><th>Block missing</th><th>Block on cut</th><th>Actions</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>LR document</td>
+                  <td><span class="param-tag">Transporter</span><span class="param-tag">LR number</span><span class="param-tag">Vehicle number</span><span class="param-tag">Stamp</span></td>
+                  <td>Yes</td><td>Yes</td>
+                  <td><button class="icon-btn-sm" onclick="openPodDrawer()"><span class="material-icons-outlined">edit</span></button></td>
+                </tr>
+                <tr>
+                  <td>Invoice document</td>
+                  <td><span class="param-tag">SKU</span><span class="param-tag">Invoice number</span><span class="param-tag">Vehicle number</span><span class="param-tag">Stamp</span></td>
+                  <td>Yes</td><td>Yes</td>
+                  <td><button class="icon-btn-sm" onclick="openPodDrawer()"><span class="material-icons-outlined">edit</span></button></td>
+                </tr>
+                <tr>
+                  <td>Waybill document</td>
+                  <td><span class="param-tag">Vehicle number</span><span class="param-tag">Stamp</span></td>
+                  <td>Yes</td><td>Yes</td>
+                  <td><button class="icon-btn-sm" onclick="openPodDrawer()"><span class="material-icons-outlined">edit</span></button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Outbound Tab ===== -->
+      <div class="tab-panel" id="fc-tab-outbound">
+
+        <!-- Picking -->
+        <div class="accordion open">
+          <div class="accordion-header" onclick="toggleAcc(this)">
+            <span class="accordion-title">Picking</span>
+            <span class="accordion-status status-pending">Pending</span>
+            <span class="material-icons-outlined accordion-arrow">expand_more</span>
+          </div>
+          <div class="accordion-body">
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">Case-Only Picking</span><span class="cfg-desc">When enabled, the system allocates only full case quantities for this client.</span></div>
+              <div class="cfg-right"><div class="yn-toggle"><button class="yn">Yes</button><button class="yn">No</button></div></div>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">Parallel Pick & Pack</span><span class="cfg-desc">When enabled, packing can start while picking is still in progress.</span></div>
+              <div class="cfg-right"><div class="yn-toggle"><button class="yn">Yes</button><button class="yn">No</button></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pickwave Automation -->
+        <div class="accordion open">
+          <div class="accordion-header" onclick="toggleAcc(this)">
+            <span class="accordion-title">Pickwave automation</span>
+            <span class="accordion-status status-pending">Pending</span>
+            <button class="icon-btn-sm" style="margin-left:8px" onclick="event.stopPropagation(); openPwDrawer()"><span class="material-icons-outlined">edit</span></button>
+            <span class="material-icons-outlined accordion-arrow">expand_more</span>
+          </div>
+          <div class="accordion-body" style="padding:0">
+            <table class="pw-table">
+              <thead>
+                <tr>
+                  <th colspan="5" class="group-header" style="border-bottom:1px solid var(--border)">Order Complexity</th>
+                  <th class="col-divider" rowspan="2" style="width:100px">Channel</th>
+                  <th rowspan="2" style="width:90px">Priority</th>
+                  <th rowspan="2" style="width:120px">Pickwave Schedule</th>
+                </tr>
+                <tr>
+                  <th style="width:110px">Complexity type</th>
+                  <th style="width:110px">Order Qty (MAX)</th>
+                  <th style="width:80px">Qty/ Picklist</th>
+                  <th style="width:100px">Location/ Picklist</th>
+                  <th style="width:120px">Additional config</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Simple</td>
+                  <td>SKU: 1<br><span class="td-sub">Qty: 8</span></td>
+                  <td>1</td>
+                  <td>6</td>
+                  <td>N/A</td>
+                  <td class="col-divider" rowspan="3" style="vertical-align:middle">Disabled</td>
+                  <td rowspan="3" style="vertical-align:middle">Disabled</td>
+                  <td rowspan="3" style="vertical-align:middle">10:20, 12:20,<br><span class="td-sub">15:20, 17:20</span></td>
+                </tr>
+                <tr>
+                  <td>Complex</td>
+                  <td>SKU: 1+<br><span class="td-sub">QTY: 6</span></td>
+                  <td>1</td>
+                  <td>6</td>
+                  <td>Pick by Zone:<br><span class="td-sub">Disabled</span></td>
+                </tr>
+                <tr>
+                  <td>Bulk</td>
+                  <td>N/A</td>
+                  <td>1000</td>
+                  <td>N/A</td>
+                  <td>Consolidated:<br><span class="td-sub">Disabled</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Combo -->
+        <div class="accordion">
+          <div class="accordion-header" onclick="toggleAcc(this)">
+            <span class="accordion-title">Combo</span>
+            <span class="accordion-status status-pending">Pending</span>
+            <span class="material-icons-outlined accordion-arrow">expand_more</span>
+          </div>
+          <div class="accordion-body">
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">Combo Products</span><span class="cfg-desc">When enabled, combo/kit product handling is activated for this client at this FC.</span></div>
+              <div class="cfg-right"><div class="yn-toggle"><button class="yn">Yes</button><button class="yn">No</button></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Appointments -->
+        <div class="accordion">
+          <div class="accordion-header" onclick="toggleAcc(this)">
+            <span class="accordion-title">Appointments</span>
+            <span class="accordion-status status-pending">Pending</span>
+            <span class="material-icons-outlined accordion-arrow">expand_more</span>
+          </div>
+          <div class="accordion-body">
+            <!-- Default mail settings -->
+            <div style="padding:14px 20px">
+              <span class="cfg-name">Default mail settings</span>
+              <span class="cfg-desc" style="display:block;margin-top:2px">Setup client mail and SPOC mail</span>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">Default client mail</span><span class="cfg-desc">Add default client email id/s</span></div>
+              <div class="cfg-right" style="flex-direction:column;align-items:flex-end;gap:4px">
+                <input type="text" class="tds-input" style="width:260px" placeholder="Add & press enter">
+                <span style="font-size:10px;color:var(--t3)">Multiple email ids to be comma separated</span>
+              </div>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">Default SPOC mail</span><span class="cfg-desc">Add default mail for a single point of contact</span></div>
+              <div class="cfg-right" style="flex-direction:column;align-items:flex-end;gap:4px">
+                <input type="text" class="tds-input" style="width:260px" placeholder="Add & press enter">
+                <span style="font-size:10px;color:var(--t3)">Multiple email ids to be comma separated</span>
+              </div>
+            </div>
+
+            <!-- Cron timings -->
+            <div style="padding:14px 20px;border-top:1px solid var(--border-light);margin-top:8px">
+              <span class="cfg-name">Cron timings</span>
+              <span class="cfg-desc" style="display:block;margin-top:2px">Setup to 2 daily run times. At least 1 is required.</span>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">Run time 1</span><span class="cfg-desc">Set up cron run time</span></div>
+              <div class="cfg-right" style="flex-direction:column;align-items:flex-end;gap:4px">
+                <span style="font-size:11px;font-weight:500;color:var(--t1)">Set up time <span style="color:var(--primary)">*</span></span>
+                <div class="select-with-icon" style="position:relative">
+                  <span class="material-icons-outlined">schedule</span>
+                  <select class="cfg-select" style="min-width:180px">
+                    <option value="">Title here</option>
+                    <option>06:00 am</option>
+                    <option>08:00 am</option>
+                    <option selected>10:00 am</option>
+                    <option>12:00 pm</option>
+                    <option>02:00 pm</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">Run time 2</span><span class="cfg-desc">Set up cron run time</span></div>
+              <div class="cfg-right" style="flex-direction:column;align-items:flex-end;gap:4px">
+                <span style="font-size:11px;font-weight:500;color:var(--t1)">Set up time</span>
+                <div class="select-with-icon" style="position:relative">
+                  <span class="material-icons-outlined">schedule</span>
+                  <select class="cfg-select" style="min-width:180px">
+                    <option value="">Title here</option>
+                    <option>06:00 am</option>
+                    <option>08:00 am</option>
+                    <option>10:00 am</option>
+                    <option>12:00 pm</option>
+                    <option>02:00 pm</option>
+                    <option>04:00 pm</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Consignees -->
+            <div style="padding:14px 20px;border-top:1px solid var(--border-light);margin-top:8px">
+              <span class="cfg-name">Consignees</span>
+              <span class="cfg-desc" style="display:block;margin-top:2px">Add consignees one by one. Same consignee can appear across multiple FCs</span>
+            </div>
+            <div style="padding:14px 20px">
+              <!-- Consignee row -->
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px" id="consigneeRows">
+                <div style="flex:1">
+                  <span style="font-size:11px;font-weight:500;color:var(--t1)">Consignee name <span style="color:var(--primary)">*</span></span>
+                  <input type="text" class="tds-input" style="margin-top:4px" placeholder="Add & press enter" id="consigneeName" oninput="checkConsigneeInputs()">
+                </div>
+                <div style="flex:1">
+                  <span style="font-size:11px;font-weight:500;color:var(--t1)">Client email ID <span style="color:var(--primary)">*</span></span>
+                  <input type="text" class="tds-input" style="margin-top:4px" placeholder="Add & press enter" id="consigneeEmail" oninput="checkConsigneeInputs()">
+                </div>
+                <button class="btn-table" id="btnSaveConsignee" disabled style="margin-top:18px;height:36px;padding:0 18px;font-size:12px;font-weight:600;background:var(--border);color:var(--t3);border-color:var(--border);cursor:not-allowed" onclick="saveConsignee()">Save</button>
+                <button class="btn-table" style="margin-top:18px;height:36px;padding:0 10px;color:var(--t3);border-color:var(--border)" onclick=""><span class="material-icons-outlined" style="font-size:16px">delete</span></button>
+              </div>
+              <!-- Saved consignees list -->
+              <div id="savedConsignees"></div>
+              <!-- Add new button -->
+              <button class="btn-table" style="margin-top:8px;padding:8px 16px;font-size:12px;font-weight:500;border:1px solid var(--border);color:var(--t1)" onclick="addConsigneeRow()">
+                Add new <span style="font-weight:700;font-size:14px;margin-left:2px">+</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ===== Inventory Tab ===== -->
+      <div class="tab-panel" id="fc-tab-inventory">
+
+        <!-- Transfer & Replenishment -->
+        <div class="accordion open">
+          <div class="accordion-header" onclick="toggleAcc(this)">
+            <span class="accordion-title">Transfer & Replenishment</span>
+            <span class="accordion-status status-pending">Pending</span>
+            <span class="material-icons-outlined accordion-arrow">expand_more</span>
+          </div>
+          <div class="accordion-body">
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">Shelf-Life Check</span><span class="cfg-desc">When enabled, the system checks shelf life before moving items from Reserve to Prime.</span></div>
+              <div class="cfg-right"><div class="yn-toggle"><button class="yn">Yes</button><button class="yn">No</button></div></div>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">Each-Level Replenishment</span><span class="cfg-desc">When enabled, transfer tasks are created at unit level instead of case level.</span></div>
+              <div class="cfg-right"><div class="yn-toggle"><button class="yn yes-active" onclick="ynClickFc(this,'yes','replenishType')">Yes</button><button class="yn" onclick="ynClickFc(this,'no','replenishType')">No</button></div></div>
+            </div>
+            <div class="cfg-row sub-row" id="replenishType" style="border-left:3px solid var(--info);padding-left:36px;background:#FAFBFC">
+              <div class="cfg-left"></div>
+              <div class="cfg-right">
+                <select class="cfg-select" style="min-width:200px">
+                  <option value="">Select</option>
+                  <option title="Merge scattered stock into fewer locations">Consolidation</option>
+                  <option title="Move exact units from Reserve to Pick zone">Replenishment</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cycle Count -->
+        <div class="accordion">
+          <div class="accordion-header" onclick="toggleAcc(this)">
+            <span class="accordion-title">Cycle count</span>
+            <span class="accordion-status status-pending">Pending</span>
+            <span class="material-icons-outlined accordion-arrow">expand_more</span>
+          </div>
+          <div class="accordion-body">
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">Supervisory Approval</span><span class="cfg-desc">When enabled, discrepancies above threshold need supervisor sign-off.</span></div>
+              <div class="cfg-right"><div class="yn-toggle"><button class="yn">Yes</button><button class="yn">No</button></div></div>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">Shortage Threshold</span><span class="cfg-desc">Number of units short above which supervisory approval is needed.</span></div>
+              <div class="cfg-right"><input type="text" class="tds-input" style="width:200px" placeholder="Add & press enter" value="100"></div>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">Overage Threshold</span><span class="cfg-desc">Number of units extra above which supervisory approval is needed.</span></div>
+              <div class="cfg-right"><input type="text" class="tds-input" style="width:200px" placeholder="Add & press enter" value="100"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fast Moving SKU -->
+        <div class="accordion">
+          <div class="accordion-header" onclick="toggleAcc(this)">
+            <span class="accordion-title">Fast moving SKU</span>
+            <span class="accordion-status status-pending">Pending</span>
+            <span class="material-icons-outlined accordion-arrow">expand_more</span>
+          </div>
+          <div class="accordion-body">
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">FMS</span><span class="cfg-desc">Enable FMS for this client on this FC.</span></div>
+              <div class="cfg-right"><div class="yn-toggle"><button class="yn">Yes</button><button class="yn">No</button></div></div>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">FMS automation ON</span><span class="cfg-desc">Enable FMS automation for this client on this FC.</span></div>
+              <div class="cfg-right" style="gap:16px">
+                <div style="display:flex;flex-direction:column;gap:4px">
+                  <span style="font-size:11px;font-weight:500;color:var(--t1)">Min. DOI at Prime <span style="color:var(--primary)">*</span></span>
+                  <div style="display:flex;align-items:center;gap:6px"><input type="text" class="tds-input" style="width:120px" placeholder="Type here..." value="02"><span style="font-size:11px;color:var(--t2)">Days</span></div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:4px">
+                  <span style="font-size:11px;font-weight:500;color:var(--t1)">Fast-SKU cutoff <span style="color:var(--primary)">*</span></span>
+                  <div style="display:flex;align-items:center;gap:6px"><input type="text" class="tds-input" style="width:120px" placeholder="Type here..." value="10"><span style="font-size:11px;color:var(--t2)">%</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">FMS - SKU Attribute</span><span class="cfg-desc">Upload SKU attribute for this FC</span></div>
+              <div class="cfg-right" style="flex-direction:column;align-items:flex-end;gap:4px">
+                <button class="btn-table" style="padding:7px 14px;font-size:12px;font-weight:500" onclick="document.getElementById('fmsFileInput').click()"><span class="material-icons-outlined" style="font-size:14px">settings</span> Upload SKU attribute</button>
+                <input type="file" id="fmsFileInput" style="display:none" onchange="showFileName(this,'fmsFileName')">
+                <a class="link" id="fmsFileName" style="font-size:11px;display:none"></a>
+              </div>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">Shelf Life Config for External Buckets</span><span class="cfg-desc">Upload shelf life config for external buckets in this FC</span></div>
+              <div class="cfg-right" style="flex-direction:column;align-items:flex-end;gap:4px">
+                <button class="btn-table" style="padding:7px 14px;font-size:12px;font-weight:500" onclick="document.getElementById('shelfFileInput').click()"><span class="material-icons-outlined" style="font-size:14px">settings</span> Upload shelf life config</button>
+                <input type="file" id="shelfFileInput" style="display:none" onchange="showFileName(this,'shelfFileName')">
+                <a class="link" id="shelfFileName" style="font-size:11px;display:none"></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ===== Dispatch Tab ===== -->
+      <div class="tab-panel" id="fc-tab-dispatch">
+
+        <!-- Dispatch Automation -->
+        <div class="accordion open">
+          <div class="accordion-header" onclick="toggleAcc(this)">
+            <span class="accordion-title">Dispatch automation</span>
+            <span class="accordion-status status-pending">Pending</span>
+            <span class="material-icons-outlined accordion-arrow">expand_more</span>
+          </div>
+          <div class="accordion-body">
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">FM Scan Auto-Ship</span><span class="cfg-desc">When enabled, shipments are auto-marked as shipped after FM scan for autoship couriers.</span></div>
+              <div class="cfg-right"><div class="yn-toggle"><button class="yn">Yes</button><button class="yn">No</button></div></div>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">Auto-Add to Dispatch</span><span class="cfg-desc">When enabled, shipments are automatically added to the open dispatch after RTS.</span></div>
+              <div class="cfg-right"><div class="yn-toggle"><button class="yn">Yes</button><button class="yn">No</button></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dispatch Rules -->
+        <div class="accordion">
+          <div class="accordion-header" onclick="toggleAcc(this)">
+            <span class="accordion-title">Dispatch rules</span>
+            <span class="accordion-status status-pending">Pending</span>
+            <span class="material-icons-outlined accordion-arrow">expand_more</span>
+          </div>
+          <div class="accordion-body">
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">One Courier per Dispatch</span><span class="cfg-desc">When enabled, each dispatch can only contain shipments for a single courier.</span></div>
+              <div class="cfg-right"><div class="yn-toggle"><button class="yn">Yes</button><button class="yn">No</button></div></div>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">One Shipment per Dispatch</span><span class="cfg-desc">When enabled, each dispatch holds exactly one shipment.</span></div>
+              <div class="cfg-right"><div class="yn-toggle"><button class="yn">Yes</button><button class="yn">No</button></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dimensions & RTS -->
+        <div class="accordion">
+          <div class="accordion-header" onclick="toggleAcc(this)">
+            <span class="accordion-title">Dimensions & RTS</span>
+            <span class="accordion-status status-pending">Pending</span>
+            <span class="material-icons-outlined accordion-arrow">expand_more</span>
+          </div>
+          <div class="accordion-body">
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">TMS enabled</span><span class="cfg-desc">When enabled, orders are routed through TMS for courier selection and load planning.</span></div>
+              <div class="cfg-right"><div class="yn-toggle"><button class="yn">Yes</button><button class="yn">No</button></div></div>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">Essae machine available</span><span class="cfg-desc">When enabled, dimensions are auto-captured from the connected weighing machine.</span></div>
+              <div class="cfg-right"><div class="yn-toggle"><button class="yn">Yes</button><button class="yn">No</button></div></div>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">Box-based dispatch</span><span class="cfg-desc">When enabled, each box in a shipment gets its own waybill and is tracked individually.</span></div>
+              <div class="cfg-right"><div class="yn-toggle"><button class="yn">Yes</button><button class="yn">No</button></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dispatch Documents -->
+        <div class="accordion">
+          <div class="accordion-header" onclick="toggleAcc(this)">
+            <span class="accordion-title">Dispatch documents</span>
+            <span class="accordion-status status-pending">Pending</span>
+            <span class="material-icons-outlined accordion-arrow">expand_more</span>
+          </div>
+          <div class="accordion-body">
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">Gate pass</span><span class="cfg-desc">When enabled, a gate pass is generated when a vehicle leaves the FC.</span></div>
+              <div class="cfg-right"><div class="yn-toggle"><button class="yn">Yes</button><button class="yn">No</button></div></div>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">Dispatch remarks</span><span class="cfg-desc">Selectable remarks operators can attach at dispatch completion.</span></div>
+              <div class="cfg-right"><div class="yn-toggle"><button class="yn">Yes</button><button class="yn">No</button></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SBD -->
+        <div class="accordion">
+          <div class="accordion-header" onclick="toggleAcc(this)">
+            <span class="accordion-title">SBD</span>
+            <span class="accordion-status status-pending">Pending</span>
+            <span class="material-icons-outlined accordion-arrow">expand_more</span>
+          </div>
+          <div class="accordion-body">
+            <!-- SBD Courier Offset -->
+            <div style="padding:14px 20px"><span class="cfg-name">SBD courier offset</span><span class="cfg-desc" style="display:block;margin-top:2px">Buffer days added per courier for SBD calculation. Surface typically needs more days than Express.</span></div>
+            <div style="padding:0 20px 14px">
+              <table class="tds-table" style="font-size:12px">
+                <thead><tr><th>Courier</th><th>Offset days</th></tr></thead>
+                <tbody>
+                  <tr><td>FTL</td><td>0</td></tr>
+                  <tr><td>Kerry_Indev</td><td>0</td></tr>
+                  <tr><td>Local Fleet Delivery</td><td>0</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- SBD Courier Cutoff -->
+            <div style="padding:14px 20px;border-top:1px solid var(--border-light)"><span class="cfg-name">SBD Courier Cutoff</span><span class="cfg-desc" style="display:block;margin-top:2px">Buffer days added per courier for SBD calculation. Surface typically needs more days than Express.</span></div>
+            <div style="padding:0 20px 14px">
+              <table class="tds-table" style="font-size:12px">
+                <thead><tr><th>Courier</th><th>P1</th><th>P2</th><th>P3</th><th>P4</th><th>P5</th></tr></thead>
+                <tbody>
+                  <tr><td>FTL</td><td>10:00</td><td>10:00</td><td>10:00</td><td>10:88</td><td>19:00</td></tr>
+                  <tr><td>Kerry_Indev</td><td>14:00</td><td>14:00</td><td>14:00</td><td>14:88</td><td>14:99</td></tr>
+                  <tr><td>Local Fleet Delivery</td><td>14:00</td><td>14:00</td><td>14:00</td><td>14:88</td><td>14:99</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- SBD Order Capacity -->
+            <div class="cfg-row" style="border-top:1px solid var(--border-light)">
+              <div class="cfg-left"><span class="cfg-name">SBD Order Capacity</span><span class="cfg-desc">Maximum shipments this FC can process per day for this client.</span></div>
+              <div class="cfg-right"><input type="text" class="tds-input" style="width:140px" value="100"></div>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">SBD Qty Capacity</span><span class="cfg-desc">Maximum units this FC can process per day for this client.</span></div>
+              <div class="cfg-right"><input type="text" class="tds-input" style="width:140px" value="100"></div>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">Surge Capacity Multiplier</span><span class="cfg-desc">Multiplier applied to daily capacity during end-of-month surge days.</span></div>
+              <div class="cfg-right"><input type="text" class="tds-input" style="width:140px" value="30.50"></div>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">Surge Days</span><span class="cfg-desc">How many end-of-month days the surge config applies to.</span></div>
+              <div class="cfg-right"><input type="text" class="tds-input" style="width:140px" value="30 days"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TMS Settings -->
+        <div class="accordion">
+          <div class="accordion-header" onclick="toggleAcc(this)">
+            <span class="accordion-title">TMS settings</span>
+            <span class="accordion-status status-pending">Pending</span>
+            <span class="material-icons-outlined accordion-arrow">expand_more</span>
+          </div>
+          <div class="accordion-body">
+            <div class="cfg-row">
+              <div class="cfg-left"><span class="cfg-name">TMS Enabled</span><span class="cfg-desc">When enabled, orders are routed through TMS for courier selection and load planning.</span></div>
+              <div class="cfg-right"><div class="yn-toggle"><button class="yn" onclick="ynClickFc(this,'yes','tmsVerifyRow')">Yes</button><button class="yn no-active" onclick="ynClickFc(this,'no','tmsVerifyRow')">No</button></div></div>
+            </div>
+            <div class="cfg-row sub-row hidden" id="tmsVerifyRow" style="border-left:3px solid var(--warning);padding-left:36px;background:#FEFCE8">
+              <div class="cfg-left"><span class="cfg-name" style="color:var(--warning)">Verify facility on TMS</span><span class="cfg-desc">Facility must be verified on TMS before this config can be enabled.</span></div>
+              <div class="cfg-right"><button class="btn-table" style="padding:7px 16px;font-size:12px;font-weight:600;background:var(--t1);color:white;border-color:var(--t1)">Verify facility</button></div>
+            </div>
+            <div class="cfg-row hidden" id="tmsLrRow">
+              <div class="cfg-left"><span class="cfg-name">LR Consolidation</span><span class="cfg-desc">Enable LR consolidation through TMS.</span></div>
+              <div class="cfg-right"><div class="yn-toggle"><button class="yn">Yes</button><button class="yn">No</button></div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Pickwave Schedule Drawer -->
+  <div class="drawer-overlay" id="pwDrawerOverlay" onclick="if(event.target===this)closePwDrawer()">
+    <div class="drawer" style="width:min(520px, 85vw)">
+      <div class="drawer-header">
+        <div>
+          <span class="drawer-title">Pickwave schedule</span>
+          <div style="font-size:11px;color:var(--t3);margin-top:2px">Setup scheduler based on which the automated pickwave creation will happen.</div>
+        </div>
+        <button class="drawer-close" onclick="closePwDrawer()"><span class="material-icons-outlined">close</span></button>
+      </div>
+      <div class="drawer-tabs">
+        <button class="drawer-tab active" onclick="switchPwTab(this,'pw-tab-schedule')">Pickwave schedule</button>
+        <button class="drawer-tab" onclick="switchPwTab(this,'pw-tab-complexity')">Order complexity</button>
+        <button class="drawer-tab" onclick="switchPwTab(this,'pw-tab-capacity')">Picklist capacity</button>
+        <button class="drawer-tab" onclick="switchPwTab(this,'pw-tab-groupby')">Group by</button>
+      </div>
+
+      <!-- Tab 1: Pickwave Schedule -->
+      <div class="drawer-tab-panel active" id="pw-tab-schedule" style="flex:1;overflow-y:auto;padding:20px 24px">
+        <div class="pw-radio-group">
+          <label class="pw-radio"><input type="radio" name="pwMode" value="frequency" checked onchange="togglePwMode()"> Set frequency</label>
+          <label class="pw-radio"><input type="radio" name="pwMode" value="custom" onchange="togglePwMode()"> Set custom time</label>
+        </div>
+        <!-- Frequency mode -->
+        <div id="pwFreqMode">
+          <span class="pw-field-label">Create new pickwave in every: <span class="req">*</span></span>
+          <select class="cfg-select" style="width:100%;min-width:100%" onchange="pwChanged()">
+            <option value="">Select frequency</option>
+            <option>30 minutes</option>
+            <option>60 minutes</option>
+            <option>90 minutes</option>
+            <option>120 minutes</option>
+          </select>
+        </div>
+        <!-- Custom time mode -->
+        <div id="pwCustomMode" style="display:none">
+          <span class="pw-field-label">Time Picker <span class="req">*</span></span>
+          <select class="cfg-select" style="width:100%;min-width:100%;margin-bottom:12px" id="pwTimePicker">
+            <option value="">Select time</option>
+            <option>06:25 PM</option>
+            <option>07:25 PM</option>
+            <option>08:25 PM</option>
+            <option>09:00 PM</option>
+            <option>10:00 PM</option>
+          </select>
+          <button class="btn-table" style="margin-bottom:12px;padding:7px 16px;font-size:12px;font-weight:600;background:var(--t1);color:white;border-color:var(--t1)" onclick="addPwTime()">Add time</button>
+          <div id="pwTimeChips">
+            <div style="font-size:12px;font-weight:500;margin-bottom:6px">Selected time:</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Order Complexity -->
+      <div class="drawer-tab-panel" id="pw-tab-complexity" style="flex:1;overflow-y:auto;padding:20px 24px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px"><span style="font-size:12px;font-weight:500">Order Type :</span><span class="pw-type-badge simple">Simple</span></div>
+        <div class="pw-field-row" style="margin-bottom:20px">
+          <div class="pw-field-col"><label>Maximum SKU in order</label><input type="text" class="tds-input" placeholder="Type here..." oninput="pwChanged()"></div>
+          <div class="pw-field-col"><label>Maximum quantity in order</label><input type="text" class="tds-input" placeholder="Type here..." oninput="pwChanged()"></div>
+        </div>
+        <hr class="pw-divider">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px"><span style="font-size:12px;font-weight:500">Order Type :</span><span class="pw-type-badge complex">Complex</span></div>
+        <div class="pw-field" style="margin-bottom:12px"><label class="pw-field-label">Maximum quantity in order</label><input type="text" class="tds-input" value="100" oninput="pwChanged()"></div>
+        <div class="pw-field" style="margin-bottom:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;font-weight:600">Order bundling</span><div class="yn-toggle"><button class="yn yes-active" onclick="pwChanged()">Yes</button><button class="yn" onclick="pwChanged()">No</button></div></div>
+          <div style="font-size:11px;color:var(--t3);margin-bottom:10px">When enabled, pickwaves will be divided into Picklists based on zones</div>
+        </div>
+        <div class="pw-field-row" style="margin-bottom:12px">
+          <div class="pw-field-col"><label>Maximum orders in a pickwave <span style="color:var(--primary)">*</span></label><input type="text" class="tds-input" value="10" oninput="pwChanged()"></div>
+          <div class="pw-field-col"><label>Minimum orders for segregation <span style="color:var(--primary)">*</span></label><input type="text" class="tds-input" value="10" oninput="pwChanged()"></div>
+        </div>
+        <div class="pw-field-row" style="margin-bottom:12px">
+          <div class="pw-field-col"><label>Maximum SKU weight (Kgs)</label><input type="text" class="tds-input" value="20" oninput="pwChanged()"></div>
+          <div class="pw-field-col"><label>Maximum SKU Volume (Cm³)</label><input type="text" class="tds-input" value="2160000" oninput="pwChanged()"></div>
+        </div>
+        <hr class="pw-divider">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px"><span style="font-size:12px;font-weight:500">Order Type :</span><span class="pw-type-badge bulk">Bulk</span></div>
+        <div class="pw-field" style="margin-bottom:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;font-weight:600">Consolidation</span><div class="yn-toggle"><button class="yn yes-active" onclick="pwChanged()">Yes</button><button class="yn" onclick="pwChanged()">No</button></div></div>
+          <div style="font-size:11px;color:var(--t3);margin-bottom:10px">Enable this config to allow consolidation of Bulk orders in staging area. Set minimum order quantity above which the consolidation is required.</div>
+        </div>
+        <div class="pw-field"><label class="pw-field-label">Minimum quantity for consolidation <span class="req">*</span></label><input type="text" class="tds-input" value="100" oninput="pwChanged()"></div>
+      </div>
+
+      <!-- Tab 3: Picklist Capacity -->
+      <div class="drawer-tab-panel" id="pw-tab-capacity" style="flex:1;overflow-y:auto;padding:20px 24px">
+        <div style="display:flex;gap:16px;padding:8px 0;border-bottom:1px solid var(--border-light);margin-bottom:16px"><span style="font-size:12px;font-weight:600;width:80px">Order type</span><span style="font-size:12px;font-weight:600;flex:1">Picklist limit</span></div>
+        <!-- Simple -->
+        <div style="display:flex;gap:16px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border-light)">
+          <span style="font-size:13px;font-weight:500;width:80px;padding-top:8px">Simple</span>
+          <div style="flex:1">
+            <div class="pw-field-row">
+              <div class="pw-field-col"><label>Maximum quantity</label><input type="text" class="tds-input" value="1" oninput="pwChanged()"></div>
+              <div class="pw-field-col"><label>Maximum locations</label><input type="text" class="tds-input" value="6" oninput="pwChanged()"></div>
+            </div>
+          </div>
+        </div>
+        <!-- Complex -->
+        <div style="display:flex;gap:16px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border-light)">
+          <span style="font-size:13px;font-weight:500;width:80px;padding-top:8px">Complex</span>
+          <div style="flex:1">
+            <div class="pw-field-row">
+              <div class="pw-field-col"><label>Maximum quantity</label><input type="text" class="tds-input" value="1" oninput="pwChanged()"></div>
+              <div class="pw-field-col"><label>Maximum locations</label><input type="text" class="tds-input" value="6" oninput="pwChanged()"></div>
+            </div>
+          </div>
+        </div>
+        <!-- Bulk -->
+        <div style="display:flex;gap:16px;align-items:flex-start;padding:12px 0">
+          <span style="font-size:13px;font-weight:500;width:80px;padding-top:8px">Bulk</span>
+          <div style="flex:1">
+            <div class="pw-field-col"><label>Maximum quantity</label><input type="text" class="tds-input" value="1000" oninput="pwChanged()"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 4: Group by -->
+      <div class="drawer-tab-panel" id="pw-tab-groupby" style="flex:1;overflow-y:auto;padding:20px 24px">
+        <div class="pw-field" style="margin-bottom:20px">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+            <div><span style="font-size:13px;font-weight:600;display:block">Priority</span><span style="font-size:11px;color:var(--t3)">Enable this to create separate pickwaves for each priority type.</span></div>
+            <div class="yn-toggle"><button class="yn yes-active" onclick="pwChanged()">Yes</button><button class="yn" onclick="pwChanged()">No</button></div>
+          </div>
+        </div>
+        <div class="pw-field" style="margin-bottom:20px">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+            <div><span style="font-size:13px;font-weight:600;display:block">Channel</span><span style="font-size:11px;color:var(--t3)">Enable this to create separate pickwaves for every channel. Channels can be grouped to create single pickwave for grouped channels.</span></div>
+            <div class="yn-toggle"><button class="yn yes-active" onclick="pwChanged()">Yes</button><button class="yn" onclick="pwChanged()">No</button></div>
+          </div>
+          <div class="pw-note">*Note: Unassigned channels will have their separate pickwaves</div>
+          <div style="margin-top:12px"><span class="pw-field-label">Group channel for pickwave <span class="req">*</span></span><select class="cfg-select" style="width:100%;min-width:100%" onchange="pwChanged()"><option>Title here</option></select></div>
+        </div>
+      </div>
+
+      <div class="drawer-footer">
+        <button class="btn-cancel" onclick="closePwDrawer()">Cancel</button>
+        <button class="btn-save" id="btnSavePw" disabled onclick="savePwDetails()">Save details</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- POD Validation Drawer -->
+  <div class="drawer-overlay" id="podDrawerOverlay" onclick="if(event.target===this)closePodDrawer()">
+    <div class="drawer" style="width:420px">
+      <div class="drawer-header">
+        <span class="drawer-title">POD Validation</span>
+        <button class="drawer-close" onclick="closePodDrawer()"><span class="material-icons-outlined">close</span></button>
+      </div>
+      <!-- Drawer Tabs -->
+      <div class="drawer-tabs">
+        <button class="drawer-tab active" onclick="switchDrawerTab(this,'pod-doc-tab')">Doc type config</button>
+        <button class="drawer-tab" onclick="switchDrawerTab(this,'pod-block-tab')">Block conditions</button>
+      </div>
+      <!-- Doc Type Config Tab -->
+      <div class="drawer-tab-panel active" id="pod-doc-tab" style="flex:1;overflow-y:auto">
+        <!-- LR parameters -->
+        <div class="pod-field">
+          <span class="pod-label">LR document parameters <span class="req">*</span></span>
+          <div class="pod-multiselect" id="podLr">
+            <div class="pod-trigger" onclick="togglePodSelect('podLr')">
+              <span class="pod-tag">Transporter</span><span class="pod-tag">LR number</span><span class="pod-tag">Vehicle number</span><span class="pod-tag-more">+1</span>
+              <span class="material-icons-outlined pod-chevron">expand_more</span>
+            </div>
+            <div class="pod-menu">
+              <div class="pod-menu-search"><span class="material-icons-outlined">search</span><input placeholder="Search" oninput="filterPodOpts(this,'podLr')"></div>
+              <div class="pod-opt selected" data-val="Transporter" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Transporter</span></div>
+              <div class="pod-opt selected" data-val="LR number" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>LR number</span></div>
+              <div class="pod-opt selected" data-val="Vehicle number" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Vehicle number</span></div>
+              <div class="pod-opt selected" data-val="Stamp" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Stamp</span></div>
+              <div class="pod-opt" data-val="Consignee" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Consignee</span></div>
+              <div class="pod-opt" data-val="Consignor" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Consignor</span></div>
+              <div class="pod-opt" data-val="Received box counts" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Received box counts</span></div>
+              <div class="pod-opt" data-val="Remarks" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Remarks</span></div>
+            </div>
+          </div>
+        </div>
+        <!-- Invoice parameters -->
+        <div class="pod-field">
+          <span class="pod-label">Invoice document parameters <span class="req">*</span></span>
+          <div class="pod-multiselect" id="podInvoice">
+            <div class="pod-trigger" onclick="togglePodSelect('podInvoice')">
+              <span class="pod-tag">SKU</span><span class="pod-tag">Invoice number</span><span class="pod-tag">Vehicle number</span><span class="pod-tag">Stamp</span>
+              <span class="material-icons-outlined pod-chevron">expand_more</span>
+            </div>
+            <div class="pod-menu">
+              <div class="pod-menu-search"><span class="material-icons-outlined">search</span><input placeholder="Search" oninput="filterPodOpts(this,'podInvoice')"></div>
+              <div class="pod-opt selected" data-val="SKU" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>SKU</span></div>
+              <div class="pod-opt selected" data-val="Invoice number" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Invoice number</span></div>
+              <div class="pod-opt selected" data-val="Vehicle number" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Vehicle number</span></div>
+              <div class="pod-opt selected" data-val="Stamp" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Stamp</span></div>
+              <div class="pod-opt" data-val="Consignee" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Consignee</span></div>
+              <div class="pod-opt" data-val="Consignor" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Consignor</span></div>
+              <div class="pod-opt" data-val="Received box counts" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Received box counts</span></div>
+              <div class="pod-opt" data-val="Remarks" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Remarks</span></div>
+            </div>
+          </div>
+        </div>
+        <!-- Waybill parameters -->
+        <div class="pod-field">
+          <span class="pod-label">Waybill document parameters <span class="req">*</span></span>
+          <div class="pod-multiselect" id="podWaybill">
+            <div class="pod-trigger" onclick="togglePodSelect('podWaybill')">
+              <span class="pod-tag">Vehicle number</span><span class="pod-tag">Stamp</span>
+              <span class="material-icons-outlined pod-chevron">expand_more</span>
+            </div>
+            <div class="pod-menu">
+              <div class="pod-menu-search"><span class="material-icons-outlined">search</span><input placeholder="Search" oninput="filterPodOpts(this,'podWaybill')"></div>
+              <div class="pod-opt selected" data-val="Vehicle number" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Vehicle number</span></div>
+              <div class="pod-opt selected" data-val="Stamp" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Stamp</span></div>
+              <div class="pod-opt" data-val="Consignee" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Consignee</span></div>
+              <div class="pod-opt" data-val="Consignor" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Consignor</span></div>
+              <div class="pod-opt" data-val="Received box counts" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Received box counts</span></div>
+              <div class="pod-opt" data-val="Remarks" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Remarks</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Block Conditions Tab -->
+      <div class="drawer-tab-panel" id="pod-block-tab" style="flex:1;overflow-y:auto">
+        <!-- LR -->
+        <div class="block-acc open">
+          <div class="block-acc-header" onclick="this.closest('.block-acc').classList.toggle('open')">
+            <span class="block-acc-title">LR</span>
+            <span class="block-acc-status">Completed</span>
+            <span class="material-icons-outlined block-acc-arrow">expand_more</span>
+          </div>
+          <div class="block-acc-body">
+            <div class="block-row"><span class="block-label">Block missing</span><div class="yn-toggle"><button class="yn yes-active" onclick="podChanged()">Yes</button><button class="yn" onclick="podChanged()">No</button></div></div>
+            <div class="block-row"><span class="block-label">Block on cut</span><div class="yn-toggle"><button class="yn yes-active" onclick="podChanged()">Yes</button><button class="yn" onclick="podChanged()">No</button></div></div>
+            <div style="margin-top:8px">
+              <span class="pod-label">Missing exceptions <span class="req">*</span></span>
+              <div class="pod-multiselect" id="podExcLr">
+                <div class="pod-trigger" onclick="togglePodSelect('podExcLr')">
+                  <span style="font-size:12px;color:var(--t3)">Title here</span>
+                  <span class="material-icons-outlined pod-chevron">expand_more</span>
+                </div>
+                <div class="pod-menu">
+                  <div class="pod-opt" data-val="Consignee" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Consignee</span></div>
+                  <div class="pod-opt" data-val="Consignor" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Consignor</span></div>
+                  <div class="pod-opt" data-val="SKU" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>SKU</span></div>
+                  <div class="pod-opt" data-val="Invoice number" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Invoice number</span></div>
+                  <div class="pod-opt" data-val="Vehicle number" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Vehicle number</span></div>
+                  <div class="pod-opt" data-val="Received box count" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Received box count</span></div>
+                  <div class="pod-opt" data-val="Stamp" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Stamp</span></div>
+                  <div class="pod-opt" data-val="Remarks" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Remarks</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Invoice -->
+        <div class="block-acc">
+          <div class="block-acc-header" onclick="this.closest('.block-acc').classList.toggle('open')">
+            <span class="block-acc-title">Invoice</span>
+            <span class="block-acc-status">Completed</span>
+            <span class="material-icons-outlined block-acc-arrow">expand_more</span>
+          </div>
+          <div class="block-acc-body">
+            <div class="block-row"><span class="block-label">Block missing</span><div class="yn-toggle"><button class="yn yes-active" onclick="podChanged()">Yes</button><button class="yn" onclick="podChanged()">No</button></div></div>
+            <div class="block-row"><span class="block-label">Block on cut</span><div class="yn-toggle"><button class="yn yes-active" onclick="podChanged()">Yes</button><button class="yn" onclick="podChanged()">No</button></div></div>
+            <div style="margin-top:8px">
+              <span class="pod-label">Missing exceptions <span class="req">*</span></span>
+              <div class="pod-multiselect" id="podExcInv">
+                <div class="pod-trigger" onclick="togglePodSelect('podExcInv')">
+                  <span style="font-size:12px;color:var(--t3)">Title here</span>
+                  <span class="material-icons-outlined pod-chevron">expand_more</span>
+                </div>
+                <div class="pod-menu">
+                  <div class="pod-opt" data-val="Consignee" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Consignee</span></div>
+                  <div class="pod-opt" data-val="Consignor" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Consignor</span></div>
+                  <div class="pod-opt" data-val="SKU" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>SKU</span></div>
+                  <div class="pod-opt" data-val="Invoice number" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Invoice number</span></div>
+                  <div class="pod-opt" data-val="Vehicle number" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Vehicle number</span></div>
+                  <div class="pod-opt" data-val="Received box count" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Received box count</span></div>
+                  <div class="pod-opt" data-val="Stamp" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Stamp</span></div>
+                  <div class="pod-opt" data-val="Remarks" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Remarks</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Waybill -->
+        <div class="block-acc">
+          <div class="block-acc-header" onclick="this.closest('.block-acc').classList.toggle('open')">
+            <span class="block-acc-title">Waybill</span>
+            <span class="block-acc-status">Completed</span>
+            <span class="material-icons-outlined block-acc-arrow">expand_more</span>
+          </div>
+          <div class="block-acc-body">
+            <div class="block-row"><span class="block-label">Block missing</span><div class="yn-toggle"><button class="yn yes-active" onclick="podChanged()">Yes</button><button class="yn" onclick="podChanged()">No</button></div></div>
+            <div class="block-row"><span class="block-label">Block on cut</span><div class="yn-toggle"><button class="yn yes-active" onclick="podChanged()">Yes</button><button class="yn" onclick="podChanged()">No</button></div></div>
+            <div style="margin-top:8px">
+              <span class="pod-label">Missing exceptions <span class="req">*</span></span>
+              <div class="pod-multiselect" id="podExcWb">
+                <div class="pod-trigger" onclick="togglePodSelect('podExcWb')">
+                  <span style="font-size:12px;color:var(--t3)">Title here</span>
+                  <span class="material-icons-outlined pod-chevron">expand_more</span>
+                </div>
+                <div class="pod-menu">
+                  <div class="pod-opt" data-val="Consignee" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Consignee</span></div>
+                  <div class="pod-opt" data-val="Consignor" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Consignor</span></div>
+                  <div class="pod-opt" data-val="SKU" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>SKU</span></div>
+                  <div class="pod-opt" data-val="Invoice number" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Invoice number</span></div>
+                  <div class="pod-opt" data-val="Vehicle number" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Vehicle number</span></div>
+                  <div class="pod-opt" data-val="Received box count" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Received box count</span></div>
+                  <div class="pod-opt" data-val="Stamp" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Stamp</span></div>
+                  <div class="pod-opt" data-val="Remarks" onclick="togglePodOpt(this)"><div class="pod-opt-check"></div><span>Remarks</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Drawer Footer -->
+      <div class="drawer-footer">
+        <button class="btn-cancel" onclick="closePodDrawer()">Cancel</button>
+        <button class="btn-save" id="btnSavePod" disabled onclick="savePodDetails()">Save details</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Snackbar -->
+  <div class="snackbar" id="draftSnackbar"><span class="material-icons-outlined">check_circle</span>Draft saved</div>
+
+  <!-- Exit Confirmation Modal -->
+  <div class="confirm-overlay" id="exitConfirm" onclick="if(event.target===this)closeExitConfirm()">
+    <div class="confirm-modal">
+      <div class="confirm-modal-title">Are you sure you want to exit configuration?</div>
+      <div class="confirm-modal-desc">Any unsaved changes will be lost.</div>
+      <div class="confirm-modal-actions">
+        <button class="btn-confirm-cancel" onclick="closeExitConfirm()">Cancel</button>
+        <button class="btn-confirm-yes" onclick="window.location.href='06-fc-list.html'">Yes, exit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer-bar">
+    <button class="btn-set-active" onclick="alert('FC configuration set as active!')">Set as active</button>
+  </div>
+
+  <script>
+    // Accordion toggle
+    function toggleAcc(header) { header.closest('.accordion').classList.toggle('open'); }
+
+    // Tab switching
+    document.querySelectorAll('.tab-bar .tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const bar = tab.closest('.tab-bar') || tab.parentElement;
+        const panel = tab.closest('.config-panel');
+        bar.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        panel.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.panel).classList.add('active');
+      });
+    });
+
+    // Client vertical tab switching
+    function selectClient(el, name) {
+      document.querySelectorAll('.client-tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('clientTitle').textContent = name;
+    }
+
+    // Yes/No toggle interaction
+    document.querySelectorAll('.yn-toggle').forEach(group => {
+      group.querySelectorAll('.yn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          group.querySelectorAll('.yn').forEach(b => b.classList.remove('yes-active', 'no-active'));
+          if (btn.textContent.trim() === 'Yes') btn.classList.add('yes-active');
+          else btn.classList.add('no-active');
+        });
+      });
+    });
+
+    // ===== POD Drawer =====
+    function openPodDrawer() {
+      document.getElementById('podDrawerOverlay').classList.add('open');
+    }
+    function closePodDrawer() {
+      document.getElementById('podDrawerOverlay').classList.remove('open');
+    }
+    function switchDrawerTab(btn, panelId) {
+      btn.closest('.drawer').querySelectorAll('.drawer-tab').forEach(t => t.classList.remove('active'));
+      btn.closest('.drawer').querySelectorAll('.drawer-tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(panelId).classList.add('active');
+    }
+    function togglePodSelect(id) {
+      // Close all others first
+      document.querySelectorAll('.pod-multiselect.open').forEach(el => {
+        if (el.id !== id) el.classList.remove('open');
+      });
+      document.getElementById(id).classList.toggle('open');
+    }
+    // Close pod selects on outside click
+    document.addEventListener('click', (e) => {
+      document.querySelectorAll('.pod-multiselect').forEach(el => {
+        if (!el.contains(e.target)) el.classList.remove('open');
+      });
+    });
+    function filterPodOpts(input, parentId) {
+      const q = input.value.toLowerCase();
+      document.querySelectorAll(`#${parentId} .pod-opt`).forEach(opt => {
+        opt.style.display = opt.dataset.val.toLowerCase().includes(q) ? 'flex' : 'none';
+      });
+    }
+    function togglePodOpt(el) {
+      el.classList.toggle('selected');
+      podChanged();
+      // Update tags in trigger
+      const wrap = el.closest('.pod-multiselect');
+      updatePodTags(wrap);
+    }
+    function updatePodTags(wrap) {
+      const trigger = wrap.querySelector('.pod-trigger');
+      const selected = wrap.querySelectorAll('.pod-opt.selected');
+      // Clear existing tags
+      trigger.querySelectorAll('.pod-tag, .pod-tag-more, span:not(.pod-chevron)').forEach(t => {
+        if (!t.classList.contains('pod-chevron')) t.remove();
+      });
+      const chevron = trigger.querySelector('.pod-chevron');
+      if (selected.length === 0) {
+        const ph = document.createElement('span');
+        ph.style.cssText = 'font-size:12px;color:var(--t3)';
+        ph.textContent = 'Title here';
+        trigger.insertBefore(ph, chevron);
+      } else {
+        const show = Array.from(selected).slice(0, 3);
+        const overflow = selected.length - 3;
+        show.forEach(opt => {
+          const tag = document.createElement('span');
+          tag.className = 'pod-tag';
+          tag.textContent = opt.dataset.val;
+          trigger.insertBefore(tag, chevron);
+        });
+        if (overflow > 0) {
+          const more = document.createElement('span');
+          more.className = 'pod-tag-more';
+          more.textContent = `+${overflow}`;
+          trigger.insertBefore(more, chevron);
+        }
+      }
+    }
+    function podChanged() {
+      document.getElementById('btnSavePod').disabled = false;
+    }
+
+    // ===== Pickwave Drawer =====
+    function openPwDrawer() {
+      document.getElementById('pwDrawerOverlay').classList.add('open');
+    }
+    function closePwDrawer() {
+      document.getElementById('pwDrawerOverlay').classList.remove('open');
+    }
+    function switchPwTab(btn, panelId) {
+      const drawer = btn.closest('.drawer');
+      drawer.querySelectorAll('.drawer-tab').forEach(t => t.classList.remove('active'));
+      drawer.querySelectorAll('.drawer-tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(panelId).classList.add('active');
+    }
+    function togglePwMode() {
+      const mode = document.querySelector('input[name="pwMode"]:checked').value;
+      document.getElementById('pwFreqMode').style.display = mode === 'frequency' ? 'block' : 'none';
+      document.getElementById('pwCustomMode').style.display = mode === 'custom' ? 'block' : 'none';
+      pwChanged();
+    }
+    function addPwTime() {
+      const picker = document.getElementById('pwTimePicker');
+      if (!picker.value) return;
+      const container = document.getElementById('pwTimeChips');
+      const chip = document.createElement('span');
+      chip.className = 'time-chip';
+      chip.innerHTML = `<span class="material-icons-outlined">schedule</span>${picker.value}`;
+      container.appendChild(chip);
+      picker.value = '';
+      pwChanged();
+    }
+    function pwChanged() {
+      document.getElementById('btnSavePw').disabled = false;
+    }
+    function savePwDetails() {
+      document.getElementById('btnSavePw').disabled = true;
+      closePwDrawer();
+    }
+
+    // ===== Appointments: Consignees =====
+    function checkConsigneeInputs() {
+      const name = document.getElementById('consigneeName').value.trim();
+      const email = document.getElementById('consigneeEmail').value.trim();
+      const btn = document.getElementById('btnSaveConsignee');
+      if (name && email) {
+        btn.disabled = false;
+        btn.style.background = 'var(--t1)';
+        btn.style.color = 'white';
+        btn.style.borderColor = 'var(--t1)';
+        btn.style.cursor = 'pointer';
+      } else {
+        btn.disabled = true;
+        btn.style.background = 'var(--border)';
+        btn.style.color = 'var(--t3)';
+        btn.style.borderColor = 'var(--border)';
+        btn.style.cursor = 'not-allowed';
+      }
+    }
+
+    function saveConsignee() {
+      const name = document.getElementById('consigneeName').value.trim();
+      const email = document.getElementById('consigneeEmail').value.trim();
+      if (!name || !email) return;
+
+      const container = document.getElementById('savedConsignees');
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:12px;margin-bottom:8px;padding:8px 12px;background:#F9FAFB;border-radius:4px';
+      row.innerHTML = `
+        <div style="flex:1;display:flex;align-items:center;gap:6px"><span style="font-size:12px;font-weight:500">${name}</span><span class="material-icons-outlined" style="font-size:14px;color:var(--success)">check_circle</span></div>
+        <div style="flex:1;display:flex;align-items:center;gap:6px"><span style="font-size:12px;color:var(--t2)">${email}</span><span class="material-icons-outlined" style="font-size:14px;color:var(--success)">check_circle</span></div>
+        <button class="btn-table" style="padding:5px 8px;color:var(--t3)" onclick="this.closest('div').remove()"><span class="material-icons-outlined" style="font-size:16px">delete</span></button>
+      `;
+      container.appendChild(row);
+
+      // Clear inputs
+      document.getElementById('consigneeName').value = '';
+      document.getElementById('consigneeEmail').value = '';
+      checkConsigneeInputs();
+    }
+
+    function addConsigneeRow() {
+      // Focus back on the inputs
+      document.getElementById('consigneeName').focus();
+    }
+
+    // ===== FC Inventory: Conditional logic =====
+    function ynClickFc(btn, value, targetId) {
+      const group = btn.closest('.yn-toggle');
+      group.querySelectorAll('.yn').forEach(b => b.classList.remove('yes-active', 'no-active'));
+      if (value === 'yes') btn.classList.add('yes-active');
+      else btn.classList.add('no-active');
+      const target = document.getElementById(targetId);
+      if (target) {
+        target.style.display = value === 'yes' ? 'flex' : 'none';
+      }
+      // TMS: also show LR row when verify row shows
+      if (targetId === 'tmsVerifyRow') {
+        const lrRow = document.getElementById('tmsLrRow');
+        if (lrRow) lrRow.style.display = value === 'yes' ? 'flex' : 'none';
+      }
+    }
+
+    // File upload show name as downloadable link
+    function showFileName(input, targetId) {
+      const el = document.getElementById(targetId);
+      if (input.files.length) {
+        const file = input.files[0];
+        const url = URL.createObjectURL(file);
+        el.textContent = file.name;
+        el.href = url;
+        el.download = file.name;
+        el.style.display = 'inline';
+      }
+    }
+
+    // ===== Draft Snackbar =====
+    function showDraftSnackbar() {
+      const sb = document.getElementById('draftSnackbar');
+      sb.classList.add('show');
+      setTimeout(() => sb.classList.remove('show'), 3000);
+    }
+
+    // ===== Exit Confirmation =====
+    function showExitConfirm() {
+      document.getElementById('exitConfirm').classList.add('open');
+    }
+    function closeExitConfirm() {
+      document.getElementById('exitConfirm').classList.remove('open');
+    }
+    function savePodDetails() {
+      document.getElementById('btnSavePod').disabled = true;
+      closePodDrawer();
+    }
+
+    // FC Operations completion check
+    function checkFcOpsComplete() {
+      const selects = document.querySelectorAll('#acc-fc-ops .cfg-row:not(:first-child) .cfg-select');
+      const allSelected = Array.from(selects).every(s => s.value !== '');
+      const daysSelected = document.getElementById('selectedDaysList').style.display !== 'none';
+      const statusEl = document.getElementById('status-fc-ops');
+      if (allSelected && daysSelected) {
+        statusEl.textContent = 'Completed';
+        statusEl.className = 'accordion-status status-completed';
+      } else {
+        statusEl.textContent = 'Pending';
+        statusEl.className = 'accordion-status status-pending';
+      }
+    }
+
+    // ===== Days Multi-select Dropdown =====
+    function toggleDaysDropdown() {
+      document.getElementById('daysDropdownWrap').classList.toggle('open');
+    }
+    document.addEventListener('click', (e) => {
+      const wrap = document.getElementById('daysDropdownWrap');
+      if (!wrap.contains(e.target)) wrap.classList.remove('open');
+    });
+    function toggleDayCheck(el) {
+      el.classList.toggle('selected');
+      const selected = document.querySelectorAll('#daysMenu .days-option.selected');
+      document.getElementById('daysApplyBtn').disabled = selected.length === 0;
+    }
+    function applyDays() {
+      let days = [];
+      document.querySelectorAll('#daysMenu .days-option.selected').forEach(opt => {
+        days.push(opt.dataset.value);
+      });
+      const listWrap = document.getElementById('selectedDaysList');
+      const listItems = document.getElementById('selectedDaysItems');
+      const triggerText = document.getElementById('daysTriggerText');
+      if (days.length > 0) {
+        listWrap.style.display = 'block';
+        listItems.innerHTML = days.map(d => `<li>${d}</li>`).join('');
+        triggerText.textContent = days.join(', ');
+        triggerText.classList.add('has-value');
+      } else {
+        listWrap.style.display = 'none';
+        triggerText.textContent = 'Select days';
+        triggerText.classList.remove('has-value');
+      }
+      document.getElementById('daysDropdownWrap').classList.remove('open');
+      checkFcOpsComplete();
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delhivery WMS - FC Configuration</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <style>
+    :root{--primary:#E31E24;--primary-light:#FDE8E9;--surface:#FFFFFF;--bg:#FFFFFF;--border:#E0E0E0;--border-light:#F0F0F0;--t1:#1A1A1A;--t2:#666666;--t3:#999999;--success:#0D7A3F;--success-bg:#E6F5ED;--warning:#D97706;--warning-bg:#FEF3E2;--radius:8px;--radius-sm:4px;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--t1);height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+
+    /* Header */
+    .header{display:flex;align-items:flex-start;justify-content:space-between;padding:20px 104px;border-bottom:1px solid var(--border-light);flex-shrink:0;}
+    .header-left h1{font-size:20px;font-weight:600;margin-bottom:4px;}
+    .header-left .subtitle{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--t2);}
+    .header-left .subtitle .pill{display:inline-flex;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:500;background:var(--warning-bg);color:var(--warning);}
+    .header-right{display:flex;align-items:center;gap:12px;}
+    .btn-draft{padding:8px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);font-family:inherit;font-size:13px;font-weight:500;color:var(--t1);cursor:pointer;}
+    .btn-close{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);cursor:pointer;color:var(--t2);}
+
+    /* Layout */
+    .layout{display:flex;flex:1;overflow:hidden;padding:0 104px;}
+    .left-nav{width:200px;padding:24px 0;border-right:1px solid var(--border-light);flex-shrink:0;overflow-y:auto;}
+    .nav-title{font-size:13px;font-weight:600;color:var(--t1);padding:0 12px;margin-bottom:10px;}
+    .nav-item{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;color:var(--t2);cursor:pointer;}
+    .nav-item:hover{background:#F5F5F7;}
+    .nav-item .material-icons-outlined{font-size:16px;color:var(--success);}
+    .nav-divider{height:1px;background:var(--border-light);margin:14px 12px;}
+    .fc-item{padding:8px 12px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;color:var(--t2);cursor:pointer;}
+    .fc-item:hover{background:#F5F5F7;}
+    .fc-item.active{background:#F5F5F7;font-weight:600;color:var(--t1);}
+
+    /* Main */
+    .main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+    /* Top Stepper */
+    .top-stepper{display:flex;align-items:flex-start;padding:20px 32px;border-bottom:1px solid var(--border-light);flex-shrink:0;gap:0;}
+    .step-item{display:flex;align-items:flex-start;gap:8px;padding:0;border:none;border-radius:0;cursor:pointer;background:none;}
+    .step-item .step-num{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--t3);flex-shrink:0;margin-top:1px;}
+    .step-item.active .step-num{border-color:var(--t1);color:var(--t1);}
+    .step-item.completed .step-num{border-color:var(--success);background:var(--success);color:#fff;}
+    .step-item .step-info{display:flex;flex-direction:column;}
+    .step-item .step-label{font-size:12px;font-weight:600;color:var(--t3);}
+    .step-item.active .step-label{color:var(--t1);}
+    .step-item.completed .step-label{color:var(--success);}
+    .step-item .step-desc{font-size:10px;color:var(--t3);margin-top:1px;}
+    .step-line{flex:1;height:2px;background:var(--border-light);margin:12px 16px 0;}
+    .step-line.done{background:var(--success);}
+
+    /* Content Area */
+    .content{flex:1;overflow-y:auto;padding:28px 32px 100px;}
+    .content-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:20px;}
+    .content-title{font-size:18px;font-weight:600;}
+    .content-subtitle{font-size:12px;color:var(--t3);margin-top:2px;}
+    .content-count{font-size:12px;color:var(--t3);}
+
+    /* Section Divider */
+    .section-divider{margin:28px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--border-light);}
+    .section-divider-title{font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:0.5px;}
+    .section-divider-desc{font-size:12px;color:var(--t3);margin-top:2px;}
+
+    /* Config Row */
+    .cfg-row{display:flex;align-items:flex-start;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--border-light);}
+    .cfg-row:last-child{border-bottom:none;}
+    .cfg-row-left{flex:1;max-width:55%;}
+    .cfg-row-right{display:flex;align-items:center;justify-content:flex-end;min-width:200px;}
+    .cfg-label{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:2px;}
+    .cfg-desc{font-size:12px;color:var(--t3);line-height:1.4;margin-bottom:6px;}
+    .cfg-badge{display:inline-flex;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;text-transform:uppercase;}
+    .badge-fc{background:#E6F0FA;color:#0066CC;}
+    .badge-client{background:#E6F5ED;color:#0D7A3F;}
+
+    /* Sub-reveal */
+    .cfg-reveal{margin-top:8px;padding:12px 16px;background:#FAFAFA;border-radius:var(--radius-sm);display:none;}
+    .cfg-reveal.show{display:flex;align-items:center;justify-content:space-between;}
+    .cfg-reveal-block.show{display:block;}
+    .cfg-reveal-label{font-size:12px;color:var(--t2);}
+    .cfg-warn{font-size:11px;color:var(--primary);font-weight:500;margin-top:6px;}
+
+    /* Segmented Btn */
+    .seg-group{display:inline-flex;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;}
+    .seg-btn{padding:6px 14px;font-family:inherit;font-size:12px;font-weight:500;border:none;background:var(--surface);color:var(--t2);cursor:pointer;}
+    .seg-btn+.seg-btn{border-left:1px solid var(--border);}
+    .seg-btn.active{background:#F5F5F7;color:var(--t1);font-weight:600;}
+    .seg-btn:hover:not(.active){background:#FAFAFA;}
+
+    /* Inputs & Selects */
+    .tds-input{padding:7px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:12px;color:var(--t1);background:#fff;width:150px;}
+    .tds-input:focus{outline:none;border-color:var(--t1);}
+    .tds-input::placeholder{color:#C0C0C0;}
+    .tds-select{padding:7px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:12px;color:var(--t1);background:#fff;min-width:160px;cursor:pointer;}
+    .tds-select:focus{outline:none;border-color:var(--t1);}
+
+    /* Pills */
+    .pill-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#F5F5F7;border:1px solid var(--border-light);border-radius:100px;font-size:11px;font-weight:500;color:var(--t1);}
+    .pill-chip .remove{font-size:13px;color:var(--t3);cursor:pointer;}
+    .pill-chip .remove:hover{color:var(--primary);}
+    .add-link{font-size:12px;font-weight:500;color:#0066CC;cursor:pointer;margin-top:4px;}
+    .info-wrap:hover .info-tip{opacity:1!important;}
+
+    /* Zones Table */
+    .zones-wrap{border:1px solid var(--border-light);border-radius:var(--radius);overflow:visible;}
+    .zones-table{width:100%;border-collapse:collapse;}
+    .zones-table thead{background:#F9FAFB;}
+    .zones-table th{padding:10px 16px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);}
+    .zones-table td{padding:10px 16px;font-size:12px;border-bottom:1px solid var(--border-light);vertical-align:middle;}
+    .zones-table tbody tr:last-child td{border-bottom:none;}
+    .zone-input{padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:12px;color:var(--t1);width:100%;background:#fff;}
+    .zone-input:focus{outline:none;border-color:var(--t1);}
+    .zone-input::placeholder{color:#C0C0C0;}
+    .zone-pill{display:inline-flex;padding:3px 8px;background:#F0F4F8;border:1px solid #E2E8F0;border-radius:4px;font-size:10px;font-weight:500;color:#475569;}
+    .zone-save-btn{padding:4px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:#fff;font-family:inherit;font-size:11px;font-weight:500;color:var(--t2);cursor:pointer;}
+    .zone-save-btn:disabled{opacity:0.4;cursor:not-allowed;}
+    .zone-edit-btn{width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:var(--radius-sm);background:#fff;cursor:pointer;color:var(--t3);}
+    .btn-bulk{padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:#fff;font-family:inherit;font-size:11px;font-weight:500;color:var(--t1);cursor:pointer;}
+
+    /* Rejection Dropdown */
+    .rej-trigger{display:flex;align-items:center;gap:6px;padding:7px 12px;border:1px solid var(--border);border-radius:4px;font-size:12px;color:var(--t3);cursor:pointer;min-width:160px;justify-content:space-between;background:#fff;}
+    .rej-dd{display:none;position:absolute;top:100%;right:0;min-width:220px;background:#fff;border:1px solid var(--border);border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.08);z-index:200;max-height:180px;overflow-y:auto;}
+    .rej-dd.open{display:block;}
+    .rej-opt{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;font-size:12px;cursor:pointer;}
+    .rej-opt:hover{background:#F5F5F7;}
+
+    /* Footer */
+    .footer{display:flex;align-items:center;justify-content:flex-end;padding:12px 136px;border-top:1px solid var(--border-light);gap:12px;flex-shrink:0;background:#fff;}
+    .btn-back{padding:8px 20px;border:none;background:transparent;font-family:inherit;font-size:13px;font-weight:500;color:var(--t3);cursor:pointer;}
+    .btn-back:hover{color:var(--t2);}
+    .btn-continue{padding:8px 24px;border:none;border-radius:var(--radius-sm);background:var(--t1);font-family:inherit;font-size:13px;font-weight:500;color:#fff;cursor:pointer;}
+    .btn-continue:hover{background:#333;}
+    .btn-continue:disabled{background:#E0E0E0;color:#999;cursor:not-allowed;}
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-left">
+      <h1>Mamaearth Ltd</h1>
+      <div class="subtitle">Client & FC configuration <span class="pill">Draft</span></div>
+    </div>
+    <div class="header-right">
+      <button class="btn-draft">Save as draft</button>
+      <button class="btn-close" onclick="window.location.href='01-client-list.html'"><span class="material-icons-outlined" style="font-size:18px;">close</span></button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="left-nav">
+      <div class="nav-title">Client mappings</div>
+      <div class="nav-item" onclick="window.location.href='02-courier-setup.html'"><span>Courier mapping</span><span class="material-icons-outlined">check_circle</span></div>
+      <div class="nav-item" onclick="window.location.href='02-courier-setup.html'"><span>Channel mapping</span><span class="material-icons-outlined">check_circle</span></div>
+      <div class="nav-item" onclick="window.location.href='02-courier-setup.html'"><span>FC mapping</span><span class="material-icons-outlined">check_circle</span></div>
+      <div class="nav-divider"></div>
+      <div class="nav-title">FC configuration</div>
+      <div id="fcNavList"></div>
+    </nav>
+
+    <div class="main">
+      <!-- Top Stepper -->
+      <div class="top-stepper" id="topStepper"></div>
+      <!-- Scrollable Content -->
+      <div class="content" id="contentArea"></div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <button class="btn-back" id="btnBack" onclick="goBack()">Previous</button>
+    <button class="btn-continue" id="btnContinue" onclick="goNext()">Save & proceed</button>
+  </footer>
+
+  <script>
+    const selectedFCs = JSON.parse(localStorage.getItem('selectedFCs')||'["GGNFC14","GGNFC12"]');
+    const steps = [
+      {id:'inbound', label:'Inbound', desc:'Receiving, QC'},
+      {id:'inventory', label:'Inventory', desc:'Zones, expiry, cycle count'},
+      {id:'outbound', label:'Outbound', desc:'Allocation, picking, dispatch'}
+    ];
+    let activeFC = selectedFCs[0];
+    let activeStep = 'inbound';
+    const saved = JSON.parse(sessionStorage.getItem('fcSaved')||'{}');
+
+    // FC Nav
+    const configuredFCs = JSON.parse(sessionStorage.getItem('configuredFCs')||'{}');
+    function renderFCNav(){
+      document.getElementById('fcNavList').innerHTML = selectedFCs.map(fc => {
+        const isConfigured = configuredFCs[fc];
+        const isOpen = fc === activeFC;
+        return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:4px;font-size:12px;font-weight:${isOpen?'600':'500'};color:${isOpen?'var(--t1)':'var(--t2)'};cursor:pointer;${isOpen?'background:#F5F5F7;':''}" onclick="selectFC('${fc}')">
+          <span>${fc}</span>
+          ${isConfigured?'<span class="material-icons-outlined" style="font-size:16px;color:var(--success);">check_circle</span>':''}
+        </div>`;
+      }).join('');
+    }
+    function selectFC(fc){
+      if(fc !== activeFC && !configuredFCs[fc]){
+        // Show clone prompt for unconfigured FC
+        showClonePrompt(fc);
+        return;
+      }
+      activeFC=fc;activeStep='inbound';renderAll();
+    }
+    function markFCConfigured(fc){
+      configuredFCs[fc]=true;
+      sessionStorage.setItem('configuredFCs',JSON.stringify(configuredFCs));
+    }
+
+    function showClonePrompt(fc){
+      const existing=document.getElementById('cloneModal');if(existing)existing.remove();
+      const configuredList=selectedFCs.filter(f=>configuredFCs[f]);
+      const modal=document.createElement('div');modal.id='cloneModal';
+      modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:500;';
+      modal.innerHTML=`<div style="background:#fff;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.15);width:420px;max-width:90vw;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--border-light);">
+          <h3 style="font-size:15px;font-weight:600;">Configure ${fc}</h3>
+          <button onclick="document.getElementById('cloneModal').remove()" style="border:none;background:none;cursor:pointer;color:var(--t3);"><span class="material-icons-outlined" style="font-size:18px;">close</span></button>
+        </div>
+        <div style="padding:24px;">
+          <div style="font-size:13px;color:var(--t2);margin-bottom:16px;">Would you like to clone configuration from an existing FC?</div>
+          <div style="font-size:12px;font-weight:500;margin-bottom:6px;">Clone from <span style="color:var(--primary);">*</span></div>
+          <select class="tds-select" id="cloneSource" style="width:100%;">
+            <option value="">Select FC to clone from</option>
+            ${selectedFCs.filter(f=>f!==fc).map(f=>`<option value="${f}">${f}${configuredFCs[f]?' (configured)':''}</option>`).join('')}
+          </select>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:14px 24px;border-top:1px solid var(--border-light);">
+          <button onclick="startFreshFC('${fc}')" style="padding:7px 16px;border:1px solid var(--border);border-radius:4px;background:#fff;font-family:inherit;font-size:12px;font-weight:500;color:var(--t1);cursor:pointer;">Start fresh</button>
+          <button onclick="cloneFC('${fc}')" style="padding:7px 16px;border:none;border-radius:4px;background:var(--t1);font-family:inherit;font-size:12px;font-weight:500;color:#fff;cursor:pointer;">Clone & configure</button>
+        </div>
+      </div>`;
+      document.body.appendChild(modal);
+    }
+    function startFreshFC(fc){
+      document.getElementById('cloneModal').remove();
+      activeFC=fc;activeStep='inbound';renderAll();
+    }
+    function cloneFC(fc){
+      const source=document.getElementById('cloneSource').value;
+      document.getElementById('cloneModal').remove();
+      // In a real app, this would copy all settings from source FC
+      activeFC=fc;activeStep='inbound';renderAll();
+    }
+
+    // Stepper
+    function renderStepper(){
+      const stepIdx = steps.findIndex(s=>s.id===activeStep);
+      document.getElementById('topStepper').innerHTML = steps.map((s,i)=>{
+        let cls='';
+        if(s.id===activeStep)cls='active';
+        else if(saved[`${activeFC}-${s.id}`])cls='completed';
+        const line = i>0?`<div class="step-line ${saved[`${activeFC}-${steps[i-1].id}`]?'done':''}"></div>`:'';
+        return `${line}<div class="step-item ${cls}" onclick="goToStep('${s.id}')">
+          <div class="step-num">${cls==='completed'?'<span class="material-icons-outlined" style="font-size:12px">check</span>':(i+1)}</div>
+          <div class="step-info"><span class="step-label">${s.label}</span><span class="step-desc">${s.desc}</span></div>
+        </div>`;
+      }).join('');
+    }
+    function goToStep(id){activeStep=id;renderAll();}
+    function goBack(){const idx=steps.findIndex(s=>s.id===activeStep);if(idx>0){activeStep=steps[idx-1].id;renderAll();}}
+    function goNext(){
+      if(activeStep==='outbound'){showReviewModal();return;}
+      saved[`${activeFC}-${activeStep}`]=true;sessionStorage.setItem('fcSaved',JSON.stringify(saved));
+      const idx=steps.findIndex(s=>s.id===activeStep);if(idx<steps.length-1){activeStep=steps[idx+1].id;}renderAll();
+    }
+
+    // Content
+    function renderContent(){
+      const area = document.getElementById('contentArea');
+      if(activeStep==='inbound') { area.innerHTML = getInboundPage(); setTimeout(()=>renderRejChips(),50); }
+      else if(activeStep==='inventory') { area.innerHTML = getInventoryPage(); }
+      else { area.innerHTML = getOutboundPage(); setTimeout(()=>renderPackChips(),50); }
+    }
+
+    function renderAll(){renderFCNav();renderStepper();renderContent();updateFooter();}
+    function updateFooter(){
+      const btn=document.getElementById('btnContinue');
+      if(activeStep==='outbound'){btn.textContent='Review';}
+      else{btn.textContent='Save & proceed';}
+    }
+
+    // ===== STATE PERSISTENCE =====
+    // Store all toggle/input states per FC+step so they persist when navigating
+    const allState = JSON.parse(sessionStorage.getItem('allConfigState')||'{}');
+    function saveAllState(){
+      // Capture all seg-btn active states and input values on current page
+      const key = `${activeFC}-${activeStep}`;
+      const state = {};
+      document.querySelectorAll('.seg-group').forEach((g,i)=>{
+        const active = g.querySelector('.seg-btn.active');
+        state[`seg_${i}`] = active ? active.textContent : '';
+      });
+      document.querySelectorAll('.tds-input, .tds-select, .zone-input').forEach((inp,i)=>{
+        state[`inp_${i}`] = inp.value;
+      });
+      // Save reveal/warn visibility
+      document.querySelectorAll('.cfg-reveal, [id$="-warn"]').forEach((el,i)=>{
+        state[`vis_${i}`] = el.style.display || (el.classList.contains('show')?'show':'');
+      });
+      allState[key] = state;
+      sessionStorage.setItem('allConfigState', JSON.stringify(allState));
+    }
+    function restoreState(){
+      const key = `${activeFC}-${activeStep}`;
+      const state = allState[key];
+      if(!state) return;
+      setTimeout(()=>{
+        document.querySelectorAll('.seg-group').forEach((g,i)=>{
+          const val = state[`seg_${i}`];
+          if(val){
+            g.querySelectorAll('.seg-btn').forEach(b=>{b.classList.remove('active');if(b.textContent===val)b.classList.add('active');});
+            // Trigger reveals
+            if(val==='Yes'){
+              const yesBtn = g.querySelector('.seg-btn.active');
+              if(yesBtn && yesBtn.onclick) yesBtn.click();
+            }
+          }
+        });
+        document.querySelectorAll('.tds-input, .tds-select, .zone-input').forEach((inp,i)=>{
+          if(state[`inp_${i}`]!==undefined) inp.value = state[`inp_${i}`];
+        });
+      },50);
+    }
+    // Save state before navigating away
+    const origGoToStep = goToStep;
+    goToStep = function(id){saveAllState();activeStep=id;renderAll();restoreState();}
+    const origGoBack = goBack;
+    goBack = function(){saveAllState();const idx=steps.findIndex(s=>s.id===activeStep);if(idx>0){activeStep=steps[idx-1].id;renderAll();restoreState();}}
+    const origGoNext = goNext;
+    goNext = function(){
+      saveAllState();
+      if(activeStep==='outbound'){showReviewModal();return;}
+      saved[`${activeFC}-${activeStep}`]=true;sessionStorage.setItem('fcSaved',JSON.stringify(saved));
+      const idx=steps.findIndex(s=>s.id===activeStep);if(idx<steps.length-1){activeStep=steps[idx+1].id;}renderAll();restoreState();
+    }
+
+    // ===== INBOUND PAGE =====
+    function getInboundPage(){
+      return `<div class="content-header"><div><div class="content-title">Inbound</div><div class="content-subtitle">Receiving, QC, POD</div></div><div class="content-count">7 settings</div></div>
+        <div class="section-divider"><div class="section-divider-title">Receiving Rules</div><div class="section-divider-desc">How operators receive stock against an AGN.</div></div>
+        <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+            <div class="cfg-row-left"><div class="cfg-label">Enable excess receiving</div><div class="cfg-desc">Operators can receive more than the expected AGN quantity.</div><span class="cfg-badge badge-client">Client</span></div>
+            <div class="cfg-row-right"><div class="seg-group" id="excess-seg"><button class="seg-btn" onclick="setSeg('excess-seg','yes',showExcess)">Yes</button><button class="seg-btn" onclick="setSeg('excess-seg','no',hideExcess)">No</button></div></div>
+          </div>
+          <div class="cfg-reveal" id="excess-reveal">
+            <div><div class="cfg-reveal-label">Excess receiving tolerance</div><div class="cfg-warn">*Manager override required if this value exceeds 15%</div></div>
+            <div style="display:flex;align-items:center;gap:4px;"><input class="tds-input" placeholder="Add and press enter" style="width:120px;"><span style="font-size:12px;color:var(--t2);">%</span></div>
+          </div>
+        </div>
+        <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Partial receiving</div><div class="cfg-desc">Receiving can finish even if not all items have arrived.</div><span class="cfg-badge badge-client">Client</span></div>
+          <div class="cfg-row-right"><div class="seg-group" id="partial-seg"><button class="seg-btn" onclick="setSeg('partial-seg','yes',null)">Yes</button><button class="seg-btn" onclick="setSeg('partial-seg','no',showPartialWarn)">No</button></div></div></div>
+        <div id="partial-warn" style="display:none;padding:0 0 8px;font-size:11px;color:var(--primary);font-weight:500;">*The entire expected quantity must be received in a single session.</div>
+        <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+            <div class="cfg-row-left"><div class="cfg-label">Rejection reasons</div><div class="cfg-desc">Reasons operators can select when rejecting an item.</div><span class="cfg-badge badge-client">Client</span></div>
+            <div class="cfg-row-right"><div style="position:relative;" id="rejWrap"><div class="rej-trigger" onclick="toggleRejDD()"><span>Select reasons</span><span class="material-icons-outlined" style="font-size:16px;color:var(--t3);">expand_more</span></div>
+              <div class="rej-dd" id="rejDD">
+                <div class="rej-opt" data-name="Major carton damage" onclick="addRej('Major carton damage')"><span>Major carton damage</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
+                <div class="rej-opt" data-name="Expired Product" onclick="addRej('Expired Product')"><span>Expired Product</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
+                <div class="rej-opt" data-name="Defective Scrap" onclick="addRej('Defective Scrap')"><span>Defective Scrap</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
+                <div class="rej-opt" data-name="Product not in good condition" onclick="addRej('Product not in good condition')"><span>Product not in good condition</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
+              </div></div></div>
+          </div>
+          <div id="rejChips" style="display:flex;flex-wrap:wrap;gap:6px;padding:6px 0 0;"></div>
+        </div>
+        <div class="section-divider"><div class="section-divider-title">Quality Check</div><div class="section-divider-desc">Inspection performed during inbound.</div></div>
+        <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Enable QC</div><div class="cfg-desc">Turn on the QC process for this client.</div><span class="cfg-badge badge-client">Client</span></div>
+          <div class="cfg-row-right"><div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">No</button></div></div></div>
+        <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label" style="display:flex;align-items:center;gap:6px;">QC instructions <span style="position:relative;display:inline-flex;" class="info-wrap"><span class="material-icons-outlined" style="font-size:15px;color:var(--t3);cursor:help;">info</span><span class="info-tip" style="position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);padding:8px 12px;background:var(--t1);color:#fff;font-size:11px;border-radius:4px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity 0.15s;z-index:200;">SKU level QC instructions can be set up in the product catalog</span></span></div><div class="cfg-desc">Show QC instructions to operators during receiving.</div><span class="cfg-badge badge-client">Client</span></div>
+          <div class="cfg-row-right"><div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">No</button></div></div></div>
+        <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+            <div class="cfg-row-left"><div class="cfg-label">Enable QC parameters</div><div class="cfg-desc">Show pass/fail parameter fields to operators during QC.</div><span class="cfg-badge badge-client">Client</span></div>
+            <div class="cfg-row-right"><div class="seg-group" id="qcparam-seg"><button class="seg-btn" onclick="setSeg('qcparam-seg','yes',()=>document.getElementById('qcparam-warn').style.display='block')">Yes</button><button class="seg-btn" onclick="setSeg('qcparam-seg','no',()=>document.getElementById('qcparam-warn').style.display='none')">No</button></div></div>
+          </div>
+          <div id="qcparam-warn" style="display:none;padding:8px 0 0;font-size:11px;color:var(--primary);font-weight:500;">*SKU level QC parameters can be set up in the product catalog</div>
+        </div>
+        <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Failed parameter images</div><div class="cfg-desc">Require image upload when a QC parameter fails.</div><span class="cfg-badge badge-client">Client</span></div>
+          <div class="cfg-row-right"><div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">No</button></div></div></div>
+        <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+            <div class="cfg-row-left"><div class="cfg-label">One unit at a time</div><div class="cfg-desc">Capture QC one unit at a time instead of bulk.</div><span class="cfg-badge badge-client">Client</span></div>
+            <div class="cfg-row-right"><div class="seg-group" id="oneunit-seg"><button class="seg-btn" onclick="setSeg('oneunit-seg','yes',showOneUnit)">Yes</button><button class="seg-btn" onclick="setSeg('oneunit-seg','no',hideOneUnit)">No</button></div></div>
+          </div>
+          <div id="oneunit-warn" style="display:none;padding:8px 0 0;font-size:11px;color:var(--primary);font-weight:500;">*Receiving may take longer because operators must perform QC one unit at a time.</div>
+          <div class="cfg-reveal" id="oneunit-scope"><span class="cfg-reveal-label">Scope of one unit at a time</span><select class="tds-select"><option value="">Select</option><option>Accept</option><option>Reject</option><option>Both</option></select></div>
+        </div>`;
+    }
+
+    // Helpers
+    function setSeg(segId,val,cb){const seg=document.getElementById(segId);if(!seg)return;seg.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));if(val==='yes')seg.children[0].classList.add('active');else seg.children[1].classList.add('active');if(cb)cb();}
+    function showExcess(){document.getElementById('excess-reveal').classList.add('show');}
+    function hideExcess(){document.getElementById('excess-reveal').classList.remove('show');}
+    function showPartialWarn(){document.getElementById('partial-warn').style.display='block';}
+    function showOneUnit(){document.getElementById('oneunit-warn').style.display='block';document.getElementById('oneunit-scope').classList.add('show');}
+    function hideOneUnit(){document.getElementById('oneunit-warn').style.display='none';document.getElementById('oneunit-scope').classList.remove('show');}
+
+    let rejReasons=JSON.parse(sessionStorage.getItem('rejReasons')||'[]');
+    function toggleRejDD(){document.getElementById('rejDD').classList.toggle('open');}
+    document.addEventListener('click',e=>{const w=document.getElementById('rejWrap');if(w&&!w.contains(e.target))document.getElementById('rejDD')?.classList.remove('open');
+      const p=document.getElementById('packWrap');if(p&&!p.contains(e.target))document.getElementById('packDD')?.classList.remove('open');});
+    function addRej(n){if(rejReasons.includes(n))return;rejReasons.push(n);sessionStorage.setItem('rejReasons',JSON.stringify(rejReasons));renderRejChips();document.querySelectorAll('#rejDD .rej-opt').forEach(o=>{o.style.display=rejReasons.includes(o.getAttribute('data-name'))?'none':'flex';});}
+    function removeRej(n){rejReasons=rejReasons.filter(r=>r!==n);sessionStorage.setItem('rejReasons',JSON.stringify(rejReasons));renderRejChips();document.querySelectorAll('#rejDD .rej-opt').forEach(o=>{o.style.display=rejReasons.includes(o.getAttribute('data-name'))?'none':'flex';});}
+    function renderRejChips(){const c=document.getElementById('rejChips');if(!c)return;c.innerHTML=rejReasons.map(r=>`<span class="pill-chip">${r}<span class="material-icons-outlined remove" onclick="removeRej('${r}')">close</span></span>`).join('');
+      // Also hide already-selected items from dropdown
+      document.querySelectorAll('#rejDD .rej-opt').forEach(o=>{o.style.display=rejReasons.includes(o.getAttribute('data-name'))?'none':'flex';});}
+
+    // ===== REVIEW MODAL =====
+    function showReviewModal(){
+      markFCConfigured(activeFC);
+      const existing=document.getElementById('reviewModal');if(existing)existing.remove();
+      // Find next unconfigured FC
+      const nextUnconfigured = selectedFCs.find(fc => fc !== activeFC && !configuredFCs[fc]);
+      const modal=document.createElement('div');modal.id='reviewModal';
+      modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:500;';
+      modal.innerHTML=`<div style="background:#fff;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.15);width:440px;max-width:90vw;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--border-light);">
+          <h3 style="font-size:15px;font-weight:600;">Configuration Review</h3>
+          <button onclick="document.getElementById('reviewModal').remove()" style="border:none;background:none;cursor:pointer;color:var(--t3);"><span class="material-icons-outlined" style="font-size:18px;">close</span></button>
+        </div>
+        <div style="padding:24px;">
+          <div style="font-size:13px;color:var(--t2);margin-bottom:16px;">Summary of configurations updated for <strong>${activeFC}</strong>:</div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#F9FAFB;border-radius:6px;">
+              <span style="font-size:13px;font-weight:500;">Inbound</span>
+              <span style="font-size:12px;font-weight:600;color:var(--success);">7 settings configured</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#F9FAFB;border-radius:6px;">
+              <span style="font-size:13px;font-weight:500;">Inventory</span>
+              <span style="font-size:12px;font-weight:600;color:var(--success);">9 settings configured</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#F9FAFB;border-radius:6px;">
+              <span style="font-size:13px;font-weight:500;">Outbound</span>
+              <span style="font-size:12px;font-weight:600;color:var(--success);">8 settings configured</span>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:14px 24px;border-top:1px solid var(--border-light);">
+          ${nextUnconfigured ? `<button onclick="goToNextFC('${nextUnconfigured}')" style="padding:8px 20px;border:1px solid var(--border);border-radius:4px;background:#fff;font-family:inherit;font-size:13px;font-weight:500;color:var(--t1);cursor:pointer;">Configure ${nextUnconfigured}</button>` : ''}
+          <button onclick="activateClient()" style="padding:8px 20px;border:none;border-radius:4px;background:var(--success);font-family:inherit;font-size:13px;font-weight:500;color:#fff;cursor:pointer;">Activate client</button>
+        </div>
+      </div>`;
+      document.body.appendChild(modal);
+    }
+    function goToNextFC(fc){
+      document.getElementById('reviewModal').remove();
+      showClonePrompt(fc);
+    }
+    function activateClient(){
+      markFCConfigured(activeFC);
+      localStorage.setItem('mamaearth_status','active');
+      // Store which FCs are configured for the list page
+      localStorage.setItem('configuredFCsList', JSON.stringify(Object.keys(configuredFCs)));
+      window.location.href='01-client-list.html';
+    }
+
+    // ===== PICKWAVE MODAL =====
+    let pwTab = 'schedule';
+    let pwScheduleMode = 'frequency'; // 'frequency' or 'custom'
+    let pwFrequency = '';
+    let pwCustomTimes = [];
+    function openPickwaveModal(){
+      const existing=document.getElementById('pwModal');if(existing)existing.remove();
+      const modal=document.createElement('div');modal.id='pwModal';
+      modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:500;';
+      modal.innerHTML=getPWModalHTML();
+      document.body.appendChild(modal);
+    }
+    function closePWModal(){document.getElementById('pwModal')?.remove();}
+    function setPWTab(tab){pwTab=tab;document.getElementById('pwModal').innerHTML=getPWModalHTML();}
+
+    function getPWModalHTML(){
+      return `<div style="background:#fff;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.15);width:640px;max-width:90vw;max-height:85vh;display:flex;flex-direction:column;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--border-light);">
+          <h3 style="font-size:15px;font-weight:600;">Pickwave automation</h3>
+          <button onclick="closePWModal()" style="border:none;background:none;cursor:pointer;color:var(--t3);"><span class="material-icons-outlined" style="font-size:18px;">close</span></button>
+        </div>
+        <div style="display:flex;gap:0;padding:0 24px;border-bottom:1px solid var(--border-light);">
+          ${['schedule','complexity','capacity','groupby'].map((t,i)=>{
+            const labels=['Pickwave schedule','Order complexity','Picklist capacity','Group by'];
+            return `<button onclick="setPWTab('${t}')" style="padding:12px 16px;font-family:inherit;font-size:12px;font-weight:${pwTab===t?'600':'500'};color:${pwTab===t?'var(--t1)':'var(--t3)'};border:none;background:none;cursor:pointer;border-bottom:2px solid ${pwTab===t?'var(--t1)':'transparent'};">${labels[i]}</button>`;
+          }).join('')}
+        </div>
+        <div style="padding:20px 24px;overflow-y:auto;flex:1;">${getPWTabContent()}</div>
+        <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:14px 24px;border-top:1px solid var(--border-light);">
+          <button onclick="closePWModal()" style="padding:7px 16px;border:1px solid var(--border);border-radius:4px;background:#fff;font-family:inherit;font-size:12px;font-weight:500;color:var(--t1);cursor:pointer;">Cancel</button>
+          <button id="pwSaveBtn" style="padding:7px 16px;border:none;border-radius:4px;background:#E0E0E0;font-family:inherit;font-size:12px;font-weight:500;color:#999;cursor:not-allowed;">Save details</button>
+        </div>
+      </div>`;
+    }
+
+    function getPWTabContent(){
+      if(pwTab==='schedule') return getScheduleTab();
+      if(pwTab==='complexity') return getComplexityTab();
+      if(pwTab==='capacity') return getCapacityTab();
+      return getGroupByTab();
+    }
+
+    function getScheduleTab(){
+      return `<div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="radio" name="schedMode" value="frequency" ${pwScheduleMode==='frequency'?'checked':''} onchange="pwScheduleMode='frequency';setPWTab('schedule')" style="accent-color:var(--t1);">Set frequency</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="radio" name="schedMode" value="custom" ${pwScheduleMode==='custom'?'checked':''} onchange="pwScheduleMode='custom';setPWTab('schedule')" style="accent-color:var(--t1);">Set custom time</label>
+        </div>
+        ${pwScheduleMode==='frequency'?`
+          <div style="margin-bottom:8px;font-size:13px;font-weight:500;">Create new pickwave in every: <span style="color:var(--primary);">*</span></div>
+          <select class="tds-select" style="width:100%;" onchange="pwFrequency=this.value;checkPWSave()">
+            <option value="">Select frequency</option><option ${pwFrequency==='30 minutes'?'selected':''}>30 minutes</option><option ${pwFrequency==='60 minutes'?'selected':''}>60 minutes</option><option ${pwFrequency==='90 minutes'?'selected':''}>90 minutes</option><option ${pwFrequency==='120 minutes'?'selected':''}>120 minutes</option>
+          </select>`:`
+          <div style="margin-bottom:8px;font-size:13px;font-weight:500;">Time Picker <span style="color:var(--primary);">*</span></div>
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
+            <input class="tds-input" type="time" id="pwTimeInput" style="width:140px;">
+            <button onclick="addPWTime()" style="padding:6px 14px;border:none;border-radius:4px;background:var(--t1);color:#fff;font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;">Add time</button>
+          </div>
+          ${pwCustomTimes.length?`<div style="font-size:12px;font-weight:500;margin-bottom:8px;">Selected time:</div><div style="display:flex;flex-wrap:wrap;gap:6px;">${pwCustomTimes.map((t,i)=>`<span class="pill-chip" style="border-color:#0066CC;color:#0066CC;"><span class="material-icons-outlined" style="font-size:12px;">schedule</span>${t}<span class="material-icons-outlined remove" onclick="pwCustomTimes.splice(${i},1);setPWTab('schedule')">close</span></span>`).join('')}</div>`:''}`}`;
+    }
+    function addPWTime(){const inp=document.getElementById('pwTimeInput');if(inp&&inp.value){pwCustomTimes.push(inp.value);setPWTab('schedule');checkPWSave();}}
+
+    function getComplexityTab(){
+      return `<div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border-light);">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><span style="font-size:13px;font-weight:600;">Order Type :</span><span style="padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:#E6F5ED;color:#0D7A3F;">Simple</span></div>
+          <div style="display:flex;gap:16px;"><div style="flex:1;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Maximum SKU in order</div><input class="tds-input" id="simpleMaxSKU" placeholder="Type here..." style="width:100%;" oninput="updateComplexMsg();checkPWSave()"></div>
+          <div style="flex:1;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Maximum quantity in order</div><input class="tds-input" placeholder="Type here..." style="width:100%;" oninput="checkPWSave()"></div></div>
+        </div>
+        <div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border-light);">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span style="font-size:13px;font-weight:600;">Order Type :</span><span style="padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:var(--warning-bg);color:var(--warning);">Complex</span></div>
+          <div id="complexMsg" style="font-size:11px;color:var(--t3);margin-bottom:12px;"></div>
+          <div style="font-size:12px;font-weight:500;margin-bottom:6px;">Maximum quantity in order</div><input class="tds-input" value="100" style="width:200px;margin-bottom:16px;" oninput="checkPWSave()">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:12px 0;border-top:1px solid var(--border-light);">
+            <div style="flex:1;max-width:70%;"><div style="font-size:13px;font-weight:600;">Order bundling</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">When enabled, pickwaves will be divided into picklists based on zones</div></div>
+            <div class="seg-group" id="bundling-seg"><button class="seg-btn" onclick="setSeg('bundling-seg','yes',showBundlingParams);checkPWSave()">Yes</button><button class="seg-btn" onclick="setSeg('bundling-seg','no',hideBundlingParams);checkPWSave()">No</button></div>
+          </div>
+          <div id="bundling-params" style="display:none;padding-top:12px;">
+            <div style="display:flex;gap:16px;margin-bottom:12px;"><div style="flex:1;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Maximum orders in a pickwave <span style="color:var(--primary);">*</span></div><input class="tds-input" placeholder="Type here..." value="10" style="width:100%;" oninput="checkPWSave()"></div>
+            <div style="flex:1;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Minimum orders for segregation <span style="color:var(--primary);">*</span></div><input class="tds-input" placeholder="Type here..." value="10" style="width:100%;" oninput="checkPWSave()"></div></div>
+            <div style="display:flex;gap:16px;"><div style="flex:1;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Maximum SKU weight (Kgs)</div><input class="tds-input" placeholder="Type here..." value="20" style="width:100%;" oninput="checkPWSave()"></div>
+            <div style="flex:1;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Maximum SKU Volume (Cm3)</div><input class="tds-input" placeholder="Type here..." value="2160000" style="width:100%;" oninput="checkPWSave()"></div></div>
+          </div>
+        </div>
+        <div><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><span style="font-size:13px;font-weight:600;">Order Type :</span><span style="padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:var(--primary-light);color:var(--primary);">Bulk</span></div>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border-light);">
+            <div style="flex:1;max-width:70%;"><div style="font-size:13px;font-weight:600;">Consolidation</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">Enable consolidation of Bulk orders in staging area. Set minimum order quantity above which consolidation is required.</div></div>
+            <div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');checkPWSave()">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');checkPWSave()">No</button></div>
+          </div>
+          <div style="padding-top:12px;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Minimum quantity for consolidation <span style="color:var(--primary);">*</span></div><input class="tds-input" value="100" style="width:200px;" oninput="checkPWSave()"></div>
+        </div>`;
+    }
+    function updateComplexMsg(){
+      const inp=document.getElementById('simpleMaxSKU');
+      const msg=document.getElementById('complexMsg');
+      if(inp&&msg){msg.textContent=inp.value?'SKUs above '+inp.value:'';}
+    }
+
+    function getCapacityTab(){
+      return `<div style="border:1px solid var(--border-light);border-radius:6px;overflow:hidden;">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead style="background:#F9FAFB;"><tr><th style="padding:10px 14px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Order type</th><th style="padding:10px 14px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);" colspan="2">Picklist limit</th></tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:10px 14px;font-size:12px;font-weight:500;" rowspan="1">Simple</td><td style="padding:10px 14px;"><div style="font-size:11px;color:var(--t3);margin-bottom:4px;">Maximum quantity</div><input class="tds-input" value="1" style="width:100px;" oninput="checkPWSave()"></td><td style="padding:10px 14px;"><div style="font-size:11px;color:var(--t3);margin-bottom:4px;">Maximum locations</div><input class="tds-input" value="6" style="width:100px;" oninput="checkPWSave()"></td></tr>
+            <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:10px 14px;font-size:12px;font-weight:500;">Complex</td><td style="padding:10px 14px;"><div style="font-size:11px;color:var(--t3);margin-bottom:4px;">Maximum quantity</div><input class="tds-input" value="1" style="width:100px;" oninput="checkPWSave()"></td><td style="padding:10px 14px;"><div style="font-size:11px;color:var(--t3);margin-bottom:4px;">Maximum locations</div><input class="tds-input" value="6" style="width:100px;" oninput="checkPWSave()"></td></tr>
+            <tr><td style="padding:10px 14px;font-size:12px;font-weight:500;">Bulk</td><td style="padding:10px 14px;"><div style="font-size:11px;color:var(--t3);margin-bottom:4px;">Maximum quantity</div><input class="tds-input" value="1000" style="width:100px;" oninput="checkPWSave()"></td><td></td></tr>
+          </tbody>
+        </table></div>`;
+    }
+
+    let channelGroups = [];
+    let selectedChannels = new Set();
+    const availableChannels = ['Flipkart','Shopify','Amazon','Myntra','Paytm'];
+
+    function getGroupByTab(){
+      return `<div style="padding:12px 0;border-bottom:1px solid var(--border-light);">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;"><div style="flex:1;max-width:70%;"><div style="font-size:13px;font-weight:600;">Priority</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">Enable this to create separate pickwaves for each priority type.</div></div>
+            <div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');checkPWSave()">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');checkPWSave()">No</button></div></div>
+        </div>
+        <div style="padding:12px 0;border-bottom:1px solid var(--border-light);">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;"><div style="flex:1;max-width:70%;"><div style="font-size:13px;font-weight:600;">Channel</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">Enable this to create separate pickwaves for every channel. Channels can be grouped to create single pickwave for grouped channels.</div></div>
+            <div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');checkPWSave()">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');checkPWSave()">No</button></div></div>
+          <div style="margin-top:8px;font-size:11px;color:var(--primary);font-weight:500;">*Note: Unassigned channels will have their separate pickwaves</div>
+          <div style="margin-top:12px;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Group channel for pickwave <span style="color:var(--primary);">*</span></div>
+            <div style="border:1px solid var(--border);border-radius:4px;padding:8px 12px;">
+              ${availableChannels.map(ch=>`<label style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12px;cursor:pointer;"><input type="checkbox" value="${ch}" onchange="toggleChannelSel('${ch}')" ${selectedChannels.has(ch)?'checked':''} style="accent-color:var(--t1);width:14px;height:14px;">${ch}</label>`).join('')}
+              <div id="createGroupBtn" style="display:${selectedChannels.size>=2?'block':'none'};margin-top:8px;padding-top:8px;border-top:1px solid var(--border-light);">
+                <button onclick="createChannelGroup()" style="padding:6px 14px;border:1px solid var(--t1);border-radius:4px;background:#fff;font-family:inherit;font-size:11px;font-weight:600;color:var(--t1);cursor:pointer;">Create group</button>
+              </div>
+            </div>
+            ${channelGroups.length?`<div style="margin-top:12px;"><div style="font-size:11px;font-weight:600;color:var(--t2);margin-bottom:6px;">Created groups</div>${channelGroups.map((g,i)=>`<div style="display:flex;align-items:center;gap:6px;padding:6px 0;font-size:12px;"><span style="font-weight:500;">${g.join(', ')}</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);cursor:pointer;" onclick="channelGroups.splice(${i},1);setPWTab('groupby')">close</span></div>`).join('')}</div>`:''}
+          </div>
+        </div>`;
+    }
+    function toggleChannelSel(ch){
+      if(selectedChannels.has(ch))selectedChannels.delete(ch);else selectedChannels.add(ch);
+      setPWTab('groupby');
+    }
+    function createChannelGroup(){
+      if(selectedChannels.size<2)return;
+      channelGroups.push([...selectedChannels]);
+      selectedChannels.clear();
+      setPWTab('groupby');
+      checkPWSave();
+    }
+
+    let pwConfigured = false;
+    let pwSummary = {};
+
+    function checkPWSave(){
+      const btn=document.getElementById('pwSaveBtn');if(!btn)return;
+      btn.style.background='var(--t1)';btn.style.color='#fff';btn.style.cursor='pointer';
+      btn.onclick=()=>savePWConfig();
+    }
+    function savePWConfig(){
+      pwConfigured = true;
+      pwSummary = {
+        scheduleType: pwScheduleMode === 'frequency' ? 'Frequency' : 'Custom times',
+        schedule: pwScheduleMode === 'frequency' ? (pwFrequency || 'Not set') : (pwCustomTimes.length ? pwCustomTimes.join(', ') : 'Not set'),
+        simpleMaxSKU: document.getElementById('simpleMaxSKU')?.value || '-',
+        complexMaxQty: '100',
+        orderBundling: document.getElementById('bundling-seg')?.querySelector('.seg-btn.active')?.textContent || '-',
+        bulkConsolidation: 'Yes',
+        bulkMinQty: '100',
+        picklistSimple: 'Qty: 1, Locations: 6',
+        picklistComplex: 'Qty: 1, Locations: 6',
+        picklistBulk: 'Qty: 1000',
+        groupByPriority: '-',
+        groups: channelGroups.length ? channelGroups.map(g=>g.join(' + ')).join('; ') : 'None'
+      };
+      closePWModal();
+      renderContent();
+    }
+    function showBundlingParams(){document.getElementById('bundling-params').style.display='block';}
+    function hideBundlingParams(){document.getElementById('bundling-params').style.display='none';}
+
+    // Packaging instructions
+    let packInstr=JSON.parse(sessionStorage.getItem('packInstr')||'[]');
+    function togglePackDD(){document.getElementById('packDD').classList.toggle('open');}
+    document.addEventListener('click',e=>{
+      const w=document.getElementById('rejWrap');if(w&&!w.contains(e.target))document.getElementById('rejDD')?.classList.remove('open');
+      const p=document.getElementById('packWrap');if(p&&!p.contains(e.target))document.getElementById('packDD')?.classList.remove('open');
+    });
+    function addPackInstr(n){if(packInstr.includes(n))return;packInstr.push(n);sessionStorage.setItem('packInstr',JSON.stringify(packInstr));renderPackChips();document.querySelectorAll('#packDD .rej-opt').forEach(o=>{o.style.display=packInstr.includes(o.getAttribute('data-name'))?'none':'flex';});}
+    function removePackInstr(n){packInstr=packInstr.filter(r=>r!==n);sessionStorage.setItem('packInstr',JSON.stringify(packInstr));renderPackChips();document.querySelectorAll('#packDD .rej-opt').forEach(o=>{o.style.display=packInstr.includes(o.getAttribute('data-name'))?'none':'flex';});}
+    function renderPackChips(){const c=document.getElementById('packChips');if(!c)return;c.innerHTML=packInstr.map(r=>`<span class="pill-chip">${r}<span class="material-icons-outlined remove" onclick="removePackInstr('${r}')">close</span></span>`).join('');document.querySelectorAll('#packDD .rej-opt').forEach(o=>{if(o)o.style.display=packInstr.includes(o.getAttribute('data-name'))?'none':'flex';});}
+
+    // Serviceability - check if platform_dispatcher or self_pick was selected in courier mapping
+    function hasServiceabilityCouriers(){
+      const couriers=JSON.parse(localStorage.getItem('selectedCouriers')||'["PLATFORM_DISPATCHER","SELF_PICK"]');
+      return couriers.some(c=>c==='PLATFORM_DISPATCHER'||c==='SELF_PICK');
+    }
+    function getServiceabilityCouriers(){
+      const couriers=JSON.parse(localStorage.getItem('selectedCouriers')||'["PLATFORM_DISPATCHER","SELF_PICK"]');
+      return couriers.filter(c=>c==='PLATFORM_DISPATCHER'||c==='SELF_PICK').map(c=>c==='PLATFORM_DISPATCHER'?'Platform dispatcher':'Self pickup');
+    }
+
+    // File Upload Modal
+    let uploadedFiles = {}; // { 'Platform dispatcher': {name:'file.csv'}, ... }
+    function openUploadModal(title, courierKey) {
+      const existing=document.getElementById('uploadModal');if(existing)existing.remove();
+      const modal=document.createElement('div');modal.id='uploadModal';
+      modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:500;';
+      modal.innerHTML=`<div style="background:#fff;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.15);width:520px;max-width:90vw;display:flex;flex-direction:column;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--border-light);">
+          <h3 style="font-size:15px;font-weight:600;">${title}</h3>
+          <button onclick="document.getElementById('uploadModal').remove()" style="border:none;background:none;cursor:pointer;color:var(--t3);"><span class="material-icons-outlined" style="font-size:18px;">close</span></button>
+        </div>
+        <div style="padding:24px;">
+          <div style="font-size:13px;font-weight:500;margin-bottom:12px;">Upload your files here</div>
+          <div id="uploadDropzone" style="border:2px dashed var(--border);border-radius:8px;padding:32px;text-align:center;cursor:pointer;" onclick="document.getElementById('uploadFileInput').click()">
+            <div style="margin-bottom:8px;"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><rect x="8" y="16" width="24" height="16" rx="2" fill="#F0F0F0" stroke="#CCC"/><rect x="12" y="10" width="16" height="6" rx="1" fill="#F9F9F9" stroke="#CCC"/><circle cx="20" cy="22" r="4" fill="#E6F0FA" stroke="#0066CC" stroke-width="0.5"/><path d="M20 20v4M18 22h4" stroke="#0066CC" stroke-width="1" stroke-linecap="round"/></svg></div>
+            <div style="font-size:12px;color:var(--t3);margin-bottom:8px;">Drop your file here, or</div>
+            <button type="button" style="padding:6px 14px;border:1px solid var(--border);border-radius:4px;background:#fff;font-family:inherit;font-size:12px;font-weight:500;color:var(--t1);cursor:pointer;">Click to browse</button>
+          </div>
+          <input type="file" id="uploadFileInput" style="display:none" accept=".csv,.xlsx,.xls" onchange="handleUploadFile(this,'${courierKey}')">
+          <div id="uploadedFileInfo" style="display:none;margin-top:12px;padding:10px 14px;border:1px solid var(--border-light);border-radius:6px;">
+            <div style="font-size:12px;font-weight:500;color:var(--t1);" id="uploadedFileName"></div>
+            <div style="display:flex;gap:8px;margin-top:6px;">
+              <button onclick="document.getElementById('uploadFileInput').click()" style="padding:4px 10px;border:1px solid var(--border);border-radius:4px;font-family:inherit;font-size:11px;cursor:pointer;background:#fff;">Change</button>
+              <button onclick="removeUploadFile('${courierKey}')" style="padding:4px 10px;border:1px solid var(--primary);border-radius:4px;font-family:inherit;font-size:11px;cursor:pointer;background:#fff;color:var(--primary);">Remove</button>
+            </div>
+          </div>
+          <a style="display:block;margin-top:16px;font-size:12px;font-weight:500;color:#0D7A3F;cursor:pointer;">Download sample file</a>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:14px 24px;border-top:1px solid var(--border-light);">
+          <button onclick="document.getElementById('uploadModal').remove()" style="padding:7px 16px;border:1px solid var(--border);border-radius:4px;background:#fff;font-family:inherit;font-size:12px;font-weight:500;color:var(--t1);cursor:pointer;">Cancel</button>
+          <button id="uploadSaveBtn" disabled style="padding:7px 16px;border:none;border-radius:4px;background:#E0E0E0;font-family:inherit;font-size:12px;font-weight:500;color:#999;cursor:not-allowed;">Save details</button>
+        </div>
+      </div>`;
+      document.body.appendChild(modal);
+    }
+    function handleUploadFile(input, courierKey){
+      if(input.files&&input.files[0]){
+        uploadedFiles[courierKey]={name:input.files[0].name};
+        document.getElementById('uploadDropzone').style.display='none';
+        document.getElementById('uploadedFileInfo').style.display='block';
+        document.getElementById('uploadedFileName').textContent=input.files[0].name;
+        const btn=document.getElementById('uploadSaveBtn');
+        btn.disabled=false;btn.style.background='var(--t1)';btn.style.color='#fff';btn.style.cursor='pointer';
+        btn.onclick=()=>{document.getElementById('uploadModal').remove();renderContent();};
+      }
+    }
+    function removeUploadFile(courierKey){
+      delete uploadedFiles[courierKey];
+      document.getElementById('uploadDropzone').style.display='';
+      document.getElementById('uploadedFileInfo').style.display='none';
+      const btn=document.getElementById('uploadSaveBtn');
+      btn.disabled=true;btn.style.background='#E0E0E0';btn.style.color='#999';btn.style.cursor='not-allowed';btn.onclick=null;
+    }
+    function downloadFile(key){
+      if(uploadedFiles[key]){alert('Downloading: '+uploadedFiles[key].name);}
+    }
+
+    // ===== INVENTORY PAGE =====
+    let zonesData = JSON.parse(sessionStorage.getItem('zonesData')||'[]');
+    function getInventoryPage(){
+      return `<div class="content-header"><div><div class="content-title">Inventory</div><div class="content-subtitle">Zones, expiry, cycle count</div></div><div class="content-count">9 settings</div></div>
+        <div class="section-divider"><div class="section-divider-title">Zone and Locations</div><div class="section-divider-desc">Configure warehouse zones and their locations.</div></div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:8px;"><button class="btn-bulk" onclick="openUploadModal('Upload locations','bulk_locations')">Bulk upload</button></div>
+        <div class="zones-wrap"><table class="zones-table"><thead><tr><th style="width:40px">S.No.</th><th style="width:160px">Zones</th><th>Locations</th><th style="width:80px;text-align:center">Action</th></tr></thead><tbody id="zonesBody"></tbody></table></div>
+        <div class="section-divider"><div class="section-divider-title">Expiry Management</div><div class="section-divider-desc">How near-expiry and expired stock are handled.</div></div>
+        <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Shelf-life check</div><div class="cfg-desc">System checks shelf life before moving items from Reserve to Prime.</div><span class="cfg-badge badge-fc">FC</span></div>
+          <div class="cfg-row-right"><div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">No</button></div></div></div>
+        <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+            <div class="cfg-row-left"><div class="cfg-label">Auto-move expired stock</div><div class="cfg-desc">Expired products are automatically moved into an expired bucket.</div><span class="cfg-badge badge-client">Client</span></div>
+            <div class="cfg-row-right"><div class="seg-group" id="auto-exp-seg"><button class="seg-btn" onclick="setSeg('auto-exp-seg','yes',()=>document.getElementById('exp-bucket').classList.add('show'))">Yes</button><button class="seg-btn" onclick="setSeg('auto-exp-seg','no',()=>document.getElementById('exp-bucket').classList.remove('show'))">No</button></div></div>
+          </div>
+          <div class="cfg-reveal" id="exp-bucket"><span class="cfg-reveal-label">Expired external bucket</span><select class="tds-select"><option value="">Select bucket</option><option>Expired stock</option><option>Damaged</option><option>Do not sell</option></select></div>
+        </div>
+        <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+            <div class="cfg-row-left"><div class="cfg-label">Auto-move near-expiry stock</div><div class="cfg-desc">Near-expiry products are moved into a near-expiry bucket.</div><span class="cfg-badge badge-client">Client</span></div>
+            <div class="cfg-row-right"><div class="seg-group" id="auto-near-seg"><button class="seg-btn" onclick="setSeg('auto-near-seg','yes',()=>document.getElementById('near-bucket').classList.add('show'))">Yes</button><button class="seg-btn" onclick="setSeg('auto-near-seg','no',()=>document.getElementById('near-bucket').classList.remove('show'))">No</button></div></div>
+          </div>
+          <div class="cfg-reveal" id="near-bucket"><span class="cfg-reveal-label">Near-expiry external bucket</span><select class="tds-select"><option value="">Select bucket</option><option>Expired stock</option><option>Damaged</option><option>Do not sell</option></select></div>
+        </div>
+        <div class="section-divider"><div class="section-divider-title">Cycle Count</div><div class="section-divider-desc">Thresholds for supervisory approval during cycle counts.</div></div>
+        <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Shortage threshold</div><div class="cfg-desc">Units short above which supervisory approval is needed.</div><span class="cfg-badge badge-fc">FC</span></div>
+          <div class="cfg-row-right"><input class="tds-input" placeholder="Add and press enter"></div></div>
+        <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Overage threshold</div><div class="cfg-desc">Units extra above which supervisory approval is needed.</div><span class="cfg-badge badge-fc">FC</span></div>
+          <div class="cfg-row-right"><input class="tds-input" placeholder="Add and press enter"></div></div>`;
+    }
+
+    // Zones table render
+    function renderZones(){
+      const tbody=document.getElementById('zonesBody');if(!tbody)return;
+      let html=zonesData.filter(z=>z.saved).map((z,i)=>{
+        const pills=z.locations.slice(0,5).map(l=>`<span class="zone-pill">${l}</span>`).join('')+(z.locations.length>5?`<span class="zone-pill">+${z.locations.length-5}</span>`:'');
+        return `<tr><td>${i+1}</td><td style="font-weight:500">${z.name}</td><td><div style="display:flex;gap:4px;flex-wrap:wrap;">${pills}</div></td><td style="text-align:center"><button class="zone-edit-btn" onclick="editZone(${i})"><span class="material-icons-outlined" style="font-size:13px">edit</span></button></td></tr>`;
+      }).join('');
+      // Editable rows
+      zonesData.filter(z=>!z.saved).forEach((z,i)=>{
+        const idx=zonesData.indexOf(z);
+        html+=`<tr><td>${zonesData.filter(x=>x.saved).length+i+1}</td><td><input class="zone-input" value="${z.name||''}" placeholder="Zone name" onchange="zonesData[${idx}].name=this.value;sessionStorage.setItem('zonesData',JSON.stringify(zonesData))"></td><td><input class="zone-input" value="${(z.locations||[]).join(', ')}" placeholder="Locations (comma separated)" onchange="zonesData[${idx}].locations=this.value.split(',').map(s=>s.trim()).filter(Boolean);sessionStorage.setItem('zonesData',JSON.stringify(zonesData))"></td><td style="text-align:center"><button class="zone-save-btn" onclick="zonesData[${idx}].saved=true;sessionStorage.setItem('zonesData',JSON.stringify(zonesData));renderZones();">Save</button></td></tr>`;
+      });
+      // Empty new row
+      html+=`<tr><td>${zonesData.length+1}</td><td><input class="zone-input" placeholder="Zone name" onchange="addZone(this.value)"></td><td><input class="zone-input" placeholder="Locations (comma separated)" disabled></td><td></td></tr>`;
+      tbody.innerHTML=html;
+    }
+    function addZone(name){if(!name.trim())return;zonesData.push({name:name.trim(),locations:[],saved:false});sessionStorage.setItem('zonesData',JSON.stringify(zonesData));renderZones();}
+    function editZone(i){zonesData[i].saved=false;sessionStorage.setItem('zonesData',JSON.stringify(zonesData));renderZones();}
+
+    // ===== OUTBOUND PAGE =====
+    function getOutboundPage(){
+      return `<div class="content-header"><div><div class="content-title">Outbound</div><div class="content-subtitle">Allocation, picking, dispatch</div></div><div class="content-count">8 settings</div></div>
+        <div class="section-divider"><div class="section-divider-title">Order Processing</div><div class="section-divider-desc">How orders are allocated and picked.</div></div>
+        <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Ship by date</div><div class="cfg-desc">Configure SBD courier offset and cutoff times per priority.</div><span class="cfg-badge badge-fc">FC</span></div>
+          <div class="cfg-row-right"><button class="btn-bulk" onclick="openSBDModal()">Configure</button></div></div>
+        ${['Pickwave Automation','Enable LR consolidation'].map(s=>{
+          if(s==='Pickwave Automation') {
+            if(pwConfigured) {
+              return `<div class="cfg-row" style="flex-direction:column;align-items:stretch;">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+                  <div class="cfg-row-left"><div class="cfg-label">Pickwave Automation</div><div class="cfg-desc">Pickwave schedule, order complexity, capacity and grouping configured.</div><span class="cfg-badge badge-fc">FC</span></div>
+                  <div class="cfg-row-right"><button class="btn-bulk" onclick="openPickwaveModal()">Edit details</button></div>
+                </div>
+                <div style="margin-top:12px;background:#F9FAFB;border-radius:6px;padding:12px 16px;">
+                  <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                    <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:6px 0;font-weight:600;color:var(--t2);" colspan="2">Schedule</td></tr>
+                    <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:6px 0;color:var(--t3);width:200px;">Type</td><td style="padding:6px 0;color:var(--t1);">${pwSummary.scheduleType}</td></tr>
+                    <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:6px 0;color:var(--t3);">Value</td><td style="padding:6px 0;color:var(--t1);">${pwSummary.schedule}</td></tr>
+                    <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:6px 0;font-weight:600;color:var(--t2);" colspan="2">Order Complexity</td></tr>
+                    <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:6px 0;color:var(--t3);">Simple - Max SKU</td><td style="padding:6px 0;color:var(--t1);">${pwSummary.simpleMaxSKU}</td></tr>
+                    <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:6px 0;color:var(--t3);">Complex - Max quantity</td><td style="padding:6px 0;color:var(--t1);">${pwSummary.complexMaxQty}</td></tr>
+                    <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:6px 0;color:var(--t3);">Order bundling</td><td style="padding:6px 0;color:var(--t1);">${pwSummary.orderBundling}</td></tr>
+                    <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:6px 0;color:var(--t3);">Bulk - Consolidation</td><td style="padding:6px 0;color:var(--t1);">${pwSummary.bulkConsolidation} (Min qty: ${pwSummary.bulkMinQty})</td></tr>
+                    <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:6px 0;font-weight:600;color:var(--t2);" colspan="2">Picklist Capacity</td></tr>
+                    <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:6px 0;color:var(--t3);">Simple</td><td style="padding:6px 0;color:var(--t1);">${pwSummary.picklistSimple}</td></tr>
+                    <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:6px 0;color:var(--t3);">Complex</td><td style="padding:6px 0;color:var(--t1);">${pwSummary.picklistComplex}</td></tr>
+                    <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:6px 0;color:var(--t3);">Bulk</td><td style="padding:6px 0;color:var(--t1);">${pwSummary.picklistBulk}</td></tr>
+                    <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:6px 0;font-weight:600;color:var(--t2);" colspan="2">Group By</td></tr>
+                    <tr><td style="padding:6px 0;color:var(--t3);">Channel groups</td><td style="padding:6px 0;color:var(--t1);">${pwSummary.groups}</td></tr>
+                  </table>
+                </div>
+              </div>`;
+            }
+            return `<div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Pickwave Automation</div><div class="cfg-desc">Configure pickwave schedule, order complexity, capacity and grouping.</div><span class="cfg-badge badge-fc">FC</span></div><div class="cfg-row-right"><button class="btn-bulk" onclick="openPickwaveModal()">Configure</button></div></div>`;
+          }
+          if(s==='Enable LR consolidation') {
+            return `<div class="cfg-row" style="flex-direction:column;align-items:stretch;">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+                <div class="cfg-row-left"><div class="cfg-label">Enable LR consolidation</div><div class="cfg-desc">Allows multiple LTL orders for the same consignee to be consolidated into a single LR.</div><span class="cfg-badge badge-fc">FC</span></div>
+                <div class="cfg-row-right"><div class="seg-group" id="lr-seg"><button class="seg-btn" onclick="setSeg('lr-seg','yes',()=>document.getElementById('lr-warn').style.display='block')">Yes</button><button class="seg-btn" onclick="setSeg('lr-seg','no',()=>document.getElementById('lr-warn').style.display='none')">No</button></div></div>
+              </div>
+              <div id="lr-warn" style="display:none;padding:8px 0 0;font-size:11px;color:var(--primary);font-weight:500;">*Please make sure the planner in TMS has Consolidate LTL Loads as enabled for this FC</div>
+            </div>`;
+          }
+          return '';
+        }).join('')}
+        <div class="section-divider"><div class="section-divider-title">Packing & Dispatch</div><div class="section-divider-desc">Rules for packing, MOQ, and serviceability.</div></div>
+        <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Enable parallel pick pack</div><div class="cfg-desc">Allows packing to begin while picking is still in progress for the same order.</div><span class="cfg-badge badge-fc">FC</span></div>
+          <div class="cfg-row-right"><div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">No</button></div></div></div>
+        <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+            <div class="cfg-row-left"><div class="cfg-label">Packaging instructions</div><div class="cfg-desc">Select the packing instructions shown to operators during packing.</div><span class="cfg-badge badge-client">Client</span></div>
+            <div class="cfg-row-right"><div style="position:relative;" id="packWrap"><div class="rej-trigger" onclick="togglePackDD()"><span>Select instructions</span><span class="material-icons-outlined" style="font-size:16px;color:var(--t3);">expand_more</span></div>
+              <div class="rej-dd" id="packDD">
+                <div class="rej-opt" data-name="Wrap item in bubble wrap" onclick="addPackInstr('Wrap item in bubble wrap')"><span>Wrap item in bubble wrap</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
+                <div class="rej-opt" data-name="Use double plastic roll wrapping" onclick="addPackInstr('Use double plastic roll wrapping')"><span>Use double plastic roll wrapping</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
+                <div class="rej-opt" data-name="Verify tape is secure on all seams" onclick="addPackInstr('Verify tape is secure on all seams')"><span>Verify tape is secure on all seams</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
+                <div class="rej-opt" data-name="Paste packing slip on top" onclick="addPackInstr('Paste packing slip on top')"><span>Paste packing slip on top</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
+              </div></div></div>
+          </div>
+          <div id="packChips" style="display:flex;flex-wrap:wrap;gap:6px;padding:6px 0 0;justify-content:flex-end;"></div>
+        </div>
+        <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+            <div class="cfg-row-left"><div class="cfg-label">Enforce MOQ</div><div class="cfg-desc">Orders allocate only in MOQ multiples of the SKU; the remainder raises an exception.</div><span class="cfg-badge badge-client">Client</span></div>
+            <div class="cfg-row-right"><div class="seg-group" id="moq-seg"><button class="seg-btn" onclick="setSeg('moq-seg','yes',()=>document.getElementById('moq-warn').style.display='block')">Yes</button><button class="seg-btn" onclick="setSeg('moq-seg','no',()=>document.getElementById('moq-warn').style.display='none')">No</button></div></div>
+          </div>
+          <div id="moq-warn" style="display:none;padding:8px 0 0;font-size:11px;color:var(--primary);font-weight:500;">*Sub-MOQ quantities won't allocate cleanly and throw exceptions ops must clear.</div>
+        </div>
+        <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Enable combo / kit orders</div><div class="cfg-desc">Allows combo and kit products to be processed during order fulfillment.</div><span class="cfg-badge badge-fc">FC</span></div>
+          <div class="cfg-row-right"><div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">No</button></div></div></div>
+        ${hasServiceabilityCouriers()?`
+        <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+            <div class="cfg-row-left"><div class="cfg-label">Serviceability</div><div class="cfg-desc">Set of couriers for which serviceability is needed for this FC.</div><span class="cfg-badge badge-fc">FC</span></div>
+          </div>
+          <div style="padding:8px 0 0;font-size:11px;color:var(--primary);font-weight:500;">*Serviceable pincodes need to be uploaded for any courier apart from Delhivery_LTL and Delhivery_FTL</div>
+          <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
+            ${getServiceabilityCouriers().map(c=>{
+              const key=c.replace(/\s/g,'_');
+              const hasFile=uploadedFiles[key];
+              return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border:1px solid var(--border-light);border-radius:6px;">
+                <div><span style="font-size:12px;font-weight:500;color:var(--t1);">${c}</span>${hasFile?`<div style="margin-top:4px;"><a onclick="downloadFile('${key}')" style="font-size:11px;color:#0066CC;cursor:pointer;text-decoration:underline;">${uploadedFiles[key].name}</a></div>`:''}</div>
+                <button class="btn-bulk" style="font-size:11px;padding:5px 12px;" onclick="openUploadModal('Upload serviceability - ${c}','${key}')">${hasFile?'Re-upload':'Upload'}</button>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>`:''}`;
+    }
+
+    // SBD Modal
+    let sbdOffsets = [
+      {courier:'FTL', days:0, saved:true},
+      {courier:'Kerry_Indev', days:0, saved:true},
+      {courier:'Local Fleet Delhivery', days:0, saved:true}
+    ];
+    let sbdCutoffs = [
+      {courier:'FTL', p1:'10:00',p2:'10:00',p3:'10:00',p4:'10:00',p5:'10:00', saved:true},
+      {courier:'Kerry_Indev', p1:'14:00',p2:'14:00',p3:'14:00',p4:'14:00',p5:'14:00', saved:true},
+      {courier:'Local Fleet Delhivery', p1:'14:00',p2:'14:00',p3:'14:00',p4:'14:00',p5:'14:00', saved:true}
+    ];
+    let surgePeriod = '30';
+
+    function openSBDModal(){
+      const existing = document.getElementById('sbdModal');
+      if(existing) existing.remove();
+      const modal = document.createElement('div');
+      modal.id='sbdModal';
+      modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:500;';
+      modal.innerHTML=`<div style="background:#fff;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.15);width:620px;max-width:90vw;max-height:85vh;display:flex;flex-direction:column;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--border-light);">
+          <h3 style="font-size:15px;font-weight:600;">Configure ship by date</h3>
+          <button onclick="document.getElementById('sbdModal').remove()" style="border:none;background:none;cursor:pointer;color:var(--t3);"><span class="material-icons-outlined" style="font-size:18px;">close</span></button>
+        </div>
+        <div style="padding:20px 24px;overflow-y:auto;flex:1;">
+          <!-- SBD Courier Offset -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <div><div style="font-size:13px;font-weight:600;">SBD courier offset</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">Buffer days added per courier for SBD calculation.</div></div>
+            <button class="zone-edit-btn" onclick="editSBDOffsets()"><span class="material-icons-outlined" style="font-size:13px">edit</span></button>
+          </div>
+          <div style="border:1px solid var(--border-light);border-radius:6px;overflow:hidden;margin-bottom:20px;">
+            <table style="width:100%;border-collapse:collapse;">
+              <thead style="background:#F9FAFB;"><tr><th style="padding:8px 14px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Courier</th><th style="padding:8px 14px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Offset days</th><th style="padding:8px 14px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);width:60px;">Action</th></tr></thead>
+              <tbody id="sbdOffsetBody"></tbody>
+            </table>
+          </div>
+          <!-- SBD Courier Cutoff -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <div><div style="font-size:13px;font-weight:600;">SBD Courier cutoff</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">Buffer days added per courier for SBD calculation. Surface typically needs more days than Express.</div></div>
+            <button class="zone-edit-btn" onclick="editSBDCutoffs()"><span class="material-icons-outlined" style="font-size:13px">edit</span></button>
+          </div>
+          <div style="border:1px solid var(--border-light);border-radius:6px;overflow:hidden;margin-bottom:20px;">
+            <table style="width:100%;border-collapse:collapse;">
+              <thead style="background:#F9FAFB;"><tr><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Courier</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">P1</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">P2</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">P3</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">P4</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">P5</th></tr></thead>
+              <tbody id="sbdCutoffBody"></tbody>
+            </table>
+          </div>
+          <!-- Surge Period -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid var(--border-light);">
+            <div><div style="font-size:13px;font-weight:600;">Surge period (days)</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">How many end-of-month days the surge config applies to.</div></div>
+            <input class="tds-input" value="${surgePeriod}" style="width:100px;text-align:center;" onchange="surgePeriod=this.value"> 
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:14px 24px;border-top:1px solid var(--border-light);">
+          <button onclick="document.getElementById('sbdModal').remove()" style="padding:7px 16px;border:1px solid var(--border);border-radius:4px;background:#fff;font-family:inherit;font-size:12px;font-weight:500;color:var(--t1);cursor:pointer;">Cancel</button>
+          <button onclick="document.getElementById('sbdModal').remove()" style="padding:7px 16px;border:none;border-radius:4px;background:var(--t1);font-family:inherit;font-size:12px;font-weight:500;color:#fff;cursor:pointer;">Save details</button>
+        </div>
+      </div>`;
+      document.body.appendChild(modal);
+      renderSBDOffsets();
+      renderSBDCutoffs();
+    }
+
+    function renderSBDOffsets(){
+      const tbody=document.getElementById('sbdOffsetBody');if(!tbody)return;
+      tbody.innerHTML=sbdOffsets.map((r,i)=>{
+        if(r.editing){
+          return `<tr style="border-bottom:1px solid var(--border-light);">
+            <td style="padding:8px 14px;font-size:12px;">${r.courier}</td>
+            <td style="padding:8px 14px;"><input class="tds-input" value="${r.days}" style="width:60px;text-align:center;" id="offsetInput${i}"></td>
+            <td style="padding:8px 14px;text-align:center;"><button class="zone-save-btn" onclick="saveOffset(${i})">Save</button></td>
+          </tr>`;
+        }
+        return `<tr style="border-bottom:1px solid var(--border-light);">
+          <td style="padding:8px 14px;font-size:12px;">${r.courier}</td>
+          <td style="padding:8px 14px;font-size:12px;">${r.days}</td>
+          <td style="padding:8px 14px;text-align:center;"><button class="zone-edit-btn" onclick="editOffset(${i})"><span class="material-icons-outlined" style="font-size:13px">edit</span></button></td>
+        </tr>`;
+      }).join('');
+    }
+    function editOffset(i){sbdOffsets[i].editing=true;renderSBDOffsets();}
+    function saveOffset(i){sbdOffsets[i].days=document.getElementById('offsetInput'+i).value;sbdOffsets[i].editing=false;renderSBDOffsets();}
+
+    function renderSBDCutoffs(){
+      const tbody=document.getElementById('sbdCutoffBody');if(!tbody)return;
+      tbody.innerHTML=sbdCutoffs.map((r,i)=>{
+        if(r.editing){
+          return `<tr style="border-bottom:1px solid var(--border-light);">
+            <td style="padding:8px 12px;font-size:12px;">${r.courier}</td>
+            <td style="padding:8px 12px;"><input class="tds-input" value="${r.p1}" style="width:50px;text-align:center;" id="cutP1_${i}"></td>
+            <td style="padding:8px 12px;"><input class="tds-input" value="${r.p2}" style="width:50px;text-align:center;" id="cutP2_${i}"></td>
+            <td style="padding:8px 12px;"><input class="tds-input" value="${r.p3}" style="width:50px;text-align:center;" id="cutP3_${i}"></td>
+            <td style="padding:8px 12px;"><input class="tds-input" value="${r.p4}" style="width:50px;text-align:center;" id="cutP4_${i}"></td>
+            <td style="padding:8px 12px;"><input class="tds-input" value="${r.p5}" style="width:50px;text-align:center;" id="cutP5_${i}"></td>
+            <td style="padding:8px 12px;text-align:center;"><button class="zone-save-btn" onclick="saveCutoff(${i})">Save</button></td>
+          </tr>`;
+        }
+        return `<tr style="border-bottom:1px solid var(--border-light);">
+          <td style="padding:8px 12px;font-size:12px;">${r.courier}</td>
+          <td style="padding:8px 12px;font-size:12px;">${r.p1}</td>
+          <td style="padding:8px 12px;font-size:12px;">${r.p2}</td>
+          <td style="padding:8px 12px;font-size:12px;">${r.p3}</td>
+          <td style="padding:8px 12px;font-size:12px;">${r.p4}</td>
+          <td style="padding:8px 12px;font-size:12px;">${r.p5}</td>
+        </tr>`;
+      }).join('');
+    }
+    function editSBDOffsets(){sbdOffsets.forEach(r=>r.editing=true);renderSBDOffsets();}
+    function editSBDCutoffs(){sbdCutoffs.forEach(r=>r.editing=true);renderSBDCutoffs();}
+    function saveCutoff(i){sbdCutoffs[i].p1=document.getElementById('cutP1_'+i).value;sbdCutoffs[i].p2=document.getElementById('cutP2_'+i).value;sbdCutoffs[i].p3=document.getElementById('cutP3_'+i).value;sbdCutoffs[i].p4=document.getElementById('cutP4_'+i).value;sbdCutoffs[i].p5=document.getElementById('cutP5_'+i).value;sbdCutoffs[i].editing=false;renderSBDCutoffs();}
+
+    // Observer for zones table
+    const obs=new MutationObserver(()=>{if(document.getElementById('zonesBody'))renderZones();});
+    obs.observe(document.getElementById('contentArea'),{childList:true});
+
+    renderAll();
+    setTimeout(restoreState, 100);
+  </script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fulfilment Centre Configuration - WMS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <style>
+    :root {
+      --primary:#E31E24;--primary-dark:#B71820;--primary-light:#FDE8E9;
+      --surface:#FFFFFF;--bg:#F5F5F7;--border:#E0E0E0;--border-light:#F0F0F0;
+      --t1:#1A1A1A;--t2:#666666;--t3:#999999;
+      --success:#0D7A3F;--success-bg:#E6F5ED;
+      --info:#0066CC;--info-bg:#E6F0FA;
+      --warning:#D97706;--warning-bg:#FEF3E2;
+      --radius:8px;--radius-sm:4px;
+      --shadow:0 1px 3px rgba(0,0,0,0.04);--shadow-md:0 2px 8px rgba(0,0,0,0.06);
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--t1);height:100vh;overflow:hidden;display:flex;flex-direction:column}
+
+    /* Top Nav */
+    .topnav{height:52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px;flex-shrink:0;z-index:100}
+    .topnav-hamburger{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;border-radius:var(--radius-sm);color:var(--t2)}
+    .topnav-hamburger:hover{background:var(--bg)}
+    .topnav-brand{display:flex;align-items:center;gap:10px}
+    .topnav-logo{width:32px;height:32px;background:linear-gradient(135deg,#E31E24 50%,#1A1A1A 50%);border-radius:var(--radius-sm)}
+    .topnav-brand-text{display:flex;flex-direction:column}
+    .topnav-brand-name{font-size:14px;font-weight:700;line-height:1.2}
+    .topnav-brand-sub{font-size:10px;color:var(--t3)}
+    .topnav-spacer{flex:1}
+    .topnav-dropdown{display:flex;align-items:center;gap:4px;padding:6px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);font-family:inherit;font-size:12px;font-weight:500;color:var(--t1);cursor:pointer}
+    .topnav-dropdown .material-icons-outlined{font-size:14px;color:var(--t3)}
+    .topnav-search{display:flex;align-items:center;gap:6px;padding:7px 14px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid transparent;width:200px}
+    .topnav-search:focus-within{border-color:var(--border);background:var(--surface)}
+    .topnav-search .material-icons-outlined{font-size:16px;color:var(--t3)}
+    .topnav-search input{border:none;outline:none;background:transparent;font-family:inherit;font-size:12px;color:var(--t1);width:100%}
+    .topnav-search input::placeholder{color:var(--t3)}
+    .topnav-user{display:flex;align-items:center;gap:8px;padding:4px 8px;border-radius:var(--radius-sm);cursor:pointer}
+    .topnav-user:hover{background:var(--bg)}
+    .topnav-avatar{width:30px;height:30px;border-radius:50%;background:#3730A3;color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600}
+    .topnav-user-info{display:flex;flex-direction:column}
+    .topnav-user-name{font-size:12px;font-weight:500}
+    .topnav-user-role{font-size:10px;color:var(--t3)}
+
+    .app-body{display:flex;flex:1;overflow:hidden}
+
+    /* Side Nav */
+    .sidenav{width:48px;background:var(--surface);border-right:1px solid var(--border-light);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px;flex-shrink:0}
+    .sidenav-item{width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--t3);cursor:pointer;transition:all .15s}
+    .sidenav-item .material-icons-outlined{font-size:20px}
+    .sidenav-item:hover{background:var(--bg);color:var(--t2)}
+    .sidenav-item.active{background:var(--primary-light);color:var(--primary)}
+
+    /* Main Content */
+    .main-content{flex:1;overflow-y:auto;padding:24px 28px}
+    .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+    .page-header-left{display:flex;align-items:center;gap:12px}
+    .page-header-icon{width:36px;height:36px;background:var(--primary-light);border-radius:var(--radius);display:flex;align-items:center;justify-content:center}
+    .page-header-icon .material-icons-outlined{font-size:20px;color:var(--primary)}
+    .page-header-title{font-size:18px;font-weight:600}
+    .btn-onboard{padding:9px 18px;border-radius:var(--radius-sm);border:none;background:var(--t1);font-family:inherit;font-size:12px;font-weight:600;color:white;cursor:pointer;transition:all .15s}
+    .btn-onboard:hover{background:#333}
+
+    /* Filters */
+    .filters-bar{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+    .filter-search{display:flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);width:220px}
+    .filter-search .material-icons-outlined{font-size:16px;color:var(--t3)}
+    .filter-search input{border:none;outline:none;background:transparent;font-family:inherit;font-size:12px;color:var(--t1);width:100%}
+    .filter-search input::placeholder{color:var(--t3)}
+    .filter-search:focus-within{border-color:var(--primary)}
+    .filter-dropdown{display:flex;align-items:center;gap:4px;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);font-family:inherit;font-size:12px;font-weight:500;color:var(--t2);cursor:pointer}
+    .filter-dropdown:hover{border-color:var(--t3)}
+    .filter-dropdown .material-icons-outlined{font-size:14px;color:var(--t3)}
+
+    /* Table */
+    .tds-table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+    .tds-table{width:100%;border-collapse:collapse}
+    .tds-table thead{background:#FAFAFA}
+    .tds-table th{padding:12px 16px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;text-transform:uppercase;letter-spacing:0.3px;border-bottom:1px solid var(--border)}
+    .tds-table td{padding:14px 16px;font-size:13px;color:var(--t1);border-bottom:1px solid var(--border-light)}
+    .tds-table tbody tr:last-child td{border-bottom:none}
+    .tds-table tbody tr:hover{background:#FAFBFC}
+    .tds-table .col-sno{width:60px}
+    .tds-table .col-action{width:80px;text-align:center}
+    .tds-table th.col-action{text-align:center}
+
+    /* Pills */
+    .pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600}
+    .pill-active{background:var(--success-bg);color:var(--success)}
+    .pill-progress{background:var(--info-bg);color:var(--info)}
+    .pill-draft{background:var(--warning-bg);color:var(--warning)}
+
+    /* Icon Button */
+    .icon-btn{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);cursor:pointer;transition:all .15s;color:var(--t2)}
+    .icon-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
+    .icon-btn .material-icons-outlined{font-size:16px}
+
+    /* Pagination */
+    .pagination-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--border-light);background:#FAFAFA}
+    .pagination-info{font-size:11px;color:var(--t3)}
+    .pagination-controls{display:flex;align-items:center;gap:4px}
+    .page-btn{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);font-family:inherit;font-size:11px;font-weight:500;color:var(--t2);cursor:pointer;transition:all .15s}
+    .page-btn:hover{border-color:var(--primary);color:var(--primary)}
+    .page-btn.active{background:var(--t1);border-color:var(--t1);color:white;font-weight:600}
+    .page-btn.disabled{opacity:0.4;cursor:not-allowed}
+    .page-btn .material-icons-outlined{font-size:14px}
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <button class="topnav-hamburger"><span class="material-icons-outlined">menu</span></button>
+    <div class="topnav-brand"><div class="topnav-logo"></div><div class="topnav-brand-text"><span class="topnav-brand-name">WMS</span><span class="topnav-brand-sub">Warehouse Management System</span></div></div>
+    <div class="topnav-spacer"></div>
+    <button class="topnav-dropdown">AWB <span class="material-icons-outlined">expand_more</span></button>
+    <div class="topnav-search"><span class="material-icons-outlined">search</span><input type="text" placeholder="Search"></div>
+    <div class="topnav-user"><div class="topnav-avatar">DD</div><div class="topnav-user-info"><span class="topnav-user-name">Jhonathan Smith</span><span class="topnav-user-role">Admin</span></div><span class="material-icons-outlined" style="font-size:16px;color:var(--t3)">expand_more</span></div>
+  </nav>
+
+  <div class="app-body">
+    <aside class="sidenav">
+      <div class="sidenav-item"><span class="material-icons-outlined">grid_view</span></div>
+      <div class="sidenav-item"><span class="material-icons-outlined">inventory_2</span></div>
+      <div class="sidenav-item active"><span class="material-icons-outlined">warehouse</span></div>
+      <div class="sidenav-item"><span class="material-icons-outlined">people</span></div>
+      <div class="sidenav-item" onclick="window.location.href='01-client-list.html'" style="cursor:pointer"><span class="material-icons-outlined">settings</span></div>
+      <div class="sidenav-item active" onclick="window.location.href='06-fc-list.html'" style="cursor:pointer"><span class="material-icons-outlined">warehouse</span></div>
+      <div class="sidenav-item"><span class="material-icons-outlined">assessment</span></div>
+      <div class="sidenav-item"><span class="material-icons-outlined">send</span></div>
+      <div class="sidenav-item"><span class="material-icons-outlined">store</span></div>
+      <div class="sidenav-item"><span class="material-icons-outlined">manage_accounts</span></div>
+    </aside>
+
+    <main class="main-content">
+      <div class="page-header">
+        <div class="page-header-left">
+          <div class="page-header-icon"><span class="material-icons-outlined">warehouse</span></div>
+          <h1 class="page-header-title">Fulfilment centre configuration</h1>
+        </div>
+        <button class="btn-onboard" onclick="alert('Onboard new FC flow')">Onboard new FC</button>
+      </div>
+
+      <div class="filters-bar">
+        <div class="filter-search"><span class="material-icons-outlined">search</span><input type="text" placeholder="Search FC name"></div>
+        <button class="filter-dropdown">Status <span class="material-icons-outlined">expand_more</span></button>
+      </div>
+
+      <div class="tds-table-wrap">
+        <table class="tds-table">
+          <thead><tr><th class="col-sno">S.No.</th><th>FC name</th><th>Status</th><th class="col-action">Action</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Mumbai Central FC</td><td><span class="pill pill-active">Active</span></td><td style="text-align:center"><button class="icon-btn" onclick="window.location.href='05-fc-config.html'"><span class="material-icons-outlined">edit</span></button></td></tr>
+            <tr><td>2</td><td>Delhi North FC</td><td><span class="pill pill-progress">In-progress</span></td><td style="text-align:center"><button class="icon-btn" onclick="window.location.href='05-fc-config.html'"><span class="material-icons-outlined">edit</span></button></td></tr>
+            <tr><td>3</td><td>Bangalore South FC</td><td><span class="pill pill-draft">Draft</span></td><td style="text-align:center"><button class="icon-btn" onclick="window.location.href='05-fc-config.html'"><span class="material-icons-outlined">edit</span></button></td></tr>
+            <tr><td>4</td><td>Kolkata East FC</td><td><span class="pill pill-draft">Draft</span></td><td style="text-align:center"><button class="icon-btn" onclick="window.location.href='05-fc-config.html'"><span class="material-icons-outlined">edit</span></button></td></tr>
+          </tbody>
+        </table>
+        <div class="pagination-bar">
+          <span class="pagination-info">Showing 1-4 of 4 FCs</span>
+          <div class="pagination-controls">
+            <button class="page-btn disabled"><span class="material-icons-outlined">chevron_left</span></button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn disabled"><span class="material-icons-outlined">chevron_right</span></button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

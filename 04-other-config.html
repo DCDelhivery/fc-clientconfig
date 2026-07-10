@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client Configuration - Other Configuration</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <style>
+    :root {
+      --primary:#E31E24;--primary-dark:#B71820;--primary-light:#FDE8E9;
+      --surface:#FFFFFF;--bg:#F5F5F7;--border:#E0E0E0;--border-light:#F0F0F0;
+      --t1:#1A1A1A;--t2:#666666;--t3:#999999;
+      --success:#0D7A3F;--success-bg:#E6F5ED;
+      --info:#0066CC;--info-bg:#E6F0FA;
+      --warning:#D97706;--warning-bg:#FEF3E2;
+      --radius:8px;--radius-sm:4px;
+      --shadow-md:0 2px 8px rgba(0,0,0,0.06);
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',-apple-system,sans-serif;background:var(--surface);color:var(--t1);min-height:100vh;display:flex;flex-direction:column}
+
+    .page-topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 32px;border-bottom:1px solid var(--border-light);flex-shrink:0}
+    .page-topbar-left{display:flex;flex-direction:column;gap:4px}
+    .page-topbar-title{font-size:18px;font-weight:700}
+    .page-topbar-meta{display:flex;align-items:center;gap:8px}
+    .page-topbar-client{font-size:13px;color:var(--t2)}
+    .pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:10px;font-weight:600}
+    .pill-progress{background:var(--info-bg);color:var(--info)}
+    .page-topbar-right{display:flex;align-items:center;gap:12px}
+    .btn-draft{padding:8px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);font-family:inherit;font-size:13px;font-weight:500;color:var(--t1);cursor:pointer}
+    .btn-draft:hover{background:var(--bg)}
+    .btn-close{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);cursor:pointer}
+    .btn-close:hover{background:var(--bg)}
+    .btn-close .material-icons-outlined{font-size:18px;color:var(--t2)}
+
+    .stepper-bar{display:flex;align-items:center;padding:24px 32px;border-bottom:1px solid var(--border-light)}
+    .stepper-step{display:flex;align-items:center;gap:10px;flex:1}
+    .stepper-step:not(:last-child)::after{content:'';flex:1;height:2px;background:var(--border);margin:0 16px}
+    .stepper-step.completed:not(:last-child)::after{background:var(--success)}
+    .step-circle{width:28px;height:28px;min-width:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;border:2px solid var(--border);color:var(--t3);background:var(--surface)}
+    .stepper-step.active .step-circle{border-color:var(--t1);background:var(--t1);color:white}
+    .stepper-step.completed .step-circle{border-color:var(--success);background:var(--success);color:white}
+    .step-text{display:flex;flex-direction:column}
+    .step-name{font-size:13px;font-weight:500;color:var(--t1)}
+    .stepper-step.active .step-name{font-weight:600}
+    .stepper-step:not(.active):not(.completed) .step-name{color:var(--t3)}
+    .step-sub{font-size:10px;color:var(--t3)}
+
+    .content-area{flex:1;overflow-y:auto;padding:28px 32px 100px;background:var(--bg)}
+    .section-title{font-size:16px;font-weight:600;margin-bottom:16px}
+
+    /* TDS Tabs */
+    .tab-bar{display:flex;gap:0;margin-bottom:20px}
+    .tab{padding:8px 16px;border:none;background:transparent;font-family:inherit;font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;border-radius:100px;transition:all .15s}
+    .tab:hover{background:var(--bg);color:var(--t1)}
+    .tab.active{background:var(--t1);color:white;font-weight:600}
+    .tab-panel{display:none}.tab-panel.active{display:block}
+
+    /* TDS Accordion */
+    .accordion{background:var(--surface);border:1px solid var(--border-light);border-radius:var(--radius);margin-bottom:12px;overflow:hidden}
+    .accordion-header{display:flex;align-items:center;gap:10px;padding:16px 20px;cursor:pointer;transition:background .15s;user-select:none}
+    .accordion-header:hover{background:#FAFBFC}
+    .accordion-arrow{font-size:20px;color:var(--t3);transition:transform .2s}
+    .accordion.open .accordion-arrow{transform:rotate(180deg)}
+    .accordion-title{flex:1;font-size:14px;font-weight:600}
+    .accordion-status{font-size:10px;font-weight:600;padding:3px 8px;border-radius:100px}
+    .status-pending{background:var(--warning-bg);color:var(--warning)}
+    .status-completed{background:var(--success-bg);color:var(--success)}
+    .accordion-body{display:none;border-top:1px solid var(--border-light)}
+    .accordion.open .accordion-body{display:block}
+
+    /* Config rows */
+    .cfg-row{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border-light)}
+    .cfg-row:last-child{border-bottom:none}
+    .cfg-row.sub-row{padding-left:36px;background:#FAFBFC;border-left:3px solid var(--info)}
+    .cfg-row.hidden{display:none}
+    .cfg-left{flex:1;min-width:0;padding-right:20px}
+    .cfg-name{font-size:13px;font-weight:600;display:block}
+    .cfg-desc{font-size:11px;color:var(--t3);display:block;margin-top:2px}
+    .cfg-note{font-size:11px;color:var(--primary);font-weight:500;margin-top:4px;display:block}
+    .cfg-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+
+    /* Yes/No Toggle */
+    .yn-toggle{display:flex;border-radius:6px;overflow:hidden;border:1px solid var(--border)}
+    .yn{padding:5px 14px;font-family:inherit;font-size:12px;font-weight:500;border:none;cursor:pointer;background:var(--surface);color:var(--t3);transition:all .15s}
+    .yn:first-child{border-right:1px solid var(--border)}
+    .yn.yes-active{background:var(--success-bg);color:var(--success);font-weight:600}
+    .yn.no-active{background:#FEE2E2;color:#DC2626;font-weight:600}
+
+    /* Inputs */
+    .cfg-input{width:100px;height:30px;padding:0 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:12px;text-align:center}
+    .cfg-input:focus{outline:none;border-color:var(--t1)}
+    .cfg-select{height:30px;padding:0 28px 0 10px;min-width:180px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:12px;font-weight:500;color:var(--t1);background:var(--surface);appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%23999' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;cursor:pointer}
+    .cfg-select:focus{outline:none;border-color:var(--t1)}
+    .cfg-text{height:30px;padding:0 10px;width:160px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:12px}
+    .cfg-text:focus{outline:none;border-color:var(--t1)}
+    .cfg-text::placeholder{color:var(--t3)}
+
+    /* QC Instructions sub-section */
+    .qc-sub{padding:12px 20px;background:#F9FAFB;border-bottom:1px solid var(--border-light);display:none}
+    .qc-sub.visible{display:block}
+    .qc-sub-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+    .qc-sub-label{font-size:12px;font-weight:600}
+    .btn-qc{padding:6px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);font-family:inherit;font-size:11px;font-weight:500;color:var(--t1);cursor:pointer}
+    .btn-qc:hover{border-color:var(--t1)}
+    .qc-selected{font-size:11px;color:var(--t2);padding:6px 0}
+    .qc-selected ul{margin:4px 0 0 16px;list-style:disc}
+    .qc-selected li{margin-bottom:2px}
+
+    /* TDS Side Drawer */
+    .drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;display:none;justify-content:flex-end}
+    .drawer-overlay.open{display:flex}
+    .drawer{width:380px;max-width:90vw;background:var(--surface);height:100%;display:flex;flex-direction:column;box-shadow:-4px 0 24px rgba(0,0,0,0.1);animation:slideIn .2s ease}
+    @keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+    .drawer-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border-light)}
+    .drawer-title{font-size:16px;font-weight:600}
+    .drawer-close{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;border-radius:var(--radius-sm);color:var(--t2)}
+    .drawer-close:hover{background:var(--bg)}
+    .drawer-body{flex:1;overflow-y:auto;padding:16px 24px}
+    .drawer-search{display:flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:16px}
+    .drawer-search .material-icons-outlined{font-size:16px;color:var(--t3)}
+    .drawer-search input{border:none;outline:none;background:transparent;font-family:inherit;font-size:12px;width:100%;color:var(--t1)}
+    .drawer-search input::placeholder{color:var(--t3)}
+    .drawer-table-header{padding:8px 0;font-size:11px;font-weight:600;color:var(--t2);border-bottom:1px solid var(--border-light);margin-bottom:8px}
+    .drawer-option{display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:1px solid var(--border-light);cursor:pointer}
+    .drawer-option:last-child{border-bottom:none}
+    .drawer-option:hover{background:var(--bg);margin:0 -24px;padding:12px 24px}
+    .drawer-checkbox{width:18px;height:18px;min-width:18px;border:1.5px solid var(--border);border-radius:3px;display:flex;align-items:center;justify-content:center;transition:all .15s;margin-top:1px}
+    .drawer-option.selected .drawer-checkbox{background:var(--t1);border-color:var(--t1)}
+    .drawer-option.selected .drawer-checkbox::after{content:'';width:9px;height:5px;border-left:2px solid white;border-bottom:2px solid white;transform:rotate(-45deg);margin-top:-2px}
+    .drawer-opt-text{font-size:13px;color:var(--t1);line-height:1.4}
+    .drawer-footer{padding:16px 24px;border-top:1px solid var(--border-light);display:flex;justify-content:flex-end;gap:10px}
+    .btn-cancel{padding:8px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);font-family:inherit;font-size:12px;font-weight:500;color:var(--t1);cursor:pointer}
+    .btn-cancel:hover{background:var(--bg)}
+    .btn-save{padding:8px 18px;border-radius:var(--radius-sm);border:none;background:var(--t1);font-family:inherit;font-size:12px;font-weight:600;color:white;cursor:pointer}
+    .btn-save:hover{background:#333}
+    .btn-save:disabled{background:var(--border);color:var(--t3);cursor:not-allowed}
+
+    /* Footer */
+    .footer-bar{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:flex-end;padding:0 32px;gap:12px;z-index:50}
+    .btn-prev{padding:10px 20px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);font-family:inherit;font-size:13px;font-weight:500;color:var(--t1);cursor:pointer}
+    .btn-prev:hover{background:var(--bg)}
+    .btn-live{padding:10px 24px;border-radius:var(--radius-sm);border:none;font-family:inherit;font-size:13px;font-weight:600;color:white;cursor:pointer;transition:all .15s;background:var(--success)}
+    .btn-live:hover{background:#096B35}
+    .btn-live:disabled{background:var(--border);color:var(--t3);cursor:not-allowed}
+
+    /* TDS Snackbar */
+    .snackbar{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--success);color:white;padding:12px 24px;border-radius:var(--radius);font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,0.2);z-index:500;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;transform:translateX(-50%) translateY(-10px)}
+    .snackbar.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+    .snackbar .material-icons-outlined{font-size:18px}
+    .confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:none;align-items:center;justify-content:center;z-index:300}
+    .confirm-overlay.open{display:flex}
+    .confirm-modal{background:var(--surface);border-radius:var(--radius);padding:24px 28px;width:380px;max-width:90vw;box-shadow:0 8px 32px rgba(0,0,0,0.12);text-align:center}
+    .confirm-modal-title{font-size:15px;font-weight:600;margin-bottom:8px}
+    .confirm-modal-desc{font-size:13px;color:var(--t2);margin-bottom:20px}
+    .confirm-modal-actions{display:flex;justify-content:center;gap:12px}
+    .btn-confirm-cancel{padding:8px 20px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);font-family:inherit;font-size:12px;font-weight:500;color:var(--t1);cursor:pointer}
+    .btn-confirm-cancel:hover{background:var(--bg)}
+    .btn-confirm-yes{padding:8px 20px;border-radius:var(--radius-sm);border:none;background:var(--primary);font-family:inherit;font-size:12px;font-weight:600;color:white;cursor:pointer}
+    .btn-confirm-yes:hover{background:var(--primary-dark)}
+
+    /* Modal */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:none;align-items:center;justify-content:center;z-index:300}
+    .modal-overlay.open{display:flex}
+    .modal{background:var(--surface);border-radius:var(--radius);padding:24px 28px;width:420px;max-width:90vw;box-shadow:0 8px 32px rgba(0,0,0,0.12)}
+    .modal-title{font-size:16px;font-weight:600;margin-bottom:4px}
+    .modal-sub{font-size:12px;color:var(--t3);margin-bottom:20px}
+    .modal-label{font-size:12px;font-weight:500;color:var(--t2);margin-bottom:6px;display:block}
+    .modal-select{width:100%;height:40px;padding:0 32px 0 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;color:var(--t1);background:var(--surface);appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%23999' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;cursor:pointer}
+    .modal-select:focus{outline:none;border-color:var(--t1)}
+    .modal-link{display:block;margin-top:8px;font-size:11px;color:var(--info);text-decoration:none;cursor:pointer;font-weight:500}
+    .modal-link:hover{text-decoration:underline}
+    .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px}
+    .btn-modal-cancel{padding:8px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);font-family:inherit;font-size:12px;font-weight:500;color:var(--t2);cursor:pointer}
+    .btn-modal-cancel:hover{background:var(--bg)}
+    .btn-modal-map{padding:8px 20px;border-radius:var(--radius-sm);border:none;background:var(--t1);font-family:inherit;font-size:12px;font-weight:600;color:white;cursor:pointer}
+    .btn-modal-map:hover{background:#333}
+    .btn-modal-map:disabled{background:var(--border);color:var(--t3);cursor:not-allowed}
+  </style>
+</head>
+<body>
+  <header class="page-topbar">
+    <div class="page-topbar-left">
+      <h1 class="page-topbar-title">Client configuration details</h1>
+      <div class="page-topbar-meta"><span class="page-topbar-client">Mamaearth Ltd</span><span class="pill pill-progress">In-progress</span></div>
+    </div>
+    <div class="page-topbar-right">
+      <button class="btn-draft" onclick="showDraftSnackbar()">Save as draft</button>
+      <button class="btn-close" onclick="showExitConfirm()"><span class="material-icons-outlined">close</span></button>
+    </div>
+  </header>
+
+  <div class="stepper-bar">
+    <div class="stepper-step completed"><div class="step-circle"><span class="material-icons-outlined" style="font-size:16px">check</span></div><div class="step-text"><span class="step-name">Courier setup</span><span class="step-sub">KAM team</span></div></div>
+    <div class="stepper-step completed"><div class="step-circle"><span class="material-icons-outlined" style="font-size:16px">check</span></div><div class="step-text"><span class="step-name">Channel setup</span><span class="step-sub">KAM team</span></div></div>
+    <div class="stepper-step active"><div class="step-circle">3</div><div class="step-text"><span class="step-name">Other configuration</span><span class="step-sub">Pre team</span></div></div>
+  </div>
+
+  <div class="content-area">
+    <div class="section-title">Other configuration</div>
+    <div class="tab-bar">
+      <button class="tab active" data-panel="tab-inbound">Inbound</button>
+      <button class="tab" data-panel="tab-outbound">Outbound</button>
+      <button class="tab" data-panel="tab-inventory">Inventory</button>
+      <button class="tab" data-panel="tab-dispatch">Dispatch</button>
+    </div>
+
+    <!-- ===== INBOUND TAB ===== -->
+    <div class="tab-panel active" id="tab-inbound">
+
+      <!-- QC Module -->
+      <div class="accordion open" id="acc-qc">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          <span class="accordion-title">QC Module</span>
+          <span class="accordion-status status-pending" id="status-qc">Pending</span>
+          <span class="material-icons-outlined accordion-arrow">expand_more</span>
+        </div>
+        <div class="accordion-body">
+          <!-- Show QC Instructions -->
+          <div class="cfg-row">
+            <div class="cfg-left"><span class="cfg-name">Show QC Instructions</span><span class="cfg-desc">Show product-level QC instructions on HHD during receiving.</span></div>
+            <div class="cfg-right"><div class="yn-toggle" data-target="qcInstructionsSub"><button class="yn yes-active" onclick="ynClick(this,'yes','qcInstructionsSub')">Yes</button><button class="yn" onclick="ynClick(this,'no','qcInstructionsSub')">No</button></div></div>
+          </div>
+          <!-- QC Instructions sub-section -->
+          <div class="qc-sub visible" id="qcInstructionsSub">
+            <div class="qc-sub-row">
+              <span class="qc-sub-label">Update QC instructions</span>
+              <button class="btn-qc" onclick="openDrawer()">Update QC instructions</button>
+            </div>
+            <div class="cfg-note">*Please note: SKU level instructions need to be defined in the product catalog</div>
+            <div class="qc-selected" id="qcSelectedList" style="display:none">
+              <strong>Selected instructions:</strong>
+              <ul id="qcSelectedItems"></ul>
+            </div>
+          </div>
+
+          <!-- Capture QC Parameters -->
+          <div class="cfg-row">
+            <div class="cfg-left"><span class="cfg-name">Capture QC Parameters</span><span class="cfg-desc">Show QC parameters for verification during receiving.</span><span class="cfg-note">*Please note: Please define QC parameters at SKU level in product catalog</span></div>
+            <div class="cfg-right"><div class="yn-toggle"><button class="yn yes-active" onclick="ynClick(this,'yes','qcParamsDeps')">Yes</button><button class="yn" onclick="ynClick(this,'no','qcParamsDeps')">No</button></div></div>
+          </div>
+
+          <!-- Require Reject Images (depends on QC Params = Yes) -->
+          <div class="cfg-row sub-row" id="qcRejectImages" data-dep="qcParamsDeps">
+            <div class="cfg-left"><span class="cfg-name">Require Reject Images</span><span class="cfg-desc">Operator must upload images when rejecting items.</span></div>
+            <div class="cfg-right"><div class="yn-toggle"><button class="yn">Yes</button><button class="yn">No</button></div></div>
+          </div>
+
+          <!-- Single Unit Reject (always visible) -->
+          <div class="cfg-row">
+            <div class="cfg-left"><span class="cfg-name">Single Unit Reject</span><span class="cfg-desc">Operator can only reject one unit at a time.</span></div>
+            <div class="cfg-right"><div class="yn-toggle"><button class="yn">Yes</button><button class="yn">No</button></div></div>
+          </div>
+
+          <!-- Single Unit Accept (always visible) -->
+          <div class="cfg-row">
+            <div class="cfg-left"><span class="cfg-name">Single Unit Accept</span><span class="cfg-desc">Operator can only accept one unit at a time.</span></div>
+            <div class="cfg-right"><div class="yn-toggle"><button class="yn">Yes</button><button class="yn">No</button></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Receiving -->
+      <div class="accordion open" id="acc-receiving">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          <span class="accordion-title">Receiving</span>
+          <span class="accordion-status status-pending" id="status-receiving">Pending</span>
+          <span class="material-icons-outlined accordion-arrow">expand_more</span>
+        </div>
+        <div class="accordion-body">
+          <div class="cfg-row">
+            <div class="cfg-left"><span class="cfg-name">Allow Partial Receiving</span><span class="cfg-desc">When enabled, receiving can be finished even if not all items have arrived.</span></div>
+            <div class="cfg-right"><div class="yn-toggle"><button class="yn">Yes</button><button class="yn">No</button></div></div>
+          </div>
+          <div class="cfg-row">
+            <div class="cfg-left"><span class="cfg-name">Rejection Reasons</span><span class="cfg-desc">The list of reasons shown to operators when they reject an item.</span></div>
+            <div class="cfg-right">
+              <select class="cfg-select" style="min-width:220px">
+                <option value="">Search reasons</option>
+                <option>Defective-Repair</option>
+                <option>Defective Scrap</option>
+                <option>Expired Product1</option>
+                <option>Major carton damage</option>
+                <option>Minor carton damage</option>
+                <option>Product not in good condition</option>
+                <option>Wrong information on product</option>
+                <option>Expired Product</option>
+                <option>Product Details not clear</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AGN Workflow -->
+      <div class="accordion open" id="acc-agn">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          <span class="accordion-title">AGN Workflow</span>
+          <span class="accordion-status status-pending" id="status-agn">Pending</span>
+          <span class="material-icons-outlined accordion-arrow">expand_more</span>
+        </div>
+        <div class="accordion-body">
+          <div class="cfg-row">
+            <div class="cfg-left"><span class="cfg-name">AGN Auto-Complete</span><span class="cfg-desc">When enabled, the AGN will automatically close once all items are received and putaway.</span></div>
+            <div class="cfg-right"><div class="yn-toggle"><button class="yn">Yes</button><button class="yn">No</button></div></div>
+          </div>
+          <div class="cfg-row">
+            <div class="cfg-left"><span class="cfg-name">Auto-Finish Receiving</span><span class="cfg-desc">When enabled, receiving finishes automatically as soon as all expected quantities are scanned.</span></div>
+            <div class="cfg-right"><div class="yn-toggle"><button class="yn">Yes</button><button class="yn">No</button></div></div>
+          </div>
+          <div class="cfg-row">
+            <div class="cfg-left"><span class="cfg-name">Client Shipment Approval</span><span class="cfg-desc">When enabled, receiving is blocked until the client approves the shipment from their system.</span></div>
+            <div class="cfg-right"><div class="yn-toggle"><button class="yn">Yes</button><button class="yn">No</button></div></div>
+          </div>
+          <div class="cfg-row">
+            <div class="cfg-left"><span class="cfg-name">No-AGN Receiving</span><span class="cfg-desc">When enabled, unloading of a truck can be done without an AGN.</span></div>
+            <div class="cfg-right"><div class="yn-toggle"><button class="yn">Yes</button><button class="yn">No</button></div></div>
+          </div>
+          <div class="cfg-row">
+            <div class="cfg-left"><span class="cfg-name">Tolerance Enabled</span><span class="cfg-desc">When enabled, operators can receive more than the expected AGN quantity.</span></div>
+            <div class="cfg-right"><div class="yn-toggle"><button class="yn" onclick="ynClick(this,'yes','toleranceSub')">Yes</button><button class="yn no-active" onclick="ynClick(this,'no','toleranceSub')">No</button></div></div>
+          </div>
+          <div class="cfg-row sub-row hidden" id="toleranceSub">
+            <div class="cfg-left"><span class="cfg-name">Tolerance Percentage</span><span class="cfg-desc">The maximum excess % allowed over expected quantity.</span></div>
+            <div class="cfg-right"><input type="text" class="cfg-text" placeholder="Add and press enter" style="width:180px"></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end tab-inbound -->
+
+    <!-- ===== OUTBOUND TAB ===== -->
+    <div class="tab-panel" id="tab-outbound">
+
+      <!-- Accordion: Partial Allocation -->
+      <div class="accordion open" id="acc-allocation">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          <span class="accordion-title">Partial allocation</span>
+          <span class="accordion-status status-pending" id="status-allocation">Pending</span>
+          <span class="material-icons-outlined accordion-arrow">expand_more</span>
+        </div>
+        <div class="accordion-body">
+          <div class="cfg-row"><div class="cfg-left"><span class="cfg-name">Partial Quantity Behaviour</span><span class="cfg-desc">When stock is short — ship whatever is available or allow partial at orderline level.</span></div><div class="cfg-right"><select class="cfg-select"><option>Ship partial</option><option>Partial at orderline</option></select></div></div>
+          <div class="cfg-row"><div class="cfg-left"><span class="cfg-name">Unallocated Status</span><span class="cfg-desc">What happens to the portion that couldn't be allocated.</span></div><div class="cfg-right"><select class="cfg-select"><option selected>Hold</option><option>Cancel</option></select></div></div>
+        </div>
+      </div>
+
+      <!-- Accordion: Packing -->
+      <div class="accordion" id="acc-packing">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          <span class="accordion-title">Packing</span>
+          <span class="accordion-status status-pending" id="status-packing">Pending</span>
+          <span class="material-icons-outlined accordion-arrow">expand_more</span>
+        </div>
+        <div class="accordion-body">
+          <div class="cfg-row"><div class="cfg-left"><span class="cfg-name">Pack Mode</span><span class="cfg-desc">How items are scanned during packing.</span></div><div class="cfg-right"><select class="cfg-select"><option selected>MPS</option><option>Non-MPS</option></select></div></div>
+          <div class="cfg-row"><div class="cfg-left"><span class="cfg-name">Multi-Container Packing</span><span class="cfg-desc">When disabled, 1 shipment will belong to 1 box.</span></div><div class="cfg-right"><div class="yn-toggle"><button class="yn">Yes</button><button class="yn">No</button></div></div></div>
+          <div class="cfg-row"><div class="cfg-left"><span class="cfg-name">Auto-Print Packing Slip</span><span class="cfg-desc">When enabled, packing slip prints automatically after pack is done.</span></div><div class="cfg-right"><div class="yn-toggle"><button class="yn">Yes</button><button class="yn">No</button></div></div></div>
+          <!-- Packaging Instructions with conditional sub-section -->
+          <div class="cfg-row"><div class="cfg-left"><span class="cfg-name">Packaging Instructions</span><span class="cfg-desc">Instructions shown to operator on HHD during packing.</span></div><div class="cfg-right"><div class="yn-toggle"><button class="yn yes-active" onclick="ynClick(this,'yes','packInstructionsSub')">Yes</button><button class="yn" onclick="ynClick(this,'no','packInstructionsSub')">No</button></div></div></div>
+          <div class="qc-sub visible" id="packInstructionsSub">
+            <div class="qc-sub-row">
+              <span class="qc-sub-label">Update instructions</span>
+              <button class="btn-qc" onclick="openPackDrawer()">Update instructions</button>
+            </div>
+            <div class="qc-selected" id="packSelectedList" style="display:none">
+              <strong>Selected instructions:</strong>
+              <ul id="packSelectedItems"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== INVENTORY TAB ===== -->
+    <div class="tab-panel" id="tab-inventory">
+      <div class="accordion open" id="acc-expiry">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          <span class="accordion-title">Expiry management</span>
+          <span class="accordion-status status-pending" id="status-expiry">Pending</span>
+          <span class="material-icons-outlined accordion-arrow">expand_more</span>
+        </div>
+        <div class="accordion-body">
+          <div class="cfg-row">
+            <div class="cfg-left"><span class="cfg-name">Near Expiry Cron</span><span class="cfg-desc">This cron identifies items nearing the expiry date and changes their inventory buckets to 'Near Expiry'.</span></div>
+            <div class="cfg-right"><div class="yn-toggle"><button class="yn yes-active" onclick="ynClick(this,'yes','nearExpiryCronTime')">Yes</button><button class="yn" onclick="ynClick(this,'no','nearExpiryCronTime')">No</button></div></div>
+          </div>
+          <div class="cfg-row sub-row" id="nearExpiryCronTime">
+            <div class="cfg-left"></div>
+            <div class="cfg-right">
+              <span class="material-icons-outlined" style="font-size:16px;color:var(--t3)">schedule</span>
+              <select class="cfg-select" style="min-width:160px" onchange="checkInventoryComplete()">
+                <option value="">Select time</option>
+                <option>12:00 pm</option>
+                <option selected>14:00 pm</option>
+                <option>16:00 pm</option>
+                <option>18:00 pm</option>
+                <option>20:00 pm</option>
+                <option>22:00 pm</option>
+              </select>
+            </div>
+          </div>
+          <div class="cfg-row">
+            <div class="cfg-left"><span class="cfg-name">Expiry Cron</span><span class="cfg-desc">This cron identifies items which are expired and changes their inventory buckets to 'Expiry'.</span></div>
+            <div class="cfg-right"><div class="yn-toggle"><button class="yn yes-active" onclick="ynClick(this,'yes','expiryCronTime')">Yes</button><button class="yn" onclick="ynClick(this,'no','expiryCronTime')">No</button></div></div>
+          </div>
+          <div class="cfg-row sub-row" id="expiryCronTime">
+            <div class="cfg-left"></div>
+            <div class="cfg-right">
+              <span class="material-icons-outlined" style="font-size:16px;color:var(--t3)">schedule</span>
+              <select class="cfg-select" style="min-width:160px" onchange="checkInventoryComplete()">
+                <option value="">Select time</option>
+                <option>12:00 pm</option>
+                <option selected>14:00 pm</option>
+                <option>16:00 pm</option>
+                <option>18:00 pm</option>
+                <option>20:00 pm</option>
+                <option>22:00 pm</option>
+              </select>
+            </div>
+          </div>
+          <div class="cfg-row"><div class="cfg-left"><span class="cfg-name">Expiry Internal Bucket</span><span class="cfg-desc">Internal bucket name for fully expired inventory.</span></div><div class="cfg-right"><input type="text" class="cfg-text" style="width:200px" placeholder="Add & press enter" value="EXPIRED_BUCKET" oninput="checkInventoryComplete()"></div></div>
+          <div class="cfg-row"><div class="cfg-left"><span class="cfg-name">Expiry External Bucket</span><span class="cfg-desc">The external bucket name shown for expired inventory.</span></div><div class="cfg-right"><input type="text" class="cfg-text" style="width:200px" placeholder="Add & press enter" value="Expired" oninput="checkInventoryComplete()"></div></div>
+          <div class="cfg-row"><div class="cfg-left"><span class="cfg-name">Short Expiry Internal Bucket</span><span class="cfg-desc">The internal bucket name for near-expiry inventory.</span></div><div class="cfg-right"><input type="text" class="cfg-text" style="width:200px" placeholder="Add & press enter" value="NEAR_EXPIRY" oninput="checkInventoryComplete()"></div></div>
+          <div class="cfg-row"><div class="cfg-left"><span class="cfg-name">Short Expiry External Bucket</span><span class="cfg-desc">The external bucket name shown for near-expiry inventory.</span></div><div class="cfg-right"><input type="text" class="cfg-text" style="width:200px" placeholder="Add & press enter" value="Near Expiry" oninput="checkInventoryComplete()"></div></div>
+        </div>
+      </div>
+      <div class="accordion open" id="acc-orderqty">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          <span class="accordion-title">Order Quantity</span>
+          <span class="accordion-status status-pending" id="status-orderqty">Pending</span>
+          <span class="material-icons-outlined accordion-arrow">expand_more</span>
+        </div>
+        <div class="accordion-body">
+          <div class="cfg-row"><div class="cfg-left"><span class="cfg-name">Minimum Order Quantity</span><span class="cfg-desc">When enabled, orders below the minimum pack quantity are rejected.</span></div><div class="cfg-right"><div class="yn-toggle"><button class="yn yes-active" onclick="markOrderQtyComplete()">Yes</button><button class="yn" onclick="markOrderQtyComplete()">No</button></div></div></div>
+          <div class="cfg-note" style="padding:0 20px 14px;color:var(--primary)">*Please note: Minimum Order Quantity needs to be setup in Product catalog.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== DISPATCH TAB ===== -->
+    <div class="tab-panel" id="tab-dispatch">
+      <div class="accordion open" id="acc-rts">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          <span class="accordion-title">Dimensions & RTS</span>
+          <span class="accordion-status status-pending" id="status-rts">Pending</span>
+          <span class="material-icons-outlined accordion-arrow">expand_more</span>
+        </div>
+        <div class="accordion-body">
+          <div class="cfg-row">
+            <div class="cfg-left"><span class="cfg-name">Auto RTS</span><span class="cfg-desc">Whether the RTS step is required or can be skipped.</span></div>
+            <div class="cfg-right"><div class="yn-toggle"><button class="yn yes-active" onclick="markRtsComplete()">Yes</button><button class="yn" onclick="markRtsComplete()">No</button></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="accordion open" id="acc-dispatch-docs">
+        <div class="accordion-header" onclick="toggleAcc(this)">
+          <span class="accordion-title">Dispatch Documents</span>
+          <span class="accordion-status status-pending" id="status-dispatch-docs">Pending</span>
+          <span class="material-icons-outlined accordion-arrow">expand_more</span>
+        </div>
+        <div class="accordion-body">
+          <div class="cfg-row">
+            <div class="cfg-left"><span class="cfg-name">Shipment Remarks</span><span class="cfg-desc">Remarks that can be attached to shipments during or after RTS.</span></div>
+            <div class="cfg-right"><button class="btn-qc" onclick="openRemarksDrawer()">Add remarks</button></div>
+          </div>
+          <div class="qc-sub" id="remarksSelectedWrap" style="display:none">
+            <div class="qc-selected" id="remarksSelectedList" style="display:block">
+              <strong>Added remarks:</strong>
+              <ul id="remarksSelectedItems"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end content-area -->
+
+  <!-- TDS Side Drawer: QC Instructions -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="if(event.target===this)closeDrawer()">
+    <div class="drawer">
+      <div class="drawer-header">
+        <span class="drawer-title">QC instructions</span>
+        <button class="drawer-close" onclick="closeDrawer()"><span class="material-icons-outlined">close</span></button>
+      </div>
+      <div class="drawer-body">
+        <div class="drawer-search">
+          <span class="material-icons-outlined">search</span>
+          <input type="text" placeholder="Search" id="drawerSearch" oninput="filterDrawerOptions()">
+        </div>
+        <div class="drawer-table-header">Parameters</div>
+        <div id="drawerOptions">
+          <div class="drawer-option" data-value="Ensure the item has no damages/scratches when Accepting it" onclick="toggleDrawerOption(this)">
+            <div class="drawer-checkbox"></div>
+            <span class="drawer-opt-text">Ensure the item has no damages/scratches when Accepting it</span>
+          </div>
+          <div class="drawer-option" data-value="Check product for Expiry (if applicable)" onclick="toggleDrawerOption(this)">
+            <div class="drawer-checkbox"></div>
+            <span class="drawer-opt-text">Check product for Expiry (if applicable)</span>
+          </div>
+          <div class="drawer-option" data-value="Check product color" onclick="toggleDrawerOption(this)">
+            <div class="drawer-checkbox"></div>
+            <span class="drawer-opt-text">Check product color</span>
+          </div>
+          <div class="drawer-option" data-value="Verify product weight matches label" onclick="toggleDrawerOption(this)">
+            <div class="drawer-checkbox"></div>
+            <span class="drawer-opt-text">Verify product weight matches label</span>
+          </div>
+          <div class="drawer-option" data-value="Check MRP tag is intact" onclick="toggleDrawerOption(this)">
+            <div class="drawer-checkbox"></div>
+            <span class="drawer-opt-text">Check MRP tag is intact</span>
+          </div>
+        </div>
+      </div>
+      <div class="drawer-footer">
+        <button class="btn-cancel" onclick="closeDrawer()">Cancel</button>
+        <button class="btn-save" id="btnSaveParams" disabled onclick="saveInstructions()">Save parameters</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TDS Side Drawer: Packaging Instructions -->
+  <div class="drawer-overlay" id="packDrawerOverlay" onclick="if(event.target===this)closePackDrawer()">
+    <div class="drawer">
+      <div class="drawer-header">
+        <span class="drawer-title">Packaging instructions</span>
+        <button class="drawer-close" onclick="closePackDrawer()"><span class="material-icons-outlined">close</span></button>
+      </div>
+      <div class="drawer-body">
+        <div class="drawer-search">
+          <span class="material-icons-outlined">search</span>
+          <input type="text" placeholder="Search" id="packDrawerSearch" oninput="filterPackDrawerOptions()">
+        </div>
+        <div class="drawer-table-header">Packaging instructions</div>
+        <div id="packDrawerOptions">
+          <div class="drawer-option" data-value="Please pack in bubble wrap & paste packing slip on top" onclick="togglePackDrawerOption(this)">
+            <div class="drawer-checkbox"></div>
+            <span class="drawer-opt-text">Please pack in bubble wrap & paste packing slip on top</span>
+          </div>
+          <div class="drawer-option" data-value="Use Bubble Wrap for Fragile Items" onclick="togglePackDrawerOption(this)">
+            <div class="drawer-checkbox"></div>
+            <span class="drawer-opt-text">Use Bubble Wrap for Fragile Items</span>
+          </div>
+          <div class="drawer-option" data-value="Check secure tape" onclick="togglePackDrawerOption(this)">
+            <div class="drawer-checkbox"></div>
+            <span class="drawer-opt-text">Check secure tape</span>
+          </div>
+          <div class="drawer-option" data-value="Double Plastic roll is required" onclick="togglePackDrawerOption(this)">
+            <div class="drawer-checkbox"></div>
+            <span class="drawer-opt-text">Double Plastic roll is required</span>
+          </div>
+        </div>
+      </div>
+      <div class="drawer-footer">
+        <button class="btn-cancel" onclick="closePackDrawer()">Cancel</button>
+        <button class="btn-save" id="btnSavePackInstr" disabled onclick="savePackInstructions()">Save instructions</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TDS Side Drawer: Shipment Remarks -->
+  <div class="drawer-overlay" id="remarksDrawerOverlay" onclick="if(event.target===this)closeRemarksDrawer()">
+    <div class="drawer">
+      <div class="drawer-header">
+        <span class="drawer-title">Add remarks</span>
+        <button class="drawer-close" onclick="closeRemarksDrawer()"><span class="material-icons-outlined">close</span></button>
+      </div>
+      <div class="drawer-body">
+        <div class="drawer-search">
+          <span class="material-icons-outlined">search</span>
+          <input type="text" placeholder="Search" id="remarksDrawerSearch" oninput="filterRemarksOptions()">
+        </div>
+        <div class="drawer-table-header">Remarks</div>
+        <div id="remarksDrawerOptions">
+          <div class="drawer-option" data-value="Vehicle issue" onclick="toggleRemarksOption(this)">
+            <div class="drawer-checkbox"></div>
+            <span class="drawer-opt-text">Vehicle issue</span>
+          </div>
+          <div class="drawer-option" data-value="Orion supply issue" onclick="toggleRemarksOption(this)">
+            <div class="drawer-checkbox"></div>
+            <span class="drawer-opt-text">Orion supply issue</span>
+          </div>
+          <div class="drawer-option" data-value="Consignee issue" onclick="toggleRemarksOption(this)">
+            <div class="drawer-checkbox"></div>
+            <span class="drawer-opt-text">Consignee issue</span>
+          </div>
+          <div class="drawer-option" data-value="Lower vehicle size unavailable" onclick="toggleRemarksOption(this)">
+            <div class="drawer-checkbox"></div>
+            <span class="drawer-opt-text">Lower vehicle size unavailable</span>
+          </div>
+          <div class="drawer-option" data-value="Loading issue" onclick="toggleRemarksOption(this)">
+            <div class="drawer-checkbox"></div>
+            <span class="drawer-opt-text">Loading issue</span>
+          </div>
+        </div>
+      </div>
+      <div class="drawer-footer">
+        <button class="btn-cancel" onclick="closeRemarksDrawer()">Cancel</button>
+        <button class="btn-save" id="btnSaveRemarks" disabled onclick="saveRemarks()">Save remarks</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Draft Snackbar -->
+  <div class="snackbar" id="draftSnackbar"><span class="material-icons-outlined">check_circle</span>Draft saved</div>
+
+  <!-- Exit Confirmation -->
+  <div class="confirm-overlay" id="exitConfirm" onclick="if(event.target===this)closeExitConfirm()">
+    <div class="confirm-modal">
+      <div class="confirm-modal-title">Are you sure you want to exit configuration?</div>
+      <div class="confirm-modal-desc">Any unsaved changes will be lost.</div>
+      <div class="confirm-modal-actions">
+        <button class="btn-confirm-cancel" onclick="closeExitConfirm()">Cancel</button>
+        <button class="btn-confirm-yes" onclick="window.location.href='01-client-list.html'">Yes, exit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Map FC Modal -->
+  <div class="modal-overlay" id="mapFcModal" onclick="if(event.target===this)closeMapFcModal()">
+    <div class="modal">
+      <div class="modal-title">Map Fulfilment Centre</div>
+      <div class="modal-sub">Select an FC to map this client configuration to.</div>
+      <label class="modal-label">Fulfilment Centre</label>
+      <select class="modal-select" id="fcSelect" onchange="onFcSelect()">
+        <option value="">Select FC</option>
+        <option value="Delhi Metro FC">Delhi Metro FC</option>
+        <option value="Mumbai Central FC">Mumbai Central FC</option>
+        <option value="Bangalore South FC">Bangalore South FC</option>
+        <option value="Hyderabad FC">Hyderabad FC</option>
+        <option value="Pune FC">Pune FC</option>
+      </select>
+      <a class="modal-link" onclick="alert('Create new FC flow')">+ Create new FC</a>
+      <div class="modal-actions">
+        <button class="btn-modal-cancel" onclick="closeMapFcModal()">Cancel</button>
+        <button class="btn-modal-map" id="btnMapFc" disabled onclick="mapFcAndRedirect()">Map FC</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer-bar">
+    <button class="btn-prev" onclick="window.location.href='03-channel-setup.html'">Previous</button>
+    <button class="btn-live" id="btnLive" onclick="openMapFcModal()">Set as live</button>
+  </div>
+
+  <script>
+    // ===== Accordion =====
+    function toggleAcc(header) { header.closest('.accordion').classList.toggle('open'); }
+
+    // ===== Tabs =====
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.panel).classList.add('active');
+      });
+    });
+
+    // ===== Yes/No Toggle with conditional logic =====
+    function ynClick(btn, value, targetId) {
+      const group = btn.closest('.yn-toggle');
+      group.querySelectorAll('.yn').forEach(b => b.classList.remove('yes-active', 'no-active'));
+      if (value === 'yes') btn.classList.add('yes-active');
+      else btn.classList.add('no-active');
+
+      // Handle conditional visibility
+      if (targetId) {
+        const target = document.getElementById(targetId);
+        if (!target) return;
+
+        if (target.classList.contains('qc-sub')) {
+          // QC instructions sub-section
+          if (value === 'yes') target.classList.add('visible');
+          else target.classList.remove('visible');
+        } else if (targetId === 'qcParamsDeps') {
+          // Show/hide Require Reject Images
+          const rejectRow = document.getElementById('qcRejectImages');
+          if (value === 'yes') rejectRow.classList.remove('hidden');
+          else rejectRow.classList.add('hidden');
+        } else {
+          // Generic sub-row show/hide (tolerance etc)
+          if (value === 'yes') target.classList.remove('hidden');
+          else target.classList.add('hidden');
+        }
+      }
+    }
+
+    // ===== Generic Yes/No (no target) =====
+    document.querySelectorAll('.yn-toggle').forEach(group => {
+      group.querySelectorAll('.yn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          // Skip if has onclick already (handled by ynClick)
+          if (btn.hasAttribute('onclick')) return;
+          group.querySelectorAll('.yn').forEach(b => b.classList.remove('yes-active', 'no-active'));
+          if (btn.textContent.trim() === 'Yes') btn.classList.add('yes-active');
+          else btn.classList.add('no-active');
+        });
+      });
+    });
+
+    // ===== QC Instructions Drawer =====
+    let selectedInstructions = [];
+
+    function openDrawer() {
+      document.getElementById('drawerOverlay').classList.add('open');
+    }
+    function closeDrawer() {
+      document.getElementById('drawerOverlay').classList.remove('open');
+    }
+
+    function filterDrawerOptions() {
+      const q = document.getElementById('drawerSearch').value.toLowerCase();
+      document.querySelectorAll('.drawer-option').forEach(opt => {
+        opt.style.display = opt.dataset.value.toLowerCase().includes(q) ? 'flex' : 'none';
+      });
+    }
+
+    function toggleDrawerOption(el) {
+      el.classList.toggle('selected');
+      updateSaveBtn();
+    }
+
+    function updateSaveBtn() {
+      const selected = document.querySelectorAll('.drawer-option.selected');
+      document.getElementById('btnSaveParams').disabled = selected.length === 0;
+    }
+
+    function saveInstructions() {
+      selectedInstructions = [];
+      document.querySelectorAll('#drawerOptions .drawer-option.selected').forEach(opt => {
+        selectedInstructions.push(opt.dataset.value);
+      });
+      const listWrap = document.getElementById('qcSelectedList');
+      const listItems = document.getElementById('qcSelectedItems');
+      if (selectedInstructions.length > 0) {
+        listWrap.style.display = 'block';
+        listItems.innerHTML = selectedInstructions.map(i => `<li>${i}</li>`).join('');
+      } else {
+        listWrap.style.display = 'none';
+      }
+      closeDrawer();
+    }
+
+    // ===== Packaging Instructions Drawer =====
+    function openPackDrawer() {
+      document.getElementById('packDrawerOverlay').classList.add('open');
+    }
+    function closePackDrawer() {
+      document.getElementById('packDrawerOverlay').classList.remove('open');
+    }
+    function filterPackDrawerOptions() {
+      const q = document.getElementById('packDrawerSearch').value.toLowerCase();
+      document.querySelectorAll('#packDrawerOptions .drawer-option').forEach(opt => {
+        opt.style.display = opt.dataset.value.toLowerCase().includes(q) ? 'flex' : 'none';
+      });
+    }
+    function togglePackDrawerOption(el) {
+      el.classList.toggle('selected');
+      const selected = document.querySelectorAll('#packDrawerOptions .drawer-option.selected');
+      document.getElementById('btnSavePackInstr').disabled = selected.length === 0;
+    }
+    function savePackInstructions() {
+      let items = [];
+      document.querySelectorAll('#packDrawerOptions .drawer-option.selected').forEach(opt => {
+        items.push(opt.dataset.value);
+      });
+      const listWrap = document.getElementById('packSelectedList');
+      const listItems = document.getElementById('packSelectedItems');
+      if (items.length > 0) {
+        listWrap.style.display = 'block';
+        listItems.innerHTML = items.map(i => `<li>${i}</li>`).join('');
+      } else {
+        listWrap.style.display = 'none';
+      }
+      closePackDrawer();
+    }
+
+    // ===== Inventory Completion Checks =====
+    function checkInventoryComplete() {
+      // Check if all text inputs in expiry section have values
+      const expiryBody = document.querySelector('#acc-expiry .accordion-body');
+      const textInputs = expiryBody.querySelectorAll('.cfg-text');
+      const allFilled = Array.from(textInputs).every(inp => inp.value.trim() !== '');
+      const statusEl = document.getElementById('status-expiry');
+      if (allFilled) {
+        statusEl.textContent = 'Completed';
+        statusEl.className = 'accordion-status status-completed';
+      } else {
+        statusEl.textContent = 'Pending';
+        statusEl.className = 'accordion-status status-pending';
+      }
+    }
+
+    function markOrderQtyComplete() {
+      // Any selection on Order Quantity marks it complete
+      setTimeout(() => {
+        const statusEl = document.getElementById('status-orderqty');
+        statusEl.textContent = 'Completed';
+        statusEl.className = 'accordion-status status-completed';
+      }, 100);
+    }
+
+    // Run initial check
+    checkInventoryComplete();
+
+    // ===== Dispatch: RTS Completion =====
+    function markRtsComplete() {
+      setTimeout(() => {
+        const statusEl = document.getElementById('status-rts');
+        statusEl.textContent = 'Completed';
+        statusEl.className = 'accordion-status status-completed';
+      }, 100);
+    }
+
+    // ===== Dispatch: Remarks Drawer =====
+    function openRemarksDrawer() {
+      document.getElementById('remarksDrawerOverlay').classList.add('open');
+    }
+    function closeRemarksDrawer() {
+      document.getElementById('remarksDrawerOverlay').classList.remove('open');
+    }
+    function filterRemarksOptions() {
+      const q = document.getElementById('remarksDrawerSearch').value.toLowerCase();
+      document.querySelectorAll('#remarksDrawerOptions .drawer-option').forEach(opt => {
+        opt.style.display = opt.dataset.value.toLowerCase().includes(q) ? 'flex' : 'none';
+      });
+    }
+    function toggleRemarksOption(el) {
+      el.classList.toggle('selected');
+      const selected = document.querySelectorAll('#remarksDrawerOptions .drawer-option.selected');
+      document.getElementById('btnSaveRemarks').disabled = selected.length === 0;
+    }
+    function saveRemarks() {
+      let items = [];
+      document.querySelectorAll('#remarksDrawerOptions .drawer-option.selected').forEach(opt => {
+        items.push(opt.dataset.value);
+      });
+      const wrap = document.getElementById('remarksSelectedWrap');
+      const listItems = document.getElementById('remarksSelectedItems');
+      if (items.length > 0) {
+        wrap.style.display = 'block';
+        listItems.innerHTML = items.map(i => `<li>${i}</li>`).join('');
+        // Update button text
+        document.querySelector('#acc-dispatch-docs .btn-qc').textContent = 'Update remarks';
+        // Mark completed
+        const statusEl = document.getElementById('status-dispatch-docs');
+        statusEl.textContent = 'Completed';
+        statusEl.className = 'accordion-status status-completed';
+      } else {
+        wrap.style.display = 'none';
+      }
+      closeRemarksDrawer();
+    }
+
+    // ===== Accordion completion: Inbound =====
+    // QC Module: mark complete when any toggle inside is clicked
+    document.querySelectorAll('#acc-qc .yn-toggle .yn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        setTimeout(() => {
+          document.getElementById('status-qc').textContent = 'Completed';
+          document.getElementById('status-qc').className = 'accordion-status status-completed';
+        }, 150);
+      });
+    });
+    // Receiving: mark complete when toggle or select is used
+    document.querySelectorAll('#acc-receiving .yn-toggle .yn, #acc-receiving .cfg-select').forEach(el => {
+      const evt = el.tagName === 'SELECT' ? 'change' : 'click';
+      el.addEventListener(evt, () => {
+        setTimeout(() => {
+          document.getElementById('status-receiving').textContent = 'Completed';
+          document.getElementById('status-receiving').className = 'accordion-status status-completed';
+        }, 150);
+      });
+    });
+    // AGN Workflow: mark complete when any toggle is clicked
+    document.querySelectorAll('#acc-agn .yn-toggle .yn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        setTimeout(() => {
+          document.getElementById('status-agn').textContent = 'Completed';
+          document.getElementById('status-agn').className = 'accordion-status status-completed';
+        }, 150);
+      });
+    });
+
+    // ===== Accordion completion: Outbound =====
+    // Allocation: mark complete when select changes
+    document.querySelectorAll('#acc-allocation .cfg-select').forEach(el => {
+      el.addEventListener('change', () => {
+        document.getElementById('status-allocation').textContent = 'Completed';
+        document.getElementById('status-allocation').className = 'accordion-status status-completed';
+      });
+    });
+    // Also mark on page load since selects have default values
+    setTimeout(() => {
+      document.getElementById('status-allocation').textContent = 'Completed';
+      document.getElementById('status-allocation').className = 'accordion-status status-completed';
+    }, 200);
+    // Packing: mark complete when any toggle is clicked
+    document.querySelectorAll('#acc-packing .yn-toggle .yn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        setTimeout(() => {
+          document.getElementById('status-packing').textContent = 'Completed';
+          document.getElementById('status-packing').className = 'accordion-status status-completed';
+        }, 150);
+      });
+    });
+
+    // ===== Map FC Modal =====
+    function openMapFcModal() {
+      document.getElementById('mapFcModal').classList.add('open');
+    }
+    function closeMapFcModal() {
+      document.getElementById('mapFcModal').classList.remove('open');
+    }
+    function onFcSelect() {
+      const val = document.getElementById('fcSelect').value;
+      document.getElementById('btnMapFc').disabled = !val;
+    }
+    function mapFcAndRedirect() {
+      window.location.href = '01-client-list.html?success=1';
+    }
+
+    // ===== Draft Snackbar =====
+    function showDraftSnackbar() {
+      const sb = document.getElementById('draftSnackbar');
+      sb.classList.add('show');
+      setTimeout(() => sb.classList.remove('show'), 3000);
+    }
+
+    // ===== Exit Confirmation =====
+    function showExitConfirm() {
+      document.getElementById('exitConfirm').classList.add('open');
+    }
+    function closeExitConfirm() {
+      document.getElementById('exitConfirm').classList.remove('open');
+    }
+  </script>
+
+</body>
+</html>

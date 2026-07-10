@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client Configuration - Channel Setup</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #E31E24;
+      --primary-dark: #B71820;
+      --primary-light: #FDE8E9;
+      --surface: #FFFFFF;
+      --bg: #F5F5F7;
+      --border: #E0E0E0;
+      --border-light: #F0F0F0;
+      --t1: #1A1A1A;
+      --t2: #666666;
+      --t3: #999999;
+      --success: #0D7A3F;
+      --success-bg: #E6F5ED;
+      --info: #0066CC;
+      --info-bg: #E6F0FA;
+      --radius: 8px;
+      --radius-sm: 4px;
+      --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--surface);
+      color: var(--t1);
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+    }
+
+    /* ===== Page Header ===== */
+    .page-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 32px;
+      border-bottom: 1px solid var(--border-light);
+      flex-shrink: 0;
+    }
+    .page-topbar-left { display: flex; flex-direction: column; gap: 4px; }
+    .page-topbar-title { font-size: 18px; font-weight: 700; }
+    .page-topbar-meta { display: flex; align-items: center; gap: 8px; }
+    .page-topbar-client { font-size: 13px; color: var(--t2); }
+    .pill {
+      display: inline-flex; align-items: center;
+      padding: 2px 8px; border-radius: 100px;
+      font-size: 10px; font-weight: 600;
+    }
+    .pill-progress { background: var(--info-bg); color: var(--info); }
+    .page-topbar-right { display: flex; align-items: center; gap: 12px; }
+    .btn-draft {
+      padding: 8px 16px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: var(--surface);
+      font-family: inherit; font-size: 13px; font-weight: 500;
+      color: var(--t1); cursor: pointer;
+    }
+    .btn-draft:hover { background: var(--bg); }
+    .btn-close {
+      width: 34px; height: 34px;
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--surface); cursor: pointer;
+    }
+    .btn-close:hover { background: var(--bg); }
+    .btn-close .material-icons-outlined { font-size: 18px; color: var(--t2); }
+
+    /* ===== TDS Stepper (Horizontal) ===== */
+    .stepper-bar {
+      display: flex; align-items: center;
+      padding: 24px 32px;
+      border-bottom: 1px solid var(--border-light);
+      background: var(--surface);
+    }
+    .stepper-step {
+      display: flex; align-items: center; gap: 10px;
+      flex: 1;
+    }
+    .stepper-step:not(:last-child)::after {
+      content: ''; flex: 1; height: 2px;
+      background: var(--border); margin: 0 16px;
+    }
+    .stepper-step.completed:not(:last-child)::after { background: var(--success); }
+    .stepper-step.active:not(:last-child)::after { background: var(--border); }
+    .step-circle {
+      width: 28px; height: 28px; min-width: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600;
+      border: 2px solid var(--border);
+      color: var(--t3); background: var(--surface);
+    }
+    .stepper-step.active .step-circle {
+      border-color: var(--t1); background: var(--t1); color: white;
+    }
+    .stepper-step.completed .step-circle {
+      border-color: var(--success); background: var(--success); color: white;
+    }
+    .step-text { display: flex; flex-direction: column; }
+    .step-name { font-size: 13px; font-weight: 500; color: var(--t1); }
+    .stepper-step.active .step-name { font-weight: 600; }
+    .stepper-step:not(.active):not(.completed) .step-name { color: var(--t3); }
+    .step-sub { font-size: 10px; color: var(--t3); }
+
+    /* ===== Content ===== */
+    .content-area {
+      flex: 1; overflow-y: auto;
+      padding: 28px 32px 100px;
+      background: var(--bg);
+    }
+
+    /* ===== Setup Card ===== */
+    .setup-card {
+      background: var(--surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      margin-bottom: 24px;
+    }
+    .setup-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 24px;
+    }
+    .setup-card-left { display: flex; flex-direction: column; gap: 4px; }
+    .setup-card-title {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 15px; font-weight: 600;
+    }
+    .badge-team {
+      font-size: 10px; font-weight: 600;
+      padding: 2px 8px; border-radius: 100px;
+      background: var(--info-bg); color: var(--info);
+    }
+    .setup-card-sub { font-size: 12px; color: var(--t3); }
+    .setup-card-right { display: flex; align-items: flex-end; gap: 12px; }
+
+    /* ===== Dropdown ===== */
+    .dropdown-label {
+      font-size: 12px; font-weight: 500; color: var(--t1);
+      margin-bottom: 4px; display: block;
+    }
+    .dropdown-label .req { color: var(--primary); }
+    .dropdown-wrap { position: relative; width: 280px; }
+    .dropdown-trigger {
+      display: flex; align-items: center; flex-wrap: wrap; gap: 4px;
+      min-height: 38px; padding: 6px 12px;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--surface); cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .dropdown-trigger:hover { border-color: var(--t3); }
+    .dropdown-trigger.open { border-color: var(--t1); }
+    .dropdown-trigger .placeholder { font-size: 13px; color: var(--t3); flex: 1; }
+    .dropdown-trigger .chevron {
+      margin-left: auto; font-size: 18px; color: var(--t3);
+      transition: transform 0.2s;
+    }
+    .dropdown-trigger.open .chevron { transform: rotate(180deg); }
+    .tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 8px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: var(--surface);
+      font-size: 11px; font-weight: 500; color: var(--t1);
+    }
+    .tag-remove {
+      font-size: 14px; cursor: pointer; color: var(--t3);
+      line-height: 1; border: none; background: none; padding: 0;
+    }
+    .tag-remove:hover { color: var(--primary); }
+    .tag-more {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 22px; height: 22px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: var(--bg);
+      font-size: 10px; font-weight: 600; color: var(--t2);
+    }
+    .dropdown-menu {
+      position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+      background: var(--surface);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      z-index: 50; display: none;
+      max-height: 280px; overflow: hidden; flex-direction: column;
+    }
+    .dropdown-wrap.open .dropdown-menu { display: flex; }
+    .dropdown-search {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 12px; border-bottom: 1px solid var(--border-light);
+    }
+    .dropdown-search .material-icons-outlined { font-size: 16px; color: var(--t3); }
+    .dropdown-search input {
+      border: none; outline: none; background: transparent;
+      font-family: inherit; font-size: 12px; width: 100%; color: var(--t1);
+    }
+    .dropdown-search input::placeholder { color: var(--t3); }
+    .dropdown-options { overflow-y: auto; max-height: 200px; padding: 4px 0; }
+    .dropdown-option {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 12px; font-size: 12px; color: var(--t1);
+      cursor: pointer; transition: background 0.1s;
+    }
+    .dropdown-option:hover { background: var(--bg); }
+    .dropdown-option .checkbox {
+      width: 16px; height: 16px; min-width: 16px;
+      border: 1.5px solid var(--border); border-radius: 3px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    .dropdown-option.selected .checkbox {
+      background: var(--t1); border-color: var(--t1);
+    }
+    .dropdown-option.selected .checkbox::after {
+      content: ''; width: 8px; height: 5px;
+      border-left: 2px solid white; border-bottom: 2px solid white;
+      transform: rotate(-45deg); margin-top: -2px;
+    }
+    .dropdown-footer {
+      padding: 8px 12px; border-top: 1px solid var(--border-light);
+      text-align: right;
+    }
+    .dropdown-footer a {
+      font-size: 11px; color: var(--info); text-decoration: none; font-weight: 500;
+      cursor: pointer;
+    }
+    .dropdown-footer a:hover { text-decoration: underline; }
+
+    /* Add Button */
+    .btn-add {
+      padding: 8px 18px; border-radius: var(--radius-sm);
+      border: none; background: var(--t1);
+      font-family: inherit; font-size: 13px; font-weight: 600;
+      color: white; cursor: pointer; transition: all 0.15s;
+      white-space: nowrap; height: 38px;
+    }
+    .btn-add:hover { background: #333; }
+    .btn-add:disabled { background: var(--border); color: var(--t3); cursor: not-allowed; }
+
+    /* ===== Channels List ===== */
+    .channels-section {
+      background: var(--surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      display: none;
+    }
+    .channels-section.visible { display: block; }
+    .channels-title {
+      font-size: 14px; font-weight: 600; margin-bottom: 16px;
+      padding-bottom: 12px; border-bottom: 1px solid var(--border-light);
+    }
+    .channel-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .channel-item:last-child { border-bottom: none; }
+    .channel-info { display: flex; flex-direction: column; gap: 2px; }
+    .channel-name { font-size: 14px; font-weight: 600; }
+    .channel-meta { font-size: 11px; color: var(--t3); }
+    .btn-remove {
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      border: none; background: none; cursor: pointer;
+      border-radius: var(--radius-sm); color: var(--t3);
+    }
+    .btn-remove:hover { background: var(--bg); color: var(--t1); }
+    .btn-remove .material-icons-outlined { font-size: 20px; }
+
+    /* ===== Footer ===== */
+    .footer-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 60px; background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: flex-end;
+      padding: 0 32px; gap: 12px; z-index: 50;
+    }
+    .btn-prev {
+      padding: 10px 20px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: var(--surface);
+      font-family: inherit; font-size: 13px; font-weight: 500;
+      color: var(--t1); cursor: pointer;
+    }
+    .btn-prev:hover { background: var(--bg); }
+    .btn-next {
+      padding: 10px 24px; border-radius: var(--radius-sm);
+      border: none; background: var(--t1);
+      font-family: inherit; font-size: 13px; font-weight: 600;
+      color: white; cursor: pointer; transition: all 0.15s;
+    }
+    .btn-next:hover { background: #333; }
+    .btn-next:disabled { background: var(--border); color: var(--t3); cursor: not-allowed; }
+    /* ===== Modal ===== */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.4);
+      display: none; align-items: center; justify-content: center;
+      z-index: 200;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      width: 400px; max-width: 90vw;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    }
+    .modal-title {
+      font-size: 15px; font-weight: 600; margin-bottom: 4px;
+    }
+    .modal-sub {
+      font-size: 12px; color: var(--t3); margin-bottom: 20px;
+    }
+    .modal-label {
+      font-size: 12px; font-weight: 500; color: var(--t2);
+      margin-bottom: 6px; display: block;
+    }
+    .modal-input {
+      width: 100%; height: 38px;
+      padding: 0 14px;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-family: inherit; font-size: 13px; color: var(--t1);
+    }
+    .modal-input:focus { outline: none; border-color: var(--t1); }
+    .modal-input::placeholder { color: var(--t3); }
+    .modal-actions {
+      display: flex; justify-content: flex-end; gap: 10px;
+      margin-top: 20px;
+    }
+    .btn-modal-cancel {
+      padding: 8px 16px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: var(--surface);
+      font-family: inherit; font-size: 12px; font-weight: 500;
+      color: var(--t2); cursor: pointer;
+    }
+    .btn-modal-cancel:hover { background: var(--bg); }
+    .btn-modal-add {
+      padding: 8px 18px; border-radius: var(--radius-sm);
+      border: none; background: var(--t1);
+      font-family: inherit; font-size: 12px; font-weight: 600;
+      color: white; cursor: pointer; transition: all 0.15s;
+    }
+    .btn-modal-add:hover { background: #333; }
+    .btn-modal-add:disabled { background: var(--border); color: var(--t3); cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+  <!-- Page Top Bar -->
+  <header class="page-topbar">
+    <div class="page-topbar-left">
+      <h1 class="page-topbar-title">Client configuration details</h1>
+      <div class="page-topbar-meta">
+        <span class="page-topbar-client">Mamaearth Ltd</span>
+        <span class="pill pill-progress">In-progress</span>
+      </div>
+    </div>
+    <div class="page-topbar-right">
+      <button class="btn-draft">Save as draft</button>
+      <button class="btn-close" onclick="window.location.href='01-client-list.html'">
+        <span class="material-icons-outlined">close</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- TDS Stepper -->
+  <div class="stepper-bar">
+    <div class="stepper-step completed">
+      <div class="step-circle"><span class="material-icons-outlined" style="font-size:16px">check</span></div>
+      <div class="step-text">
+        <span class="step-name">Courier setup</span>
+        <span class="step-sub">KAM team</span>
+      </div>
+    </div>
+    <div class="stepper-step active">
+      <div class="step-circle">2</div>
+      <div class="step-text">
+        <span class="step-name">Channel setup</span>
+        <span class="step-sub">Integration team</span>
+      </div>
+    </div>
+    <div class="stepper-step">
+      <div class="step-circle">3</div>
+      <div class="step-text">
+        <span class="step-name">Other configuration</span>
+        <span class="step-sub">Pre team</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content-area">
+    <!-- Setup Card -->
+    <div class="setup-card">
+      <div class="setup-card-header">
+        <div class="setup-card-left">
+          <div class="setup-card-title">
+            Channel Setup
+            <span class="badge-team">Integration team</span>
+          </div>
+          <span class="setup-card-sub">Add at least one channel to proceed</span>
+        </div>
+        <div class="setup-card-right">
+          <div>
+            <span class="dropdown-label">Channel name <span class="req">*</span></span>
+            <div class="dropdown-wrap" id="channelDropdown">
+              <div class="dropdown-trigger" onclick="toggleDropdown()">
+                <span class="placeholder" id="ddPlaceholder">Search channel</span>
+                <span class="material-icons-outlined chevron">expand_more</span>
+              </div>
+              <div class="dropdown-menu">
+                <div class="dropdown-search">
+                  <span class="material-icons-outlined">search</span>
+                  <input type="text" id="ddSearch" placeholder="Search channel..." oninput="filterOptions()">
+                </div>
+                <div class="dropdown-options" id="ddOptions">
+                  <div class="dropdown-option" data-value="Flipkart" data-meta="Mumbai | flipkart@wms.com" onclick="selectOption(this)">
+                    <div class="checkbox"></div>
+                    <span>Flipkart</span>
+                  </div>
+                  <div class="dropdown-option" data-value="Paytm" data-meta="Noida | paytm@wms.com" onclick="selectOption(this)">
+                    <div class="checkbox"></div>
+                    <span>Paytm</span>
+                  </div>
+                  <div class="dropdown-option" data-value="Hitachi" data-meta="Delhi | hitachi@wms.com" onclick="selectOption(this)">
+                    <div class="checkbox"></div>
+                    <span>Hitachi</span>
+                  </div>
+                  <div class="dropdown-option" data-value="Finolex" data-meta="Pune | finolex@wms.com" onclick="selectOption(this)">
+                    <div class="checkbox"></div>
+                    <span>Finolex</span>
+                  </div>
+                  <div class="dropdown-option" data-value="Airtel" data-meta="Gurgaon | airtel@wms.com" onclick="selectOption(this)">
+                    <div class="checkbox"></div>
+                    <span>Airtel</span>
+                  </div>
+                </div>
+                <div class="dropdown-footer">
+                  <a onclick="openModal()">Create new channel</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button class="btn-add" id="btnAdd" disabled onclick="addChannels()">Add channels</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Channels List (appears after adding) -->
+    <div class="channels-section" id="channelsSection">
+      <div class="channels-title" id="channelsTitle">Channels (0)</div>
+      <div id="channelsList"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer-bar">
+    <button class="btn-prev" onclick="window.location.href='02-courier-setup.html'">Previous</button>
+    <button class="btn-next" id="btnNext" disabled onclick="window.location.href='04-other-config.html'">Next</button>
+  </div>
+
+  <!-- Create New Channel Modal -->
+  <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="modal-title">Create new channel</div>
+      <div class="modal-sub">Add a new channel name and map it to this client.</div>
+      <label class="modal-label">Channel name</label>
+      <input type="text" class="modal-input" id="newChannelInput" placeholder="Enter channel name..." oninput="onNewChannelInput()">
+      <div class="modal-actions">
+        <button class="btn-modal-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-modal-add" id="btnAddMap" disabled onclick="addAndMap()">Add and map</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let selectedChannels = [];
+    let addedChannels = [];
+
+    function toggleDropdown() {
+      const wrap = document.getElementById('channelDropdown');
+      wrap.classList.toggle('open');
+      const trigger = wrap.querySelector('.dropdown-trigger');
+      trigger.classList.toggle('open');
+      if (wrap.classList.contains('open')) {
+        document.getElementById('ddSearch').focus();
+      }
+    }
+
+    document.addEventListener('click', (e) => {
+      const wrap = document.getElementById('channelDropdown');
+      if (!wrap.contains(e.target)) {
+        wrap.classList.remove('open');
+        wrap.querySelector('.dropdown-trigger').classList.remove('open');
+      }
+    });
+
+    function filterOptions() {
+      const q = document.getElementById('ddSearch').value.toLowerCase();
+      document.querySelectorAll('.dropdown-option').forEach(opt => {
+        const text = opt.dataset.value.toLowerCase();
+        opt.style.display = text.includes(q) ? 'flex' : 'none';
+      });
+    }
+
+    function selectOption(el) {
+      el.classList.toggle('selected');
+      const val = el.dataset.value;
+      const meta = el.dataset.meta;
+      if (el.classList.contains('selected')) {
+        selectedChannels.push({ name: val, meta: meta });
+      } else {
+        selectedChannels = selectedChannels.filter(c => c.name !== val);
+      }
+      updateTriggerDisplay();
+    }
+
+    function updateTriggerDisplay() {
+      const trigger = document.querySelector('.dropdown-trigger');
+      const placeholder = document.getElementById('ddPlaceholder');
+      const btn = document.getElementById('btnAdd');
+
+      trigger.querySelectorAll('.tag, .tag-more').forEach(t => t.remove());
+
+      if (selectedChannels.length === 0) {
+        placeholder.style.display = '';
+        btn.disabled = true;
+        return;
+      }
+
+      placeholder.style.display = 'none';
+      btn.disabled = false;
+
+      const show = selectedChannels.slice(0, 2);
+      const overflow = selectedChannels.length - 2;
+
+      show.forEach(c => {
+        const tag = document.createElement('span');
+        tag.className = 'tag';
+        tag.innerHTML = `${c.name}<button class="tag-remove" onclick="event.stopPropagation(); removeTag('${c.name}')">&times;</button>`;
+        trigger.insertBefore(tag, trigger.querySelector('.chevron'));
+      });
+
+      if (overflow > 0) {
+        const more = document.createElement('span');
+        more.className = 'tag-more';
+        more.textContent = `+${overflow}`;
+        trigger.insertBefore(more, trigger.querySelector('.chevron'));
+      }
+    }
+
+    function removeTag(name) {
+      selectedChannels = selectedChannels.filter(c => c.name !== name);
+      document.querySelectorAll('.dropdown-option').forEach(opt => {
+        if (opt.dataset.value === name) opt.classList.remove('selected');
+      });
+      updateTriggerDisplay();
+    }
+
+    function addChannels() {
+      addedChannels = [...addedChannels, ...selectedChannels];
+      selectedChannels = [];
+      document.querySelectorAll('.dropdown-option').forEach(opt => opt.classList.remove('selected'));
+      updateTriggerDisplay();
+      document.getElementById('ddPlaceholder').textContent = 'Search channel';
+      renderChannels();
+    }
+
+    function renderChannels() {
+      const section = document.getElementById('channelsSection');
+      const list = document.getElementById('channelsList');
+      const title = document.getElementById('channelsTitle');
+
+      if (addedChannels.length > 0) {
+        section.classList.add('visible');
+        title.textContent = `Channels (${addedChannels.length})`;
+        list.innerHTML = addedChannels.map((ch, idx) => `
+          <div class="channel-item">
+            <div class="channel-info">
+              <span class="channel-name">${ch.name}</span>
+              <span class="channel-meta">${ch.meta}</span>
+            </div>
+            <button class="btn-remove" onclick="removeChannel(${idx})">
+              <span class="material-icons-outlined">close</span>
+            </button>
+          </div>
+        `).join('');
+        document.getElementById('btnNext').disabled = false;
+      } else {
+        section.classList.remove('visible');
+        document.getElementById('btnNext').disabled = true;
+      }
+    }
+
+    function removeChannel(idx) {
+      addedChannels.splice(idx, 1);
+      renderChannels();
+    }
+
+    // ===== Modal Logic =====
+    function openModal() {
+      // Close dropdown first
+      const wrap = document.getElementById('channelDropdown');
+      wrap.classList.remove('open');
+      wrap.querySelector('.dropdown-trigger').classList.remove('open');
+      // Open modal
+      document.getElementById('modalOverlay').classList.add('open');
+      document.getElementById('newChannelInput').value = '';
+      document.getElementById('btnAddMap').disabled = true;
+      setTimeout(() => document.getElementById('newChannelInput').focus(), 100);
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('open');
+    }
+
+    function onNewChannelInput() {
+      const val = document.getElementById('newChannelInput').value.trim();
+      document.getElementById('btnAddMap').disabled = val === '';
+    }
+
+    function addAndMap() {
+      const val = document.getElementById('newChannelInput').value.trim();
+      if (!val) return;
+      addedChannels.push({ name: val, meta: 'Custom channel | Newly created' });
+      renderChannels();
+      closeModal();
+    }
+  </script>
+
+</body>
+</html>

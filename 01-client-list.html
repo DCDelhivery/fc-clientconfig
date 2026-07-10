@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client Configuration - WMS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <style>
+    /* ===== TDS Design Tokens ===== */
+    :root {
+      --primary: #E31E24;
+      --primary-dark: #B71820;
+      --primary-light: #FDE8E9;
+      --surface: #FFFFFF;
+      --bg: #FFFFFF;
+      --coal: #1A1A1A;
+      --coal-light: #2D2D2D;
+      --border: #E0E0E0;
+      --border-light: #F0F0F0;
+      --t1: #1A1A1A;
+      --t2: #666666;
+      --t3: #999999;
+      --success: #0D7A3F;
+      --success-bg: #E6F5ED;
+      --info: #0066CC;
+      --info-bg: #E6F0FA;
+      --warning: #D97706;
+      --warning-bg: #FEF3E2;
+      --inactive: #E31E24;
+      --inactive-bg: #FDE8E9;
+      --radius: 8px;
+      --radius-sm: 4px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.04);
+      --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--t1);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ===== TDS Top Nav ===== */
+    .topnav {
+      height: 56px;
+      background: var(--coal);
+      border-bottom: none;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 12px;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+    .topnav-hamburger {
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      border: none; background: none; cursor: pointer;
+      border-radius: var(--radius-sm);
+      color: #FFFFFF;
+    }
+    .topnav-hamburger:hover { background: var(--coal-light); }
+    .topnav-brand {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .topnav-logo {
+      width: 28px; height: 28px;
+      background: linear-gradient(135deg, #E31E24 50%, #FFFFFF 50%);
+      border-radius: 4px;
+    }
+    .topnav-brand-name {
+      font-size: 16px; font-weight: 700; color: #FFFFFF;
+    }
+    .topnav-spacer { flex: 1; }
+    .topnav-user {
+      display: flex; align-items: center; gap: 8px;
+      padding: 4px 8px; border-radius: var(--radius-sm);
+      cursor: pointer;
+    }
+    .topnav-user:hover { background: var(--coal-light); }
+    .topnav-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: #6366F1; color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600;
+    }
+    .topnav-user-info { display: flex; flex-direction: column; }
+    .topnav-user-name { font-size: 13px; font-weight: 500; color: #FFFFFF; }
+    .topnav-user-role { font-size: 11px; color: #AAAAAA; }
+    .topnav-user-chevron { font-size: 18px; color: #AAAAAA; }
+
+    /* ===== Layout: Sidenav + Main ===== */
+    .app-body {
+      display: flex; flex: 1; overflow: hidden;
+    }
+
+    /* ===== TDS Side Nav (Text-based) ===== */
+    .sidenav {
+      width: 200px;
+      background: var(--coal);
+      border-right: none;
+      display: flex;
+      flex-direction: column;
+      padding: 16px 0;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+    .sidenav-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #CCCCCC;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-decoration: none;
+      border-left: 3px solid transparent;
+    }
+    .sidenav-item:hover {
+      background: var(--coal-light);
+      color: #FFFFFF;
+    }
+    .sidenav-item.active {
+      background: var(--coal-light);
+      color: #FFFFFF;
+      font-weight: 600;
+      border-left-color: var(--primary);
+    }
+    .sidenav-item .chevron {
+      font-size: 16px;
+      color: #999999;
+    }
+    .sidenav-item .info-icon {
+      font-size: 16px;
+      color: #999999;
+      margin-left: 4px;
+    }
+    .sidenav-section {
+      display: flex;
+      flex-direction: column;
+    }
+    .sidenav-section-sub {
+      padding-left: 20px;
+    }
+
+    /* ===== Main Content ===== */
+    .main-content {
+      flex: 1; overflow-y: auto;
+      padding: 28px 32px;
+    }
+
+    /* ===== Page Header ===== */
+    .page-header {
+      margin-bottom: 24px;
+    }
+    .page-header-title {
+      font-size: 20px; font-weight: 600; color: var(--t1);
+    }
+
+    /* ===== Filters Bar ===== */
+    .filters-bar {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 20px;
+    }
+    .filter-search {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 14px;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--surface);
+      width: 240px;
+    }
+    .filter-search .material-icons-outlined { font-size: 18px; color: var(--t3); }
+    .filter-search input {
+      border: none; outline: none; background: transparent;
+      font-family: inherit; font-size: 13px; color: var(--t1); width: 100%;
+    }
+    .filter-search input::placeholder { color: var(--t3); }
+    .filter-search:focus-within { border-color: var(--primary); }
+
+    .filter-dropdown-wrap {
+      position: relative;
+    }
+    .filter-dropdown {
+      display: flex; align-items: center; gap: 4px;
+      padding: 8px 14px;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--surface);
+      font-family: inherit; font-size: 13px; font-weight: 500;
+      color: var(--t2); cursor: pointer;
+    }
+    .filter-dropdown:hover { border-color: var(--t3); }
+    .filter-dropdown .material-icons-outlined { font-size: 16px; color: var(--t3); }
+    .filter-dropdown-menu {
+      position: absolute; top: calc(100% + 4px); left: 0;
+      min-width: 160px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      padding: 6px 0;
+      z-index: 50;
+      display: none;
+    }
+    .filter-dropdown-wrap.open .filter-dropdown-menu { display: block; }
+    .filter-dropdown-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 14px;
+      font-size: 12px; font-weight: 500;
+      color: var(--t1); cursor: pointer;
+      transition: background 0.1s;
+    }
+    .filter-dropdown-item:hover { background: var(--bg); }
+    .filter-dropdown-item.selected { background: var(--primary-light); }
+
+    /* ===== TDS Table ===== */
+    .tds-table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .tds-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .tds-table thead {
+      background: #F5F5F7;
+    }
+    .tds-table th {
+      padding: 12px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--t2);
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .tds-table td {
+      padding: 16px;
+      font-size: 13px;
+      color: var(--t1);
+      border-bottom: 1px solid var(--border-light);
+      vertical-align: middle;
+    }
+    .tds-table tbody tr:last-child td { border-bottom: none; }
+    .tds-table tbody tr {
+      transition: background 0.1s;
+    }
+    .tds-table tbody tr:hover { background: #FAFBFC; }
+
+    /* Column widths */
+    .tds-table .col-sno { width: 70px; }
+    .tds-table .col-name { width: 200px; }
+    .tds-table .col-fc { width: auto; }
+    .tds-table .col-status { width: 120px; }
+    .tds-table .col-action { width: 100px; text-align: center; }
+    .tds-table th.col-action { text-align: center; }
+
+    /* ===== FC Badges ===== */
+    .fc-badges {
+      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    }
+    .fc-badge {
+      display: inline-flex; align-items: center;
+      padding: 4px 10px;
+      background: #F0F4F8;
+      border: 1px solid #E2E8F0;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+      color: #475569;
+      white-space: nowrap;
+    }
+    .fc-badge-more {
+      display: inline-flex; align-items: center;
+      padding: 4px 8px;
+      background: #F0F4F8;
+      border: 1px solid #E2E8F0;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+      color: #64748B;
+      cursor: pointer;
+    }
+    .fc-badge-more:hover {
+      background: #E2E8F0;
+    }
+    .fc-na {
+      font-size: 13px;
+      color: var(--t3);
+    }
+
+    /* ===== TDS Pills (Status) ===== */
+    .pill {
+      display: inline-flex; align-items: center;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 12px; font-weight: 500;
+      letter-spacing: 0.1px;
+    }
+    .pill-active { background: var(--success-bg); color: var(--success); }
+    .pill-draft { background: var(--warning-bg); color: var(--warning); }
+    .pill-inactive { background: var(--inactive-bg); color: var(--inactive); }
+
+    /* ===== TDS Outline Button ===== */
+    .btn-outline {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 6px 16px;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--surface);
+      font-family: inherit; font-size: 12px; font-weight: 500;
+      color: var(--t1);
+      cursor: pointer;
+      transition: all 0.15s;
+      min-width: 80px;
+    }
+    .btn-outline:hover {
+      border-color: var(--t2);
+      background: var(--bg);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== TDS Top Nav ===== -->
+  <nav class="topnav">
+    <button class="topnav-hamburger">
+      <span class="material-icons-outlined">menu</span>
+    </button>
+    <div class="topnav-brand">
+      <div class="topnav-logo"></div>
+      <span class="topnav-brand-name">WMS</span>
+    </div>
+    <div class="topnav-spacer"></div>
+    <div class="topnav-user">
+      <div class="topnav-avatar">DD</div>
+      <div class="topnav-user-info">
+        <span class="topnav-user-name">Jhonathan Smith</span>
+        <span class="topnav-user-role">Admin</span>
+      </div>
+      <span class="material-icons-outlined topnav-user-chevron">expand_more</span>
+    </div>
+  </nav>
+
+  <div class="app-body">
+    <!-- ===== TDS Side Nav (Text-based) ===== -->
+    <aside class="sidenav">
+      <a class="sidenav-item" href="#">Select FC</a>
+      <a class="sidenav-item" href="#">
+        Organisations
+        <span class="material-icons-outlined chevron">expand_more</span>
+      </a>
+      <a class="sidenav-item" href="#">Channels</a>
+      <a class="sidenav-item active" href="#">Client configuration</a>
+      <a class="sidenav-item" href="#">Couriers</a>
+      <a class="sidenav-item" href="#">
+        User management
+        <span class="material-icons-outlined info-icon">info</span>
+      </a>
+      <a class="sidenav-item" href="#">
+        Workflow Management
+        <span class="material-icons-outlined chevron">expand_more</span>
+      </a>
+      <a class="sidenav-item" href="#">Serial Configurations</a>
+      <a class="sidenav-item" href="#">Client onboarding</a>
+    </aside>
+
+    <!-- ===== Main Content ===== -->
+    <main class="main-content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1 class="page-header-title">Client configuration</h1>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters-bar">
+        <div class="filter-search">
+          <span class="material-icons-outlined">search</span>
+          <input type="text" placeholder="Search client name" id="searchInput">
+        </div>
+        <div class="filter-dropdown-wrap" id="statusFilter">
+          <button class="filter-dropdown" onclick="toggleFilter()">
+            Status <span class="material-icons-outlined">expand_more</span>
+          </button>
+          <div class="filter-dropdown-menu">
+            <div class="filter-dropdown-item selected" onclick="filterByStatus('all')">All</div>
+            <div class="filter-dropdown-item" onclick="filterByStatus('active')">Active</div>
+            <div class="filter-dropdown-item" onclick="filterByStatus('draft')">Draft</div>
+            <div class="filter-dropdown-item" onclick="filterByStatus('inactive')">Inactive</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TDS Table -->
+      <div class="tds-table-wrap">
+        <table class="tds-table">
+          <thead>
+            <tr>
+              <th class="col-sno">S.No.</th>
+              <th class="col-name">Client name</th>
+              <th class="col-fc">Mapped FCs</th>
+              <th class="col-status">Status</th>
+              <th class="col-action">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-status="active">
+              <td>1</td>
+              <td>Mahindra & Mahindra Ltd</td>
+              <td>
+                <div class="fc-badges">
+                  <span class="fc-badge">GGNFC14</span>
+                  <span class="fc-badge">GGNFC12</span>
+                  <span class="fc-badge">GGNFC12</span>
+                  <span class="fc-badge">BLRFC14</span>
+                  <span class="fc-badge-more">+3</span>
+                </div>
+              </td>
+              <td><span class="pill pill-active">Active</span></td>
+              <td style="text-align:center">
+                <button class="btn-outline" onclick="window.location.href='02-courier-setup.html'">Edit</button>
+              </td>
+            </tr>
+            <tr data-status="draft">
+              <td>2</td>
+              <td>Mamaearth Ltd</td>
+              <td><span class="fc-na" id="mamaearth-fcs">NA</span></td>
+              <td><span class="pill pill-draft" id="mamaearth-status">Draft</span></td>
+              <td style="text-align:center">
+                <button class="btn-outline" id="mamaearth-action" onclick="window.location.href='02-courier-setup.html'">Configure</button>
+              </td>
+            </tr>
+            <tr data-status="draft">
+              <td>3</td>
+              <td>Lenskart Solutions</td>
+              <td><span class="fc-na">NA</span></td>
+              <td><span class="pill pill-draft">Draft</span></td>
+              <td style="text-align:center">
+                <button class="btn-outline" onclick="window.location.href='02-courier-setup.html'">Configure</button>
+              </td>
+            </tr>
+            <tr data-status="inactive">
+              <td>4</td>
+              <td>Boat Lifestyle Ltd</td>
+              <td><span class="fc-na">NA</span></td>
+              <td><span class="pill pill-inactive">Inactive</span></td>
+              <td style="text-align:center">
+                <button class="btn-outline" onclick="window.location.href='02-courier-setup.html'">Configure</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    // Toggle filter dropdown
+    function toggleFilter() {
+      const wrap = document.getElementById('statusFilter');
+      wrap.classList.toggle('open');
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      const wrap = document.getElementById('statusFilter');
+      if (!wrap.contains(e.target)) {
+        wrap.classList.remove('open');
+      }
+    });
+
+    // Filter table by status
+    function filterByStatus(status) {
+      const wrap = document.getElementById('statusFilter');
+      const items = wrap.querySelectorAll('.filter-dropdown-item');
+      const rows = document.querySelectorAll('.tds-table tbody tr');
+      const btn = wrap.querySelector('.filter-dropdown');
+
+      // Update selected state
+      items.forEach(i => i.classList.remove('selected'));
+      event.target.classList.add('selected');
+
+      if (status === 'all') {
+        btn.innerHTML = 'Status <span class="material-icons-outlined">expand_more</span>';
+        rows.forEach(r => r.style.display = '');
+      } else {
+        const labels = { active: 'Active', draft: 'Draft', inactive: 'Inactive' };
+        btn.innerHTML = `${labels[status]} <span class="material-icons-outlined">expand_more</span>`;
+        rows.forEach(r => {
+          if (r.dataset.status === status) {
+            r.style.display = '';
+          } else {
+            r.style.display = 'none';
+          }
+        });
+      }
+
+      wrap.classList.remove('open');
+    }
+
+    // Check if Mamaearth was activated
+    if (localStorage.getItem('mamaearth_status') === 'active') {
+      const statusEl = document.getElementById('mamaearth-status');
+      const actionEl = document.getElementById('mamaearth-action');
+      const fcsEl = document.getElementById('mamaearth-fcs');
+      const row = statusEl.closest('tr');
+      statusEl.textContent = 'Active';
+      statusEl.className = 'pill pill-active';
+      row.setAttribute('data-status', 'active');
+      actionEl.textContent = 'Edit';
+      // Show mapped FCs with configured/unconfigured styling
+      const fcs = JSON.parse(localStorage.getItem('selectedFCs') || '["GGNFC14","GGNFC12"]');
+      const configuredList = JSON.parse(localStorage.getItem('configuredFCsList') || '[]');
+      fcsEl.outerHTML = '<div class="fc-badges">' + fcs.map(fc => {
+        const isConfigured = configuredList.includes(fc);
+        if (isConfigured) {
+          return '<span class="fc-badge">' + fc + '</span>';
+        } else {
+          return '<span class="fc-badge" style="background:transparent;border:1px dashed #CBD5E1;color:#94A3B8;">' + fc + '</span>';
+        }
+      }).join('') + '</div>';
+    }
+
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+      const query = e.target.value.toLowerCase();
+      const rows = document.querySelectorAll('.tds-table tbody tr');
+      rows.forEach(r => {
+        const name = r.querySelector('td:nth-child(2)').textContent.toLowerCase();
+        r.style.display = name.includes(query) ? '' : 'none';
+      });
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delhivery WMS - Client & FC Configuration</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #E31E24;
+      --primary-light: #FDE8E9;
+      --surface: #FFFFFF;
+      --bg: #FFFFFF;
+      --border: #E0E0E0;
+      --border-light: #F0F0F0;
+      --t1: #1A1A1A;
+      --t2: #666666;
+      --t3: #999999;
+      --success: #0D7A3F;
+      --success-bg: #E6F5ED;
+      --warning: #D97706;
+      --warning-bg: #FEF3E2;
+      --radius: 8px;
+      --radius-sm: 4px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.04);
+      --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--t1);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ===== Creation Module Header ===== */
+    .creation-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 24px 104px;
+      border-bottom: 1px solid var(--border-light);
+      flex-shrink: 0;
+    }
+    .creation-header-left h1 {
+      font-size: 20px; font-weight: 600; color: var(--t1);
+      margin-bottom: 4px;
+    }
+    .creation-header-left .subtitle {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; color: var(--t2);
+    }
+    .creation-header-left .subtitle .pill {
+      display: inline-flex; align-items: center;
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 11px; font-weight: 500;
+      background: var(--warning-bg); color: var(--warning);
+    }
+    .creation-header-right {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .btn-save-draft {
+      padding: 8px 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      font-family: inherit; font-size: 13px; font-weight: 500;
+      color: var(--t1); cursor: pointer;
+    }
+    .btn-save-draft:hover { background: #F9F9F9; border-color: var(--t3); }
+    .btn-close {
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--surface); cursor: pointer;
+      color: var(--t2);
+    }
+    .btn-close:hover { background: #F9F9F9; }
+    .btn-close .material-icons-outlined { font-size: 18px; }
+
+    /* ===== Creation Module Body ===== */
+    .creation-body {
+      display: flex; flex: 1; overflow: hidden;
+      padding: 0 104px;
+    }
+
+    /* ===== Left Stepper Nav ===== */
+    .step-nav {
+      width: 220px;
+      padding: 24px 20px;
+      border-right: 1px solid var(--border-light);
+      flex-shrink: 0;
+    }
+    .step-nav-title {
+      font-size: 14px; font-weight: 600; color: var(--t1);
+      margin-bottom: 20px;
+    }
+    .step-nav-list {
+      list-style: none; display: flex; flex-direction: column; gap: 0;
+    }
+    .step-nav-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 500;
+      color: var(--t2); cursor: pointer;
+      transition: all 0.15s;
+    }
+    .step-nav-item:hover { background: #F5F5F7; }
+    .step-nav-item.active {
+      background: #F5F5F7;
+      color: var(--t1); font-weight: 600;
+    }
+    .step-nav-item .step-status {
+      width: 18px; height: 18px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .step-status-dot {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: #FFC107;
+      display: none;
+    }
+    .step-nav-item.has-items.completed .step-status-dot { display: none; }
+    .step-status-check {
+      font-size: 18px; color: var(--success);
+      display: none;
+    }
+    .step-nav-item.completed .step-status-dot { display: none; }
+    .step-nav-item.completed .step-status-check { display: block; }
+
+    /* ===== Main Content Panel ===== */
+    .step-content {
+      flex: 1; overflow-y: auto;
+      padding: 24px 32px;
+    }
+    .step-panel { display: none; }
+    .step-panel.active { display: block; }
+
+    /* ===== Form Label ===== */
+    .form-label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 14px; font-weight: 500; color: var(--t1);
+      margin-bottom: 8px;
+    }
+    .form-label .required { color: var(--primary); }
+    .form-label .info-icon-wrap {
+      position: relative; display: inline-flex;
+    }
+    .form-label .info-icon {
+      font-size: 16px; color: var(--t3); cursor: help;
+    }
+    .form-label .info-icon-wrap .tooltip {
+      position: absolute; top: calc(100% + 8px); left: 50%;
+      transform: translateX(-50%);
+      padding: 8px 12px;
+      background: var(--t1); color: #FFFFFF;
+      font-size: 11px; font-weight: 400; line-height: 1.4;
+      border-radius: var(--radius-sm);
+      white-space: nowrap;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.15s;
+      z-index: 200;
+    }
+    .form-label .info-icon-wrap .tooltip::after {
+      content: '';
+      position: absolute; bottom: 100%; left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-bottom-color: var(--t1);
+    }
+    .form-label .info-icon-wrap:hover .tooltip { opacity: 1; }
+
+    /* ===== Searchable Dropdown ===== */
+    .select-wrap {
+      position: relative; margin-bottom: 16px;
+      max-width: 320px;
+    }
+    .select-trigger {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 12px;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--surface);
+      font-family: inherit; font-size: 13px; color: var(--t3);
+      cursor: pointer; transition: border-color 0.15s;
+      min-height: 38px; flex-wrap: wrap; gap: 4px;
+    }
+    .select-trigger:hover { border-color: var(--t3); }
+    .select-trigger.open { border-color: var(--t1); border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+    .select-trigger .material-icons-outlined { font-size: 18px; color: var(--t3); transition: transform 0.2s; margin-left: auto; }
+    .select-trigger.open .material-icons-outlined { transform: rotate(180deg); }
+    .select-trigger .trigger-pills { display: flex; flex-wrap: wrap; gap: 4px; flex: 1; }
+    .trigger-pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; background: #F5F5F7;
+      border: 1px solid var(--border); border-radius: 100px;
+      font-size: 11px; font-weight: 500; color: var(--t1);
+    }
+    .trigger-pill .remove-pill {
+      font-size: 12px; color: var(--t3); cursor: pointer; line-height: 1;
+    }
+    .trigger-pill .remove-pill:hover { color: var(--primary); }
+    .trigger-placeholder { color: var(--t3); font-size: 13px; }
+
+    .select-dropdown {
+      position: absolute; top: 100%; left: 0; right: 0;
+      background: var(--surface);
+      border: 1px solid var(--border); border-top: none;
+      border-bottom-left-radius: var(--radius-sm);
+      border-bottom-right-radius: var(--radius-sm);
+      box-shadow: var(--shadow-md);
+      z-index: 100;
+      display: none;
+      max-height: 220px;
+      overflow: hidden;
+      flex-direction: column;
+    }
+    .select-dropdown.open { display: flex; }
+    .select-search {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .select-search .material-icons-outlined { font-size: 16px; color: var(--t3); }
+    .select-search input {
+      border: none; outline: none; background: transparent;
+      font-family: inherit; font-size: 13px; color: var(--t1); width: 100%;
+    }
+    .select-search input::placeholder { color: var(--t3); }
+    .select-options {
+      overflow-y: auto; flex: 1;
+    }
+    .select-option {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px;
+      font-size: 13px; color: var(--t1);
+      cursor: pointer; transition: background 0.1s;
+    }
+    .select-option:hover { background: #F5F5F7; }
+    .select-option .add-icon {
+      font-size: 18px; color: var(--t3);
+    }
+    .select-option:hover .add-icon { color: var(--t1); }
+
+    /* ===== Selected Items Table ===== */
+    .selected-table-wrap {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .selected-table {
+      width: 100%; border-collapse: collapse;
+    }
+    .selected-table thead { background: #F9FAFB; }
+    .selected-table th {
+      padding: 10px 16px;
+      font-size: 12px; font-weight: 600;
+      color: var(--t2); text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .selected-table th.col-action { text-align: center; }
+    .selected-table td {
+      padding: 12px 16px;
+      font-size: 13px; color: var(--t1);
+      border-bottom: 1px solid var(--border-light);
+      vertical-align: middle;
+    }
+    .selected-table tbody tr:last-child td { border-bottom: none; }
+    .selected-table tbody tr:hover { background: #FAFBFC; }
+    .selected-table .col-sno { width: 60px; }
+    .selected-table .col-action { width: 80px; text-align: center; }
+
+    .btn-delete {
+      width: 28px; height: 28px;
+      display: inline-flex; align-items: center; justify-content: center;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--surface); cursor: pointer; color: var(--t3);
+    }
+    .btn-delete:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+    .btn-delete .material-icons-outlined { font-size: 16px; }
+
+    /* ===== Empty State ===== */
+    .empty-table {
+      padding: 60px 16px;
+      text-align: center;
+      color: var(--t3); font-size: 13px;
+    }
+
+    /* ===== FC Mapping Specific ===== */
+    .fc-table { table-layout: fixed; }
+    .fc-table th, .fc-table td {
+      padding: 10px 8px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .fc-table .col-sno { width: 50px; }
+    .fc-table .col-fc { width: 90px; }
+    .fc-table .col-days { width: 260px; }
+    .fc-table .col-capacity { width: 120px; }
+    .fc-table .col-action { width: 60px; text-align: center; }
+    .day-pills {
+      display: flex; gap: 3px; flex-wrap: nowrap;
+    }
+    .day-pill {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 3px 6px;
+      border-radius: 100px;
+      font-size: 10px; font-weight: 500;
+      border: 1px solid var(--border);
+      color: var(--t2); background: var(--surface);
+      cursor: pointer; transition: all 0.15s;
+      user-select: none;
+    }
+    .day-pill.active {
+      background: #475569; color: #FFFFFF; border-color: #475569;
+    }
+    .capacity-input {
+      width: 70px; padding: 6px 6px;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-family: inherit; font-size: 12px; color: var(--t1);
+      text-align: center;
+    }
+    .capacity-input:focus { outline: none; border-color: var(--t1); }
+
+    /* ===== Footer Nav ===== */
+    .creation-footer {
+      display: flex; align-items: center; justify-content: flex-end;
+      padding: 12px 104px;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .btn-next {
+      padding: 8px 24px;
+      border: none; border-radius: var(--radius-sm);
+      background: var(--t1);
+      font-family: inherit; font-size: 13px; font-weight: 500;
+      color: #FFFFFF; cursor: pointer;
+    }
+    .btn-next:hover { background: #333; }
+    .btn-next:disabled { background: #E0E0E0; color: #999; cursor: not-allowed; }
+
+    /* ===== Create New Button ===== */
+    .btn-create-new {
+      padding: 8px 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      font-family: inherit; font-size: 13px; font-weight: 500;
+      color: var(--t1); cursor: pointer;
+    }
+    .btn-create-new:hover { background: #F9F9F9; border-color: var(--t3); }
+
+    .content-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    /* ===== TDS Modal / Dialog ===== */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.4);
+      display: none; align-items: center; justify-content: center;
+      z-index: 500;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+      width: 400px;
+      max-width: 90vw;
+    }
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .modal-header h3 {
+      font-size: 15px; font-weight: 600; color: var(--t1);
+    }
+    .modal-close {
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      border: none; background: none; cursor: pointer;
+      color: var(--t3); border-radius: var(--radius-sm);
+    }
+    .modal-close:hover { background: #F5F5F7; color: var(--t1); }
+    .modal-close .material-icons-outlined { font-size: 18px; }
+    .modal-body {
+      padding: 20px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .modal-field label {
+      display: block;
+      font-size: 12px; font-weight: 500; color: var(--t2);
+      margin-bottom: 6px;
+    }
+    .modal-field label .required { color: var(--primary); }
+    .modal-input {
+      width: 100%; padding: 9px 12px;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-family: inherit; font-size: 13px; color: var(--t1);
+      transition: border-color 0.15s;
+    }
+    .modal-input:focus { outline: none; border-color: var(--t1); }
+    .modal-input::placeholder { color: var(--t3); }
+    .modal-select {
+      width: 100%; padding: 9px 12px;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-family: inherit; font-size: 13px; color: var(--t1);
+      background: var(--surface);
+      cursor: pointer; appearance: auto;
+    }
+    .modal-select:focus { outline: none; border-color: var(--t1); }
+    .modal-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border-light);
+      display: flex; justify-content: flex-end; gap: 10px;
+    }
+    .btn-modal-cancel {
+      padding: 8px 16px;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--surface);
+      font-family: inherit; font-size: 13px; font-weight: 500;
+      color: var(--t2); cursor: pointer;
+    }
+    .btn-modal-cancel:hover { background: #F9F9F9; }
+    .btn-modal-primary {
+      padding: 8px 20px;
+      border: none; border-radius: var(--radius-sm);
+      background: var(--t1);
+      font-family: inherit; font-size: 13px; font-weight: 500;
+      color: #FFFFFF; cursor: pointer;
+    }
+    .btn-modal-primary:hover { background: #333; }
+    .btn-modal-primary:disabled {
+      background: #E0E0E0; color: #999; cursor: not-allowed;
+    }
+
+    /* ===== Loading Overlay ===== */
+    .loading-overlay {
+      position: fixed; inset: 0;
+      background: rgba(255,255,255,0.92);
+      display: none; align-items: center; justify-content: center;
+      flex-direction: column; gap: 16px; z-index: 600;
+    }
+    .loading-overlay.show { display: flex; }
+    .loading-spinner {
+      width: 36px; height: 36px;
+      border: 3px solid #F0F0F0;
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text {
+      font-size: 14px; color: var(--t2); font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== Creation Module Header ===== -->
+  <header class="creation-header">
+    <div class="creation-header-left">
+      <h1>Mamaearth Ltd</h1>
+      <div class="subtitle">
+        Client & FC configuration
+        <span class="pill">Draft</span>
+      </div>
+    </div>
+    <div class="creation-header-right">
+      <button class="btn-save-draft">Save as draft</button>
+      <button class="btn-close" onclick="window.location.href='01-client-list.html'">
+        <span class="material-icons-outlined">close</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ===== Creation Module Body ===== -->
+  <div class="creation-body">
+    <!-- Left Step Nav -->
+    <nav class="step-nav">
+      <div class="step-nav-title">Client mappings</div>
+      <ul class="step-nav-list">
+        <li class="step-nav-item active" data-step="courier" onclick="goToStep('courier')">
+          <span class="step-label">Courier mapping</span>
+          <span class="step-status">
+            <span class="step-status-dot"></span>
+            <span class="material-icons-outlined step-status-check">check_circle</span>
+          </span>
+        </li>
+        <li class="step-nav-item" data-step="channel" onclick="goToStep('channel')">
+          <span class="step-label">Channel mapping</span>
+          <span class="step-status">
+            <span class="step-status-dot"></span>
+            <span class="material-icons-outlined step-status-check">check_circle</span>
+          </span>
+        </li>
+        <li class="step-nav-item" data-step="fc" onclick="goToStep('fc')">
+          <span class="step-label">FC mapping</span>
+          <span class="step-status">
+            <span class="step-status-dot"></span>
+            <span class="material-icons-outlined step-status-check">check_circle</span>
+          </span>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- ===== Step Panels ===== -->
+    <div class="step-content">
+
+      <!-- STEP 1: Courier Mapping -->
+      <div class="step-panel active" id="panel-courier">
+        <div class="content-header">
+          <label class="form-label">
+            Select courier(s) <span class="required">*</span>
+            <span class="info-icon-wrap">
+              <span class="material-icons-outlined info-icon">info</span>
+              <span class="tooltip">Please select couriers from the dropdown to add to the list</span>
+            </span>
+          </label>
+        </div>
+
+        <div class="select-wrap" id="courierSelect">
+          <div class="select-trigger" onclick="toggleSelect('courierSelect')">
+            <div class="trigger-pills" id="courierPills"><span class="trigger-placeholder">Select courier(s)</span></div>
+            <span class="material-icons-outlined">expand_more</span>
+          </div>
+          <div class="select-dropdown">
+            <div class="select-search">
+              <span class="material-icons-outlined">search</span>
+              <input type="text" placeholder="Search..." oninput="filterOptions('courierSelect', this.value)">
+            </div>
+            <div class="select-options">
+              <div class="select-option" data-name="DELHIVERY_LTL" onclick="addItem('courier', 'DELHIVERY_LTL')">
+                <span>DELHIVERY_LTL</span>
+                <span class="material-icons-outlined add-icon">add</span>
+              </div>
+              <div class="select-option" data-name="DELHIVERY_ORION" onclick="addItem('courier', 'DELHIVERY_ORION')">
+                <span>DELHIVERY_ORION</span>
+                <span class="material-icons-outlined add-icon">add</span>
+              </div>
+              <div class="select-option" data-name="DELHIVERY_FTL" onclick="addItem('courier', 'DELHIVERY_FTL')">
+                <span>DELHIVERY_FTL</span>
+                <span class="material-icons-outlined add-icon">add</span>
+              </div>
+              <div class="select-option" data-name="PLATFORM_DISPATCHER" onclick="addItem('courier', 'PLATFORM_DISPATCHER')">
+                <span>PLATFORM_DISPATCHER</span>
+                <span class="material-icons-outlined add-icon">add</span>
+              </div>
+              <div class="select-option" data-name="SELF_PICK" onclick="addItem('courier', 'SELF_PICK')">
+                <span>SELF_PICK</span>
+                <span class="material-icons-outlined add-icon">add</span>
+              </div>
+              <div class="select-option" data-name="BLUEDART" onclick="addItem('courier', 'BLUEDART')">
+                <span>BLUEDART</span>
+                <span class="material-icons-outlined add-icon">add</span>
+              </div>
+              <div class="select-option" data-name="ECOM_EXPRESS" onclick="addItem('courier', 'ECOM_EXPRESS')">
+                <span>ECOM_EXPRESS</span>
+                <span class="material-icons-outlined add-icon">add</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Selected Couriers Table -->
+        <div class="selected-table-wrap">
+          <table class="selected-table">
+            <thead>
+              <tr>
+                <th class="col-sno">S.No.</th>
+                <th>Selected couriers</th>
+                <th class="col-action">Action</th>
+              </tr>
+            </thead>
+            <tbody id="courier-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+          <div class="empty-table" id="courier-empty">No couriers selected</div>
+        </div>
+      </div>
+
+      <!-- STEP 2: Channel Mapping -->
+      <div class="step-panel" id="panel-channel">
+        <div class="content-header">
+          <label class="form-label">
+            Select channel(s) <span class="required">*</span>
+            <span class="info-icon-wrap">
+              <span class="material-icons-outlined info-icon">info</span>
+              <span class="tooltip">Please select Channels from the dropdown to add to the list</span>
+            </span>
+          </label>
+          <button class="btn-create-new" onclick="openCreateChannelModal()">Create new channel</button>
+        </div>
+
+        <div class="select-wrap" id="channelSelect">
+          <div class="select-trigger" onclick="toggleSelect('channelSelect')">
+            <div class="trigger-pills" id="channelPills"><span class="trigger-placeholder">Select channel(s)</span></div>
+            <span class="material-icons-outlined">expand_more</span>
+          </div>
+          <div class="select-dropdown">
+            <div class="select-search">
+              <span class="material-icons-outlined">search</span>
+              <input type="text" placeholder="Search..." oninput="filterOptions('channelSelect', this.value)">
+            </div>
+            <div class="select-options">
+              <div class="select-option" data-name="Flipkart" onclick="addItem('channel', 'Flipkart')">
+                <span>Flipkart</span>
+                <span class="material-icons-outlined add-icon">add</span>
+              </div>
+              <div class="select-option" data-name="Shopify" onclick="addItem('channel', 'Shopify')">
+                <span>Shopify</span>
+                <span class="material-icons-outlined add-icon">add</span>
+              </div>
+              <div class="select-option" data-name="Paytm" onclick="addItem('channel', 'Paytm')">
+                <span>Paytm</span>
+                <span class="material-icons-outlined add-icon">add</span>
+              </div>
+              <div class="select-option" data-name="PAYTM_DIY" onclick="addItem('channel', 'PAYTM_DIY')">
+                <span>PAYTM_DIY</span>
+                <span class="material-icons-outlined add-icon">add</span>
+              </div>
+              <div class="select-option" data-name="Vinculum_STO" onclick="addItem('channel', 'Vinculum_STO')">
+                <span>Vinculum_STO</span>
+                <span class="material-icons-outlined add-icon">add</span>
+              </div>
+              <div class="select-option" data-name="Amazon" onclick="addItem('channel', 'Amazon')">
+                <span>Amazon</span>
+                <span class="material-icons-outlined add-icon">add</span>
+              </div>
+              <div class="select-option" data-name="Myntra" onclick="addItem('channel', 'Myntra')">
+                <span>Myntra</span>
+                <span class="material-icons-outlined add-icon">add</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Selected Channels Table -->
+        <div class="selected-table-wrap">
+          <table class="selected-table">
+            <thead>
+              <tr>
+                <th class="col-sno">S.No.</th>
+                <th>Selected channels</th>
+                <th class="col-action">Action</th>
+              </tr>
+            </thead>
+            <tbody id="channel-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+          <div class="empty-table" id="channel-empty">No channels selected</div>
+        </div>
+      </div>
+
+      <!-- STEP 3: FC Mapping -->
+      <div class="step-panel" id="panel-fc">
+        <div class="content-header">
+          <label class="form-label">
+            Select FC(s) <span class="required">*</span>
+            <span class="info-icon-wrap">
+              <span class="material-icons-outlined info-icon">info</span>
+              <span class="tooltip">Please select FCs from the dropdown to add to the list</span>
+            </span>
+          </label>
+        </div>
+
+        <div class="select-wrap" id="fcSelect">
+          <div class="select-trigger" onclick="toggleSelect('fcSelect')">
+            <div class="trigger-pills" id="fcPills"><span class="trigger-placeholder">Select FC(s)</span></div>
+            <span class="material-icons-outlined">expand_more</span>
+          </div>
+          <div class="select-dropdown">
+            <div class="select-search">
+              <span class="material-icons-outlined">search</span>
+              <input type="text" placeholder="Search..." oninput="filterOptions('fcSelect', this.value)">
+            </div>
+            <div class="select-options">
+              <div class="select-option" data-name="GGNFC14" onclick="addFCItem('GGNFC14')">
+                <span>GGNFC14</span>
+                <span class="material-icons-outlined add-icon">add</span>
+              </div>
+              <div class="select-option" data-name="GGNFC12" onclick="addFCItem('GGNFC12')">
+                <span>GGNFC12</span>
+                <span class="material-icons-outlined add-icon">add</span>
+              </div>
+              <div class="select-option" data-name="GGNFC10" onclick="addFCItem('GGNFC10')">
+                <span>GGNFC10</span>
+                <span class="material-icons-outlined add-icon">add</span>
+              </div>
+              <div class="select-option" data-name="GGNFC15" onclick="addFCItem('GGNFC15')">
+                <span>GGNFC15</span>
+                <span class="material-icons-outlined add-icon">add</span>
+              </div>
+              <div class="select-option" data-name="GGNFC16" onclick="addFCItem('GGNFC16')">
+                <span>GGNFC16</span>
+                <span class="material-icons-outlined add-icon">add</span>
+              </div>
+              <div class="select-option" data-name="BLRFC14" onclick="addFCItem('BLRFC14')">
+                <span>BLRFC14</span>
+                <span class="material-icons-outlined add-icon">add</span>
+              </div>
+              <div class="select-option" data-name="MUMFC08" onclick="addFCItem('MUMFC08')">
+                <span>MUMFC08</span>
+                <span class="material-icons-outlined add-icon">add</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Selected FCs Table -->
+        <div class="selected-table-wrap">
+          <table class="selected-table fc-table">
+            <thead>
+              <tr>
+                <th class="col-sno">S.No.</th>
+                <th class="col-fc">Selected FCs</th>
+                <th class="col-days">Operating days</th>
+                <th class="col-capacity">Daily order capacity</th>
+                <th class="col-capacity">Daily orderline capacity</th>
+                <th class="col-capacity">Daily quantity cap</th>
+                <th class="col-action">Action</th>
+              </tr>
+            </thead>
+            <tbody id="fc-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+          <div class="empty-table" id="fc-empty">No FCs selected</div>
+        </div>
+      </div>
+
+    </div><!-- end step-content -->
+  </div><!-- end creation-body -->
+
+  <!-- ===== Footer ===== -->
+  <footer class="creation-footer">
+    <button class="btn-next" id="btnNext" disabled onclick="nextStep()">Next</button>
+  </footer>
+
+  <!-- ===== Create Channel Modal ===== -->
+  <div class="modal-overlay" id="createChannelModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Create new channel</h3>
+        <button class="modal-close" onclick="closeCreateChannelModal()">
+          <span class="material-icons-outlined">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-field">
+          <label>Channel name <span class="required">*</span></label>
+          <input class="modal-input" type="text" id="newChannelName" placeholder="Enter channel name" oninput="validateChannelModal()">
+        </div>
+        <div class="modal-field">
+          <label>Return address <span class="required">*</span></label>
+          <select class="modal-select" id="newChannelReturn" onchange="validateChannelModal()">
+            <option value="">Select return address</option>
+            <option value="FC">FC</option>
+            <option value="Client">Client</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-modal-cancel" onclick="closeCreateChannelModal()">Cancel</button>
+        <button class="btn-modal-primary" id="btnAddChannel" disabled onclick="addNewChannel()">Add channel and map</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Confirm Delete Modal ===== -->
+  <div class="modal-overlay" id="confirmDeleteModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Confirm deletion</h3>
+        <button class="modal-close" onclick="closeDeleteModal()">
+          <span class="material-icons-outlined">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:13px; color: var(--t1); line-height:1.5;">
+          Are you sure you want to delete <strong id="confirmDeleteName"></strong>?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-modal-cancel" onclick="closeDeleteModal()">Cancel</button>
+        <button class="btn-modal-primary" style="background:var(--primary)" onclick="executeDelete()">Yes, delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Loading Overlay ===== -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <span class="loading-text">Adding FC's to this client...</span>
+  </div>
+
+  <script>
+    // ===== State (persisted in localStorage) =====
+    const savedState = JSON.parse(localStorage.getItem('clientMappingState') || 'null');
+    const state = savedState || {
+      currentStep: 'courier',
+      steps: ['courier', 'channel', 'fc'],
+      items: { courier: [], channel: [], fc: [] },
+      pendingDelete: null
+    };
+    function persistState() {
+      localStorage.setItem('clientMappingState', JSON.stringify(state));
+    }
+
+    // ===== Step Navigation =====
+    function goToStep(step) {
+      state.currentStep = step;
+      persistState();
+      // Update panels
+      document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('panel-' + step).classList.add('active');
+      // Update nav
+      document.querySelectorAll('.step-nav-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.dataset.step === step) item.classList.add('active');
+      });
+      // Update footer buttons
+      updateFooterButtons();
+    }
+
+    function nextStep() {
+      const idx = state.steps.indexOf(state.currentStep);
+      if (state.currentStep === 'fc' && state.items.fc.length > 0) {
+        // Show loading, then redirect to FC config page
+        document.getElementById('loadingOverlay').classList.add('show');
+        // Store selected FCs and couriers for the next page
+        localStorage.setItem('selectedFCs', JSON.stringify(state.items.fc));
+        localStorage.setItem('selectedCouriers', JSON.stringify(state.items.courier));
+        setTimeout(() => {
+          window.location.href = '03-fc-config.html';
+        }, 2000);
+        return;
+      }
+      if (idx < state.steps.length - 1) {
+        markStepStatus(state.currentStep);
+        goToStep(state.steps[idx + 1]);
+      }
+    }
+
+    function prevStep() {
+      const idx = state.steps.indexOf(state.currentStep);
+      if (idx > 0) {
+        goToStep(state.steps[idx - 1]);
+      }
+    }
+
+    function updateFooterButtons() {
+      const idx = state.steps.indexOf(state.currentStep);
+      const nextBtn = document.getElementById('btnNext');
+      if (state.currentStep === 'fc') {
+        nextBtn.textContent = 'Save and proceed';
+        nextBtn.disabled = state.items.fc.length === 0;
+      } else {
+        nextBtn.textContent = 'Next';
+        nextBtn.disabled = state.items[state.currentStep].length === 0;
+      }
+    }
+
+    function markStepStatus(step) {
+      const navItem = document.querySelector(`.step-nav-item[data-step="${step}"]`);
+      if (state.items[step].length > 0) {
+        navItem.classList.add('completed');
+        navItem.classList.remove('has-items');
+      } else {
+        navItem.classList.remove('completed');
+      }
+    }
+
+    function updateAllStepStatuses() {
+      state.steps.forEach(step => {
+        const navItem = document.querySelector(`.step-nav-item[data-step="${step}"]`);
+        if (state.items[step].length > 0) {
+          navItem.classList.add('has-items');
+          // FC mapping gets checkmark immediately when items are added
+          if (step === 'fc') {
+            navItem.classList.add('completed');
+          }
+        } else {
+          navItem.classList.remove('has-items');
+          navItem.classList.remove('completed');
+        }
+      });
+      updateFooterButtons();
+    }
+
+    // ===== Dropdown Toggle =====
+    function toggleSelect(id) {
+      const wrap = document.getElementById(id);
+      const trigger = wrap.querySelector('.select-trigger');
+      const dropdown = wrap.querySelector('.select-dropdown');
+      const isOpen = trigger.classList.contains('open');
+
+      // Close all dropdowns first
+      document.querySelectorAll('.select-trigger').forEach(t => t.classList.remove('open'));
+      document.querySelectorAll('.select-dropdown').forEach(d => d.classList.remove('open'));
+
+      if (!isOpen) {
+        trigger.classList.add('open');
+        dropdown.classList.add('open');
+        const searchInput = dropdown.querySelector('input');
+        if (searchInput) setTimeout(() => searchInput.focus(), 50);
+      }
+    }
+
+    // Close dropdowns on outside click
+    document.addEventListener('click', (e) => {
+      document.querySelectorAll('.select-wrap').forEach(wrap => {
+        if (!wrap.contains(e.target)) {
+          wrap.querySelector('.select-trigger').classList.remove('open');
+          wrap.querySelector('.select-dropdown').classList.remove('open');
+        }
+      });
+    });
+
+    // ===== Filter Options =====
+    function filterOptions(selectId, query) {
+      const wrap = document.getElementById(selectId);
+      const options = wrap.querySelectorAll('.select-option');
+      const q = query.toLowerCase();
+      const typeMap = { courierSelect: 'courier', channelSelect: 'channel', fcSelect: 'fc' };
+      const type = typeMap[selectId];
+      options.forEach(opt => {
+        const optName = opt.getAttribute('data-name');
+        // Already selected? Keep hidden
+        if (state.items[type].includes(optName)) {
+          opt.style.display = 'none';
+          return;
+        }
+        const text = opt.querySelector('span').textContent.toLowerCase();
+        opt.style.display = text.includes(q) ? '' : 'none';
+      });
+    }
+
+    // ===== Add/Remove Items (Courier & Channel) =====
+    function addItem(type, name) {
+      if (state.items[type].includes(name)) return;
+      state.items[type].push(name);
+      persistState();
+      renderTable(type);
+      hideSelectedOptions(type);
+      updateAllStepStatuses();
+    }
+
+    function removeItem(type, name) {
+      state.items[type] = state.items[type].filter(n => n !== name);
+      persistState();
+      renderTable(type);
+      hideSelectedOptions(type);
+      updateAllStepStatuses();
+    }
+
+    // Show confirmation dialog before deleting
+    function confirmDelete(type, name) {
+      const displayName = type === 'courier' ? formatCourierName(name) : name;
+      state.pendingDelete = { type, name };
+      document.getElementById('confirmDeleteName').textContent = displayName;
+      document.getElementById('confirmDeleteModal').classList.add('open');
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('confirmDeleteModal').classList.remove('open');
+      state.pendingDelete = null;
+    }
+
+    function executeDelete() {
+      if (!state.pendingDelete) return;
+      const { type, name } = state.pendingDelete;
+      if (type === 'fc') {
+        removeFCItem(name);
+      } else {
+        removeItem(type, name);
+      }
+      closeDeleteModal();
+    }
+
+    // Hide already-selected options from dropdown, disable if all selected
+    function hideSelectedOptions(type) {
+      const selectMap = { courier: 'courierSelect', channel: 'channelSelect', fc: 'fcSelect' };
+      const wrap = document.getElementById(selectMap[type]);
+      const options = wrap.querySelectorAll('.select-option');
+      let visibleCount = 0;
+      options.forEach(opt => {
+        const optName = opt.getAttribute('data-name');
+        if (state.items[type].includes(optName)) {
+          opt.style.display = 'none';
+        } else {
+          opt.style.display = '';
+          visibleCount++;
+        }
+      });
+      // Disable trigger if all options selected
+      const trigger = wrap.querySelector('.select-trigger');
+      if (visibleCount === 0) {
+        trigger.classList.add('disabled');
+        trigger.style.opacity = '0.5';
+        trigger.style.pointerEvents = 'none';
+      } else {
+        trigger.classList.remove('disabled');
+        trigger.style.opacity = '';
+        trigger.style.pointerEvents = '';
+      }
+    }
+
+    function renderTable(type) {
+      const tbody = document.getElementById(type + '-table-body');
+      const empty = document.getElementById(type + '-empty');
+      if (state.items[type].length === 0) {
+        tbody.innerHTML = '';
+        empty.style.display = 'block';
+      } else {
+        empty.style.display = 'none';
+        tbody.innerHTML = state.items[type].map((item, idx) => `
+          <tr>
+            <td>${idx + 1}</td>
+            <td>${type === 'courier' ? formatCourierName(item) : item}</td>
+            <td style="text-align:center">
+              <button class="btn-delete" onclick="confirmDelete('${type}', '${item}')">
+                <span class="material-icons-outlined">delete_outline</span>
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      }
+      renderTriggerPills(type);
+    }
+
+    function renderTriggerPills(type) {
+      const pillsContainer = document.getElementById(type + 'Pills');
+      if (state.items[type].length === 0) {
+        const placeholders = { courier: 'Select courier(s)', channel: 'Select channel(s)', fc: 'Select FC(s)' };
+        pillsContainer.innerHTML = `<span class="trigger-placeholder">${placeholders[type]}</span>`;
+      } else {
+        pillsContainer.innerHTML = state.items[type].map(item => {
+          const display = type === 'courier' ? formatCourierName(item) : item;
+          return `<span class="trigger-pill">${display}<span class="material-icons-outlined remove-pill" onclick="event.stopPropagation(); confirmDelete('${type}', '${item}')">close</span></span>`;
+        }).join('');
+      }
+    }
+
+    function formatCourierName(name) {
+      return name.split('_').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ');
+    }
+
+    // ===== FC Mapping (with day pills and capacity inputs) =====
+    const fcData = {};
+
+    function addFCItem(name) {
+      if (state.items.fc.includes(name)) return;
+      state.items.fc.push(name);
+      fcData[name] = {
+        days: ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri'],
+        orderCap: 100,
+        orderlineCap: 100,
+        qtyCap: 100
+      };
+      persistState();
+      localStorage.setItem('selectedFCs', JSON.stringify(state.items.fc));
+      renderFCTable();
+      hideSelectedOptions('fc');
+      updateAllStepStatuses();
+    }
+
+    function removeFCItem(name) {
+      state.items.fc = state.items.fc.filter(n => n !== name);
+      delete fcData[name];
+      persistState();
+      localStorage.setItem('selectedFCs', JSON.stringify(state.items.fc));
+      renderFCTable();
+      hideSelectedOptions('fc');
+      updateAllStepStatuses();
+    }
+
+    function toggleDay(fcName, day) {
+      const days = fcData[fcName].days;
+      const idx = days.indexOf(day);
+      if (idx >= 0) days.splice(idx, 1);
+      else days.push(day);
+      renderFCTable();
+    }
+
+    function renderFCTable() {
+      const tbody = document.getElementById('fc-table-body');
+      const empty = document.getElementById('fc-empty');
+      if (state.items.fc.length === 0) {
+        tbody.innerHTML = '';
+        empty.style.display = 'block';
+      } else {
+        empty.style.display = 'none';
+        const allDays = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];
+        tbody.innerHTML = state.items.fc.map((fc, idx) => {
+          const data = fcData[fc];
+          const dayPillsHtml = allDays.map(d =>
+            `<span class="day-pill ${data.days.includes(d) ? 'active' : ''}" onclick="toggleDay('${fc}', '${d}')">${d}</span>`
+          ).join('');
+          return `
+            <tr>
+              <td>${idx + 1}</td>
+              <td>${fc}</td>
+              <td><div class="day-pills">${dayPillsHtml}</div></td>
+              <td><input class="capacity-input" type="number" value="${data.orderCap}" onchange="fcData['${fc}'].orderCap=this.value"></td>
+              <td><input class="capacity-input" type="number" value="${data.orderlineCap}" onchange="fcData['${fc}'].orderlineCap=this.value"></td>
+              <td><input class="capacity-input" type="number" value="${data.qtyCap}" onchange="fcData['${fc}'].qtyCap=this.value"></td>
+              <td style="text-align:center">
+                <button class="btn-delete" onclick="confirmDelete('fc', '${fc}')">
+                  <span class="material-icons-outlined">delete_outline</span>
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+      renderTriggerPills('fc');
+    }
+
+    // ===== Create Channel Modal =====
+    function openCreateChannelModal() {
+      document.getElementById('createChannelModal').classList.add('open');
+      document.getElementById('newChannelName').value = '';
+      document.getElementById('newChannelReturn').value = '';
+      document.getElementById('btnAddChannel').disabled = true;
+    }
+
+    function closeCreateChannelModal() {
+      document.getElementById('createChannelModal').classList.remove('open');
+    }
+
+    function validateChannelModal() {
+      const name = document.getElementById('newChannelName').value.trim();
+      const returnAddr = document.getElementById('newChannelReturn').value;
+      document.getElementById('btnAddChannel').disabled = !(name && returnAddr);
+    }
+
+    function addNewChannel() {
+      const name = document.getElementById('newChannelName').value.trim();
+      if (name && !state.items.channel.includes(name)) {
+        state.items.channel.push(name);
+        persistState();
+        renderTable('channel');
+        updateAllStepStatuses();
+      }
+      closeCreateChannelModal();
+    }
+
+    // Initialize
+    updateFooterButtons();
+    // Restore saved state on page load
+    if (savedState) {
+      // Render existing data
+      ['courier', 'channel'].forEach(type => {
+        if (state.items[type].length > 0) {
+          renderTable(type);
+          hideSelectedOptions(type);
+        }
+      });
+      if (state.items.fc.length > 0) {
+        // Rebuild fcData for existing FCs
+        state.items.fc.forEach(name => {
+          if (!fcData[name]) {
+            fcData[name] = { days: ['Mon','Tues','Wed','Thurs','Fri'], orderCap: 100, orderlineCap: 100, qtyCap: 100 };
+          }
+        });
+        renderFCTable();
+        hideSelectedOptions('fc');
+      }
+      updateAllStepStatuses();
+      // Go to saved step
+      if (state.currentStep !== 'courier') goToStep(state.currentStep);
+    }
+  </script>
+
+</body>
+</html>
