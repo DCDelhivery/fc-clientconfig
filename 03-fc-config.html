@@ -37,7 +37,7 @@
     .main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 
     /* Top Stepper */
-    .top-stepper{display:flex;align-items:flex-start;padding:20px 32px;border-bottom:1px solid var(--border-light);flex-shrink:0;gap:0;}
+    .top-stepper{display:flex;align-items:flex-start;padding:20px 32px;border-bottom:1px solid var(--border-light);flex-shrink:0;gap:0;margin-right:-32px;padding-right:32px;}
     .step-item{display:flex;align-items:flex-start;gap:8px;padding:0;border:none;border-radius:0;cursor:pointer;background:none;}
     .step-item .step-num{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--t3);flex-shrink:0;margin-top:1px;}
     .step-item.active .step-num{border-color:var(--t1);color:var(--t1);}
@@ -71,14 +71,14 @@
     .cfg-desc{font-size:12px;color:var(--t3);line-height:1.4;margin-bottom:6px;}
     .cfg-badge{display:inline-flex;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;text-transform:uppercase;}
     .badge-fc{background:#E6F0FA;color:#0066CC;}
-    .badge-client{background:#E6F5ED;color:#0D7A3F;}
+    .badge-client{background:#E6F0FA;color:#0066CC;}
 
     /* Sub-reveal */
     .cfg-reveal{margin-top:8px;padding:12px 16px;background:#FAFAFA;border-radius:var(--radius-sm);display:none;}
     .cfg-reveal.show{display:flex;align-items:center;justify-content:space-between;}
     .cfg-reveal-block.show{display:block;}
     .cfg-reveal-label{font-size:12px;color:var(--t2);}
-    .cfg-warn{font-size:11px;color:var(--primary);font-weight:500;margin-top:6px;}
+    .cfg-warn{font-size:11px;color:#B45309;font-weight:500;margin-top:6px;}
 
     /* Segmented Btn */
     .seg-group{display:inline-flex;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;}
@@ -349,7 +349,7 @@
         </div>
         <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Partial receiving</div><div class="cfg-desc">Receiving can finish even if not all items have arrived.</div><span class="cfg-badge badge-client">Client</span></div>
           <div class="cfg-row-right"><div class="seg-group" id="partial-seg"><button class="seg-btn" onclick="setSeg('partial-seg','yes',null)">Yes</button><button class="seg-btn" onclick="setSeg('partial-seg','no',showPartialWarn)">No</button></div></div></div>
-        <div id="partial-warn" style="display:none;padding:0 0 8px;font-size:11px;color:var(--primary);font-weight:500;">*The entire expected quantity must be received in a single session.</div>
+        <div id="partial-warn" style="display:none;padding:0 0 8px;font-size:11px;color:#B45309;font-weight:500;">*The entire expected quantity must be received in a single session.</div>
         <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;">
             <div class="cfg-row-left"><div class="cfg-label">Rejection reasons</div><div class="cfg-desc">Reasons operators can select when rejecting an item.</div><span class="cfg-badge badge-client">Client</span></div>
@@ -373,7 +373,7 @@
             <div class="cfg-row-left"><div class="cfg-label">Enable QC parameters</div><div class="cfg-desc">Show pass/fail parameter fields to operators during QC.</div><span class="cfg-badge badge-client">Client</span></div>
             <div class="cfg-row-right"><div class="seg-group" id="qcparam-seg"><button class="seg-btn" onclick="setSeg('qcparam-seg','yes',()=>document.getElementById('qcparam-warn').style.display='block')">Yes</button><button class="seg-btn" onclick="setSeg('qcparam-seg','no',()=>document.getElementById('qcparam-warn').style.display='none')">No</button></div></div>
           </div>
-          <div id="qcparam-warn" style="display:none;padding:8px 0 0;font-size:11px;color:var(--primary);font-weight:500;">*SKU level QC parameters can be set up in the product catalog</div>
+          <div id="qcparam-warn" style="display:none;padding:8px 0 0;font-size:11px;color:#B45309;font-weight:500;">*SKU level QC parameters can be set up in the product catalog</div>
         </div>
         <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Failed parameter images</div><div class="cfg-desc">Require image upload when a QC parameter fails.</div><span class="cfg-badge badge-client">Client</span></div>
           <div class="cfg-row-right"><div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">No</button></div></div></div>
@@ -382,7 +382,7 @@
             <div class="cfg-row-left"><div class="cfg-label">One unit at a time</div><div class="cfg-desc">Capture QC one unit at a time instead of bulk.</div><span class="cfg-badge badge-client">Client</span></div>
             <div class="cfg-row-right"><div class="seg-group" id="oneunit-seg"><button class="seg-btn" onclick="setSeg('oneunit-seg','yes',showOneUnit)">Yes</button><button class="seg-btn" onclick="setSeg('oneunit-seg','no',hideOneUnit)">No</button></div></div>
           </div>
-          <div id="oneunit-warn" style="display:none;padding:8px 0 0;font-size:11px;color:var(--primary);font-weight:500;">*Receiving may take longer because operators must perform QC one unit at a time.</div>
+          <div id="oneunit-warn" style="display:none;padding:8px 0 0;font-size:11px;color:#B45309;font-weight:500;">*Receiving may take longer because operators must perform QC one unit at a time.</div>
           <div class="cfg-reveal" id="oneunit-scope"><span class="cfg-reveal-label">Scope of one unit at a time</span><select class="tds-select"><option value="">Select</option><option>Accept</option><option>Reject</option><option>Both</option></select></div>
         </div>`;
     }
@@ -408,31 +408,45 @@
     // ===== REVIEW MODAL =====
     function showReviewModal(){
       markFCConfigured(activeFC);
+      saved[`${activeFC}-outbound`]=true;sessionStorage.setItem('fcSaved',JSON.stringify(saved));
+      renderStepper(); // Update outbound to green check
       const existing=document.getElementById('reviewModal');if(existing)existing.remove();
-      // Find next unconfigured FC
       const nextUnconfigured = selectedFCs.find(fc => fc !== activeFC && !configuredFCs[fc]);
       const modal=document.createElement('div');modal.id='reviewModal';
       modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:500;';
-      modal.innerHTML=`<div style="background:#fff;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.15);width:440px;max-width:90vw;">
+      modal.innerHTML=`<div style="background:#fff;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.15);width:520px;max-width:90vw;max-height:85vh;display:flex;flex-direction:column;">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--border-light);">
-          <h3 style="font-size:15px;font-weight:600;">Configuration Review</h3>
+          <h3 style="font-size:15px;font-weight:600;">Configuration Review — ${activeFC}</h3>
           <button onclick="document.getElementById('reviewModal').remove()" style="border:none;background:none;cursor:pointer;color:var(--t3);"><span class="material-icons-outlined" style="font-size:18px;">close</span></button>
         </div>
-        <div style="padding:24px;">
-          <div style="font-size:13px;color:var(--t2);margin-bottom:16px;">Summary of configurations updated for <strong>${activeFC}</strong>:</div>
-          <div style="display:flex;flex-direction:column;gap:12px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#F9FAFB;border-radius:6px;">
-              <span style="font-size:13px;font-weight:500;">Inbound</span>
-              <span style="font-size:12px;font-weight:600;color:var(--success);">7 settings configured</span>
-            </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#F9FAFB;border-radius:6px;">
-              <span style="font-size:13px;font-weight:500;">Inventory</span>
-              <span style="font-size:12px;font-weight:600;color:var(--success);">9 settings configured</span>
-            </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#F9FAFB;border-radius:6px;">
-              <span style="font-size:13px;font-weight:500;">Outbound</span>
-              <span style="font-size:12px;font-weight:600;color:var(--success);">8 settings configured</span>
-            </div>
+        <div style="padding:20px 24px;overflow-y:auto;flex:1;">
+          <!-- Inbound Summary -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span style="font-size:14px;font-weight:600;">Inbound</span>
+            <button onclick="document.getElementById('reviewModal').remove();goToStep('inbound')" style="padding:4px 12px;border:1px solid var(--border);border-radius:4px;background:#fff;font-family:inherit;font-size:11px;font-weight:500;color:var(--t1);cursor:pointer;">Edit</button>
+          </div>
+          <div style="font-size:12px;color:var(--t3);padding:8px 12px;background:#F9FAFB;border-radius:6px;margin-bottom:16px;">
+            <div style="padding:4px 0;border-bottom:1px solid var(--border-light);">Excess receiving • Partial receiving • Rejection reasons</div>
+            <div style="padding:4px 0;">QC enabled • QC parameters • Failed images • One unit at a time</div>
+          </div>
+          <!-- Inventory Summary -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span style="font-size:14px;font-weight:600;">Inventory</span>
+            <button onclick="document.getElementById('reviewModal').remove();goToStep('inventory')" style="padding:4px 12px;border:1px solid var(--border);border-radius:4px;background:#fff;font-family:inherit;font-size:11px;font-weight:500;color:var(--t1);cursor:pointer;">Edit</button>
+          </div>
+          <div style="font-size:12px;color:var(--t3);padding:8px 12px;background:#F9FAFB;border-radius:6px;margin-bottom:16px;">
+            <div style="padding:4px 0;border-bottom:1px solid var(--border-light);">Zones & locations configured</div>
+            <div style="padding:4px 0;border-bottom:1px solid var(--border-light);">Shelf-life check • Auto-move expired • Auto-move near-expiry</div>
+            <div style="padding:4px 0;">Shortage threshold • Overage threshold</div>
+          </div>
+          <!-- Outbound Summary -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span style="font-size:14px;font-weight:600;">Outbound</span>
+            <button onclick="document.getElementById('reviewModal').remove();goToStep('outbound')" style="padding:4px 12px;border:1px solid var(--border);border-radius:4px;background:#fff;font-family:inherit;font-size:11px;font-weight:500;color:var(--t1);cursor:pointer;">Edit</button>
+          </div>
+          <div style="font-size:12px;color:var(--t3);padding:8px 12px;background:#F9FAFB;border-radius:6px;margin-bottom:8px;">
+            <div style="padding:4px 0;border-bottom:1px solid var(--border-light);">Ship by date • Pickwave automation • LR consolidation</div>
+            <div style="padding:4px 0;">Parallel pick pack • Packaging • MOQ • Combo/Kit • Serviceability</div>
           </div>
         </div>
         <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:14px 24px;border-top:1px solid var(--border-light);">
@@ -574,7 +588,7 @@
         <div style="padding:12px 0;border-bottom:1px solid var(--border-light);">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;"><div style="flex:1;max-width:70%;"><div style="font-size:13px;font-weight:600;">Channel</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">Enable this to create separate pickwaves for every channel. Channels can be grouped to create single pickwave for grouped channels.</div></div>
             <div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');checkPWSave()">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');checkPWSave()">No</button></div></div>
-          <div style="margin-top:8px;font-size:11px;color:var(--primary);font-weight:500;">*Note: Unassigned channels will have their separate pickwaves</div>
+          <div style="margin-top:8px;font-size:11px;color:#B45309;font-weight:500;">*Note: Unassigned channels will have their separate pickwaves</div>
           <div style="margin-top:12px;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Group channel for pickwave <span style="color:var(--primary);">*</span></div>
             <div style="border:1px solid var(--border);border-radius:4px;padding:8px 12px;">
               ${availableChannels.map(ch=>`<label style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12px;cursor:pointer;"><input type="checkbox" value="${ch}" onchange="toggleChannelSel('${ch}')" ${selectedChannels.has(ch)?'checked':''} style="accent-color:var(--t1);width:14px;height:14px;">${ch}</label>`).join('')}
@@ -798,7 +812,7 @@
                 <div class="cfg-row-left"><div class="cfg-label">Enable LR consolidation</div><div class="cfg-desc">Allows multiple LTL orders for the same consignee to be consolidated into a single LR.</div><span class="cfg-badge badge-fc">FC</span></div>
                 <div class="cfg-row-right"><div class="seg-group" id="lr-seg"><button class="seg-btn" onclick="setSeg('lr-seg','yes',()=>document.getElementById('lr-warn').style.display='block')">Yes</button><button class="seg-btn" onclick="setSeg('lr-seg','no',()=>document.getElementById('lr-warn').style.display='none')">No</button></div></div>
               </div>
-              <div id="lr-warn" style="display:none;padding:8px 0 0;font-size:11px;color:var(--primary);font-weight:500;">*Please make sure the planner in TMS has Consolidate LTL Loads as enabled for this FC</div>
+              <div id="lr-warn" style="display:none;padding:8px 0 0;font-size:11px;color:#B45309;font-weight:500;">*Please make sure the planner in TMS has Consolidate LTL Loads as enabled for this FC</div>
             </div>`;
           }
           return '';
@@ -824,7 +838,7 @@
             <div class="cfg-row-left"><div class="cfg-label">Enforce MOQ</div><div class="cfg-desc">Orders allocate only in MOQ multiples of the SKU; the remainder raises an exception.</div><span class="cfg-badge badge-client">Client</span></div>
             <div class="cfg-row-right"><div class="seg-group" id="moq-seg"><button class="seg-btn" onclick="setSeg('moq-seg','yes',()=>document.getElementById('moq-warn').style.display='block')">Yes</button><button class="seg-btn" onclick="setSeg('moq-seg','no',()=>document.getElementById('moq-warn').style.display='none')">No</button></div></div>
           </div>
-          <div id="moq-warn" style="display:none;padding:8px 0 0;font-size:11px;color:var(--primary);font-weight:500;">*Sub-MOQ quantities won't allocate cleanly and throw exceptions ops must clear.</div>
+          <div id="moq-warn" style="display:none;padding:8px 0 0;font-size:11px;color:#B45309;font-weight:500;">*Sub-MOQ quantities won't allocate cleanly and throw exceptions ops must clear.</div>
         </div>
         <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Enable combo / kit orders</div><div class="cfg-desc">Allows combo and kit products to be processed during order fulfillment.</div><span class="cfg-badge badge-fc">FC</span></div>
           <div class="cfg-row-right"><div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">No</button></div></div></div>
@@ -833,7 +847,7 @@
           <div style="display:flex;align-items:flex-start;justify-content:space-between;">
             <div class="cfg-row-left"><div class="cfg-label">Serviceability</div><div class="cfg-desc">Set of couriers for which serviceability is needed for this FC.</div><span class="cfg-badge badge-fc">FC</span></div>
           </div>
-          <div style="padding:8px 0 0;font-size:11px;color:var(--primary);font-weight:500;">*Serviceable pincodes need to be uploaded for any courier apart from Delhivery_LTL and Delhivery_FTL</div>
+          <div style="padding:8px 0 0;font-size:11px;color:#B45309;font-weight:500;">*Serviceable pincodes need to be uploaded for any courier apart from Delhivery_LTL and Delhivery_FTL</div>
           <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
             ${getServiceabilityCouriers().map(c=>{
               const key=c.replace(/\s/g,'_');

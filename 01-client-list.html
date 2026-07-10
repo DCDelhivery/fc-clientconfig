@@ -528,6 +528,10 @@
           return '<span class="fc-badge" style="background:transparent;border:1px dashed #CBD5E1;color:#94A3B8;">' + fc + '</span>';
         }
       }).join('') + '</div>';
+      // Highlight row with success background animation
+      row.style.transition = 'background-color 0.5s ease';
+      row.style.backgroundColor = '#E6F5ED';
+      setTimeout(() => { row.style.backgroundColor = ''; }, 3000);
     }
 
     // Search functionality
