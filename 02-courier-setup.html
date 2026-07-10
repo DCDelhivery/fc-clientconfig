@@ -477,6 +477,7 @@
       </div>
     </div>
     <div class="creation-header-right">
+      <button class="btn-mark-inactive" id="btnMarkInactive" style="display:none;padding:8px 16px;border:1px solid #E31E24;border-radius:4px;background:#fff;font-family:inherit;font-size:13px;font-weight:500;color:#E31E24;cursor:pointer;">Mark as inactive</button>
       <button class="btn-save-draft">Save as draft</button>
       <button class="btn-close" onclick="window.location.href='01-client-list.html'">
         <span class="material-icons-outlined">close</span>
@@ -1182,6 +1183,17 @@
       updateAllStepStatuses();
       // Go to saved step
       if (state.currentStep !== 'courier') goToStep(state.currentStep);
+    }
+    // Show "Mark as inactive" if client is active
+    if (localStorage.getItem('mamaearth_status') === 'active') {
+      const btn = document.getElementById('btnMarkInactive');
+      btn.style.display = '';
+      btn.onclick = function() {
+        if (confirm('Are you sure you want to mark this client as inactive?')) {
+          localStorage.setItem('mamaearth_status', 'inactive');
+          window.location.href = '01-client-list.html';
+        }
+      };
     }
   </script>
 

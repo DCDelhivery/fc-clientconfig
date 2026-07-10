@@ -409,44 +409,74 @@
     function showReviewModal(){
       markFCConfigured(activeFC);
       saved[`${activeFC}-outbound`]=true;sessionStorage.setItem('fcSaved',JSON.stringify(saved));
-      renderStepper(); // Update outbound to green check
+      renderStepper();
       const existing=document.getElementById('reviewModal');if(existing)existing.remove();
       const nextUnconfigured = selectedFCs.find(fc => fc !== activeFC && !configuredFCs[fc]);
+      // Gather state for summary
+      const st = JSON.parse(sessionStorage.getItem('allConfigState')||'{}');
+      const inboundState = st[`${activeFC}-inbound`]||{};
+      const inventoryState = st[`${activeFC}-inventory`]||{};
+      const outboundState = st[`${activeFC}-outbound`]||{};
+      const rr = JSON.parse(sessionStorage.getItem('rejReasons')||'[]');
+      const pi = JSON.parse(sessionStorage.getItem('packInstr')||'[]');
+      const zd = JSON.parse(sessionStorage.getItem('zonesData')||'[]');
+
       const modal=document.createElement('div');modal.id='reviewModal';
       modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:500;';
-      modal.innerHTML=`<div style="background:#fff;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.15);width:520px;max-width:90vw;max-height:85vh;display:flex;flex-direction:column;">
+      modal.innerHTML=`<div style="background:#fff;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.15);width:560px;max-width:90vw;max-height:85vh;display:flex;flex-direction:column;">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--border-light);">
           <h3 style="font-size:15px;font-weight:600;">Configuration Review — ${activeFC}</h3>
           <button onclick="document.getElementById('reviewModal').remove()" style="border:none;background:none;cursor:pointer;color:var(--t3);"><span class="material-icons-outlined" style="font-size:18px;">close</span></button>
         </div>
         <div style="padding:20px 24px;overflow-y:auto;flex:1;">
-          <!-- Inbound Summary -->
+          <!-- Inbound -->
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
             <span style="font-size:14px;font-weight:600;">Inbound</span>
             <button onclick="document.getElementById('reviewModal').remove();goToStep('inbound')" style="padding:4px 12px;border:1px solid var(--border);border-radius:4px;background:#fff;font-family:inherit;font-size:11px;font-weight:500;color:var(--t1);cursor:pointer;">Edit</button>
           </div>
-          <div style="font-size:12px;color:var(--t3);padding:8px 12px;background:#F9FAFB;border-radius:6px;margin-bottom:16px;">
-            <div style="padding:4px 0;border-bottom:1px solid var(--border-light);">Excess receiving • Partial receiving • Rejection reasons</div>
-            <div style="padding:4px 0;">QC enabled • QC parameters • Failed images • One unit at a time</div>
+          <div style="background:#F9FAFB;border-radius:6px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--t2);">
+            <table style="width:100%;border-collapse:collapse;">
+              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">Enable excess receiving</td><td style="padding:5px 0;text-align:right;">${inboundState.seg_0||'—'}</td></tr>
+              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">Partial receiving</td><td style="padding:5px 0;text-align:right;">${inboundState.seg_1||'—'}</td></tr>
+              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">Rejection reasons</td><td style="padding:5px 0;text-align:right;">${rr.length?rr.join(', '):'—'}</td></tr>
+              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">Enable QC</td><td style="padding:5px 0;text-align:right;">${inboundState.seg_3||'—'}</td></tr>
+              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">QC instructions</td><td style="padding:5px 0;text-align:right;">${inboundState.seg_4||'—'}</td></tr>
+              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">Enable QC parameters</td><td style="padding:5px 0;text-align:right;">${inboundState.seg_5||'—'}</td></tr>
+              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">Failed parameter images</td><td style="padding:5px 0;text-align:right;">${inboundState.seg_6||'—'}</td></tr>
+              <tr><td style="padding:5px 0;font-weight:500;">One unit at a time</td><td style="padding:5px 0;text-align:right;">${inboundState.seg_7||'—'}</td></tr>
+            </table>
           </div>
-          <!-- Inventory Summary -->
+          <!-- Inventory -->
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
             <span style="font-size:14px;font-weight:600;">Inventory</span>
             <button onclick="document.getElementById('reviewModal').remove();goToStep('inventory')" style="padding:4px 12px;border:1px solid var(--border);border-radius:4px;background:#fff;font-family:inherit;font-size:11px;font-weight:500;color:var(--t1);cursor:pointer;">Edit</button>
           </div>
-          <div style="font-size:12px;color:var(--t3);padding:8px 12px;background:#F9FAFB;border-radius:6px;margin-bottom:16px;">
-            <div style="padding:4px 0;border-bottom:1px solid var(--border-light);">Zones & locations configured</div>
-            <div style="padding:4px 0;border-bottom:1px solid var(--border-light);">Shelf-life check • Auto-move expired • Auto-move near-expiry</div>
-            <div style="padding:4px 0;">Shortage threshold • Overage threshold</div>
+          <div style="background:#F9FAFB;border-radius:6px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--t2);">
+            <table style="width:100%;border-collapse:collapse;">
+              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">Zones configured</td><td style="padding:5px 0;text-align:right;">${zd.filter(z=>z.saved).length} zone(s)</td></tr>
+              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">Shelf-life check</td><td style="padding:5px 0;text-align:right;">${inventoryState.seg_0||'—'}</td></tr>
+              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">Auto-move expired stock</td><td style="padding:5px 0;text-align:right;">${inventoryState.seg_1||'—'}</td></tr>
+              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">Auto-move near-expiry stock</td><td style="padding:5px 0;text-align:right;">${inventoryState.seg_2||'—'}</td></tr>
+              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">Shortage threshold</td><td style="padding:5px 0;text-align:right;">${inventoryState.inp_0||'—'}</td></tr>
+              <tr><td style="padding:5px 0;font-weight:500;">Overage threshold</td><td style="padding:5px 0;text-align:right;">${inventoryState.inp_1||'—'}</td></tr>
+            </table>
           </div>
-          <!-- Outbound Summary -->
+          <!-- Outbound -->
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
             <span style="font-size:14px;font-weight:600;">Outbound</span>
             <button onclick="document.getElementById('reviewModal').remove();goToStep('outbound')" style="padding:4px 12px;border:1px solid var(--border);border-radius:4px;background:#fff;font-family:inherit;font-size:11px;font-weight:500;color:var(--t1);cursor:pointer;">Edit</button>
           </div>
-          <div style="font-size:12px;color:var(--t3);padding:8px 12px;background:#F9FAFB;border-radius:6px;margin-bottom:8px;">
-            <div style="padding:4px 0;border-bottom:1px solid var(--border-light);">Ship by date • Pickwave automation • LR consolidation</div>
-            <div style="padding:4px 0;">Parallel pick pack • Packaging • MOQ • Combo/Kit • Serviceability</div>
+          <div style="background:#F9FAFB;border-radius:6px;padding:10px 14px;margin-bottom:8px;font-size:12px;color:var(--t2);">
+            <table style="width:100%;border-collapse:collapse;">
+              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">Ship by date</td><td style="padding:5px 0;text-align:right;">Configured</td></tr>
+              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">Pickwave automation</td><td style="padding:5px 0;text-align:right;">${pwConfigured?'Configured':'—'}</td></tr>
+              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">Enable LR consolidation</td><td style="padding:5px 0;text-align:right;">${outboundState.seg_0||'—'}</td></tr>
+              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">Enable parallel pick pack</td><td style="padding:5px 0;text-align:right;">${outboundState.seg_1||'—'}</td></tr>
+              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">Packaging instructions</td><td style="padding:5px 0;text-align:right;">${pi.length?pi.join(', '):'—'}</td></tr>
+              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">Enforce MOQ</td><td style="padding:5px 0;text-align:right;">${outboundState.seg_3||'—'}</td></tr>
+              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">Enable combo / kit orders</td><td style="padding:5px 0;text-align:right;">${outboundState.seg_4||'—'}</td></tr>
+              <tr><td style="padding:5px 0;font-weight:500;">Serviceability</td><td style="padding:5px 0;text-align:right;">${Object.keys(uploadedFiles).length?Object.keys(uploadedFiles).join(', '):'—'}</td></tr>
+            </table>
           </div>
         </div>
         <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:14px 24px;border-top:1px solid var(--border-light);">
