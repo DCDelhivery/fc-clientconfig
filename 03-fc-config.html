@@ -52,21 +52,24 @@
 
     /* Content Area */
     .content{flex:1;overflow-y:auto;padding:28px 32px 100px;}
-    .content-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:20px;}
+    .content-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:0;padding:16px;border-bottom:1px solid var(--border-light);}
     .content-title{font-size:18px;font-weight:600;}
     .content-subtitle{font-size:12px;color:var(--t3);margin-top:2px;}
     .content-count{font-size:12px;color:var(--t3);}
 
     /* Section Divider */
-    .section-divider{margin:28px 0 16px;padding:10px 14px;border-left:3px solid var(--t1);background:#FAFAFA;border-radius:0 4px 4px 0;}
-    .section-divider-title{font-size:13px;font-weight:700;color:var(--t1);}
-    .section-divider-desc{font-size:11px;color:var(--t3);margin-top:2px;}
+    .section-divider{margin:0;padding:16px;background:transparent;border-left:none;border-radius:0;border-bottom:none;position:relative;}
+    .section-divider:after{content:'';position:absolute;bottom:0;left:16px;right:16px;height:1px;background:var(--border-light);}
+    .section-divider-title{font-size:14px;font-weight:700;color:var(--t1);display:flex;align-items:center;gap:6px;}
+    .section-divider-title .material-icons-outlined{font-size:16px;color:var(--t3);}
+    .section-divider-desc{font-size:12px;color:var(--t3);margin-top:2px;padding-left:22px;}
 
     /* Config Row */
-    .cfg-row{display:flex;align-items:flex-start;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--border-light);}
-    .cfg-row:last-child{border-bottom:none;}
-    .cfg-row-left{flex:1;max-width:55%;}
-    .cfg-row-right{display:flex;align-items:center;justify-content:flex-end;min-width:200px;}
+    .cfg-row{display:flex;align-items:flex-start;justify-content:space-between;padding:16px 16px 16px 38px;border-bottom:none;position:relative;}
+    .cfg-row:after{content:'';position:absolute;bottom:0;left:38px;right:16px;height:1px;background:var(--border-light);}
+    .cfg-row:last-child:after{display:none;}
+    .cfg-row-left{flex:1;max-width:65%;}
+    .cfg-row-right{display:flex;align-items:center;justify-content:flex-end;min-width:160px;}
     .cfg-label{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:2px;}
     .cfg-desc{font-size:12px;color:var(--t3);line-height:1.4;margin-bottom:6px;}
     .cfg-badge{display:inline-flex;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;text-transform:uppercase;}
@@ -74,7 +77,7 @@
     .badge-client{background:#E6F0FA;color:#0066CC;}
 
     /* Sub-reveal */
-    .cfg-reveal{margin-top:8px;padding:12px 16px;background:#FAFAFA;border-radius:var(--radius-sm);display:none;}
+    .cfg-reveal{margin:8px 0 0;padding:12px 16px;background:#FAFAFA;border-radius:var(--radius-sm);display:none;}
     .cfg-reveal.show{display:flex;align-items:center;justify-content:space-between;}
     .cfg-reveal-block.show{display:block;}
     .cfg-reveal-label{font-size:12px;color:var(--t2);}
@@ -335,8 +338,8 @@
 
     // ===== INBOUND PAGE =====
     function getInboundPage(){
-      return `<div class="content-header"><div><div class="content-title">Inbound</div><div class="content-subtitle">Receiving, QC</div></div><div class="content-count">7 settings</div></div>
-        <div class="section-divider"><div class="section-divider-title">Receiving Rules</div><div class="section-divider-desc">How operators receive stock against an AGN.</div></div>
+      return `<div style="border:1px solid var(--border-light);border-radius:var(--radius);overflow:hidden;"><div class="content-header"><div><div class="content-title">Inbound</div><div class="content-subtitle">Receiving, QC</div></div><div class="content-count">7 settings</div></div>
+        <div class="section-divider"><div class="section-divider-title"><span class="material-icons-outlined">arrow_right</span>Receiving Rules</div><div class="section-divider-desc">How operators receive stock against an AGN.</div></div>
         <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;">
             <div class="cfg-row-left"><div class="cfg-label">Enable excess receiving</div><div class="cfg-desc">Operators can receive more than the expected AGN quantity.</div><span class="cfg-badge badge-client">Client</span></div>
@@ -361,36 +364,44 @@
                 <div class="rej-opt" data-name="Product not in good condition" onclick="addRej('Product not in good condition')"><span>Product not in good condition</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
               </div></div></div>
           </div>
-          <div id="rejChips" style="display:flex;flex-wrap:wrap;gap:6px;padding:6px 0 0;"></div>
+          <div id="rejChips" style="display:none;"></div>
         </div>
-        <div class="section-divider"><div class="section-divider-title">Quality Check</div><div class="section-divider-desc">Inspection performed during inbound.</div></div>
-        <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Enable QC</div><div class="cfg-desc">Turn on the QC process for this client.</div><span class="cfg-badge badge-client">Client</span></div>
-          <div class="cfg-row-right"><div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">No</button></div></div></div>
-        <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label" style="display:flex;align-items:center;gap:6px;">QC instructions <span style="position:relative;display:inline-flex;" class="info-wrap"><span class="material-icons-outlined" style="font-size:15px;color:var(--t3);cursor:help;">info</span><span class="info-tip" style="position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);padding:8px 12px;background:var(--t1);color:#fff;font-size:11px;border-radius:4px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity 0.15s;z-index:200;">SKU level QC instructions can be set up in the product catalog</span></span></div><div class="cfg-desc">Show QC instructions to operators during receiving.</div><span class="cfg-badge badge-client">Client</span></div>
-          <div class="cfg-row-right"><div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">No</button></div></div></div>
+        <div class="section-divider"><div class="section-divider-title"><span class="material-icons-outlined">arrow_right</span>Quality Check</div><div class="section-divider-desc">Inspection performed during inbound.</div></div>
         <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;">
-            <div class="cfg-row-left"><div class="cfg-label">Enable QC parameters</div><div class="cfg-desc">Show pass/fail parameter fields to operators during QC.</div><span class="cfg-badge badge-client">Client</span></div>
-            <div class="cfg-row-right"><div class="seg-group" id="qcparam-seg"><button class="seg-btn" onclick="setSeg('qcparam-seg','yes',()=>document.getElementById('qcparam-warn').style.display='block')">Yes</button><button class="seg-btn" onclick="setSeg('qcparam-seg','no',()=>document.getElementById('qcparam-warn').style.display='none')">No</button></div></div>
+            <div class="cfg-row-left"><div class="cfg-label">Enable QC</div><div class="cfg-desc">Turn on the QC process for this client.</div><span class="cfg-badge badge-client">Client</span></div>
+            <div class="cfg-row-right"><div class="seg-group" id="qc-enable-seg"><button class="seg-btn" onclick="setSeg('qc-enable-seg','yes',showQcSettings)">Yes</button><button class="seg-btn" onclick="setSeg('qc-enable-seg','no',hideQcSettings)">No</button></div></div>
           </div>
-          <div id="qcparam-warn" style="display:none;padding:8px 0 0;font-size:11px;color:#B45309;font-weight:500;">*SKU level QC parameters can be set up in the product catalog</div>
-        </div>
-        <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Failed parameter images</div><div class="cfg-desc">Require image upload when a QC parameter fails.</div><span class="cfg-badge badge-client">Client</span></div>
-          <div class="cfg-row-right"><div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">No</button></div></div></div>
-        <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;">
-            <div class="cfg-row-left"><div class="cfg-label">One unit at a time</div><div class="cfg-desc">Capture QC one unit at a time instead of bulk.</div><span class="cfg-badge badge-client">Client</span></div>
-            <div class="cfg-row-right"><div class="seg-group" id="oneunit-seg"><button class="seg-btn" onclick="setSeg('oneunit-seg','yes',showOneUnit)">Yes</button><button class="seg-btn" onclick="setSeg('oneunit-seg','no',hideOneUnit)">No</button></div></div>
+          <div class="cfg-reveal" id="qc-settings-reveal" style="flex-direction:column;gap:0;padding:0;margin-top:12px;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border-light);">
+              <div class="cfg-row-left"><div class="cfg-label" style="display:flex;align-items:center;gap:6px;">QC instructions <span style="position:relative;display:inline-flex;" class="info-wrap"><span class="material-icons-outlined" style="font-size:15px;color:var(--t3);cursor:help;">info</span><span class="info-tip" style="position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);padding:8px 12px;background:var(--t1);color:#fff;font-size:11px;border-radius:4px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity 0.15s;z-index:200;">SKU level QC instructions can be set up in the product catalog</span></span></div><div class="cfg-desc">Show QC instructions to operators during receiving.</div></div>
+              <div class="cfg-row-right"><div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">No</button></div></div>
+            </div>
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border-light);">
+              <div class="cfg-row-left"><div class="cfg-label">Enable QC parameters</div><div class="cfg-desc">Show pass/fail parameter fields to operators during QC.</div></div>
+              <div class="cfg-row-right"><div class="seg-group" id="qcparam-seg"><button class="seg-btn" onclick="setSeg('qcparam-seg','yes',()=>document.getElementById('qcparam-warn').style.display='block')">Yes</button><button class="seg-btn" onclick="setSeg('qcparam-seg','no',()=>document.getElementById('qcparam-warn').style.display='none')">No</button></div></div>
+            </div>
+            <div id="qcparam-warn" style="display:none;padding:8px 16px;font-size:11px;color:#B45309;font-weight:500;">*SKU level QC parameters can be set up in the product catalog</div>
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border-light);">
+              <div class="cfg-row-left"><div class="cfg-label">Failed parameter images</div><div class="cfg-desc">Require image upload when a QC parameter fails.</div></div>
+              <div class="cfg-row-right"><div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">No</button></div></div>
+            </div>
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:12px 16px;">
+              <div class="cfg-row-left"><div class="cfg-label">One unit at a time</div><div class="cfg-desc">Capture QC one unit at a time instead of bulk.</div></div>
+              <div class="cfg-row-right"><div class="seg-group" id="oneunit-seg"><button class="seg-btn" onclick="setSeg('oneunit-seg','yes',showOneUnit)">Yes</button><button class="seg-btn" onclick="setSeg('oneunit-seg','no',hideOneUnit)">No</button></div></div>
+            </div>
+            <div id="oneunit-warn" style="display:none;padding:0 16px 8px;font-size:11px;color:#B45309;font-weight:500;">*Receiving may take longer because operators must perform QC one unit at a time.</div>
+            <div class="cfg-reveal" id="oneunit-scope" style="margin:0 16px 12px;"><span class="cfg-reveal-label">Scope of one unit at a time</span><select class="tds-select"><option value="">Select</option><option>Accept</option><option>Reject</option><option>Both</option></select></div>
           </div>
-          <div id="oneunit-warn" style="display:none;padding:8px 0 0;font-size:11px;color:#B45309;font-weight:500;">*Receiving may take longer because operators must perform QC one unit at a time.</div>
-          <div class="cfg-reveal" id="oneunit-scope"><span class="cfg-reveal-label">Scope of one unit at a time</span><select class="tds-select"><option value="">Select</option><option>Accept</option><option>Reject</option><option>Both</option></select></div>
-        </div>`;
+        </div></div>`;
     }
 
     // Helpers
     function setSeg(segId,val,cb){const seg=document.getElementById(segId);if(!seg)return;seg.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));if(val==='yes')seg.children[0].classList.add('active');else seg.children[1].classList.add('active');if(cb)cb();}
     function showExcess(){document.getElementById('excess-reveal').classList.add('show');}
     function hideExcess(){document.getElementById('excess-reveal').classList.remove('show');}
+    function showQcSettings(){const el=document.getElementById('qc-settings-reveal');if(el){el.style.display='flex';}}
+    function hideQcSettings(){const el=document.getElementById('qc-settings-reveal');if(el){el.style.display='none';}}
     function showPartialWarn(){document.getElementById('partial-warn').style.display='block';}
     function showOneUnit(){document.getElementById('oneunit-warn').style.display='block';document.getElementById('oneunit-scope').classList.add('show');}
     function hideOneUnit(){document.getElementById('oneunit-warn').style.display='none';document.getElementById('oneunit-scope').classList.remove('show');}
@@ -401,8 +412,7 @@
       const p=document.getElementById('packWrap');if(p&&!p.contains(e.target))document.getElementById('packDD')?.classList.remove('open');});
     function addRej(n){if(rejReasons.includes(n))return;rejReasons.push(n);sessionStorage.setItem('rejReasons',JSON.stringify(rejReasons));renderRejChips();document.querySelectorAll('#rejDD .rej-opt').forEach(o=>{o.style.display=rejReasons.includes(o.getAttribute('data-name'))?'none':'flex';});}
     function removeRej(n){rejReasons=rejReasons.filter(r=>r!==n);sessionStorage.setItem('rejReasons',JSON.stringify(rejReasons));renderRejChips();document.querySelectorAll('#rejDD .rej-opt').forEach(o=>{o.style.display=rejReasons.includes(o.getAttribute('data-name'))?'none':'flex';});}
-    function renderRejChips(){const c=document.getElementById('rejChips');if(!c)return;c.innerHTML=rejReasons.map(r=>`<span class="pill-chip">${r}<span class="material-icons-outlined remove" onclick="removeRej('${r}')">close</span></span>`).join('');
-      // Also hide already-selected items from dropdown
+    function renderRejChips(){const c=document.getElementById('rejChips');if(!c)return;if(rejReasons.length===0){c.style.display='none';c.innerHTML='';}else{c.style.display='flex';c.style.cssText='display:flex;align-items:center;gap:8px;padding:12px 16px;background:#F9FAFB;border-radius:4px;margin:8px 0 0;flex-wrap:wrap;';c.innerHTML=`<span style="font-size:12px;font-weight:600;color:var(--t1);white-space:nowrap;">Selected reasons:</span>`+rejReasons.map(r=>`<span class="pill-chip">${r}<span class="material-icons-outlined remove" onclick="removeRej('${r}')">close</span></span>`).join('');}
       document.querySelectorAll('#rejDD .rej-opt').forEach(o=>{o.style.display=rejReasons.includes(o.getAttribute('data-name'))?'none':'flex';});}
 
     // ===== REVIEW MODAL =====
@@ -568,7 +578,7 @@
         <div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border-light);">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span style="font-size:13px;font-weight:600;">Order Type :</span><span style="padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:var(--warning-bg);color:var(--warning);">Complex</span></div>
           <div id="complexMsg" style="font-size:11px;color:var(--t3);margin-bottom:12px;"></div>
-          <div style="font-size:12px;font-weight:500;margin-bottom:6px;">Maximum quantity in order</div><input class="tds-input" value="100" style="width:200px;margin-bottom:16px;" oninput="checkPWSave()">
+          <div style="display:flex;gap:16px;margin-bottom:16px;"><div style="flex:1;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Maximum SKU in order</div><input class="tds-input" placeholder="Type here..." style="width:100%;" oninput="checkPWSave()"></div><div style="flex:1;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Maximum quantity in order</div><input class="tds-input" value="100" style="width:100%;" oninput="checkPWSave()"></div></div>
           <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:12px 0;border-top:1px solid var(--border-light);">
             <div style="flex:1;max-width:70%;"><div style="font-size:13px;font-weight:600;">Order bundling</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">When enabled, pickwaves will be divided into picklists based on zones</div></div>
             <div class="seg-group" id="bundling-seg"><button class="seg-btn" onclick="setSeg('bundling-seg','yes',showBundlingParams);checkPWSave()">Yes</button><button class="seg-btn" onclick="setSeg('bundling-seg','no',hideBundlingParams);checkPWSave()">No</button></div>
@@ -681,7 +691,7 @@
     });
     function addPackInstr(n){if(packInstr.includes(n))return;packInstr.push(n);sessionStorage.setItem('packInstr',JSON.stringify(packInstr));renderPackChips();document.querySelectorAll('#packDD .rej-opt').forEach(o=>{o.style.display=packInstr.includes(o.getAttribute('data-name'))?'none':'flex';});}
     function removePackInstr(n){packInstr=packInstr.filter(r=>r!==n);sessionStorage.setItem('packInstr',JSON.stringify(packInstr));renderPackChips();document.querySelectorAll('#packDD .rej-opt').forEach(o=>{o.style.display=packInstr.includes(o.getAttribute('data-name'))?'none':'flex';});}
-    function renderPackChips(){const c=document.getElementById('packChips');if(!c)return;c.innerHTML=packInstr.map(r=>`<span class="pill-chip">${r}<span class="material-icons-outlined remove" onclick="removePackInstr('${r}')">close</span></span>`).join('');document.querySelectorAll('#packDD .rej-opt').forEach(o=>{if(o)o.style.display=packInstr.includes(o.getAttribute('data-name'))?'none':'flex';});}
+    function renderPackChips(){const c=document.getElementById('packChips');if(!c)return;if(packInstr.length===0){c.style.display='none';c.innerHTML='';}else{c.style.display='flex';c.style.cssText='display:flex;align-items:center;gap:8px;padding:12px 16px;background:#F9FAFB;border-radius:4px;margin:8px 0 0;flex-wrap:wrap;';c.innerHTML=`<span style="font-size:12px;font-weight:600;color:var(--t1);white-space:nowrap;">Selected instructions:</span>`+packInstr.map(r=>`<span class="pill-chip">${r}<span class="material-icons-outlined remove" onclick="removePackInstr('${r}')">close</span></span>`).join('');}document.querySelectorAll('#packDD .rej-opt').forEach(o=>{if(o)o.style.display=packInstr.includes(o.getAttribute('data-name'))?'none':'flex';});}
 
     // Serviceability - check if platform_dispatcher or self_pick was selected in courier mapping
     function hasServiceabilityCouriers(){
@@ -736,7 +746,13 @@
         document.getElementById('uploadedFileName').textContent=input.files[0].name;
         const btn=document.getElementById('uploadSaveBtn');
         btn.disabled=false;btn.style.background='var(--t1)';btn.style.color='#fff';btn.style.cursor='pointer';
-        btn.onclick=()=>{document.getElementById('uploadModal').remove();renderContent();};
+        btn.onclick=()=>{
+          if(courierKey==='bulk_locations'){
+            zonesData=[{name:'Prime',locations:['A1','A2','A3','B1','B2'],saved:true},{name:'Reserve',locations:['R1','R2','R3','R4'],saved:true},{name:'Staging',locations:['S1','S2'],saved:true}];
+            sessionStorage.setItem('zonesData',JSON.stringify(zonesData));
+          }
+          document.getElementById('uploadModal').remove();renderContent();
+        };
       }
     }
     function removeUploadFile(courierKey){
@@ -753,11 +769,10 @@
     // ===== INVENTORY PAGE =====
     let zonesData = JSON.parse(sessionStorage.getItem('zonesData')||'[]');
     function getInventoryPage(){
-      return `<div class="content-header"><div><div class="content-title">Inventory</div><div class="content-subtitle">Zones, expiry, cycle count</div></div><div class="content-count">9 settings</div></div>
-        <div class="section-divider"><div class="section-divider-title">Zone and Locations</div><div class="section-divider-desc">Configure warehouse zones and their locations.</div></div>
-        <div style="display:flex;justify-content:flex-end;margin-bottom:8px;"><button class="btn-bulk" onclick="openUploadModal('Upload locations','bulk_locations')">Bulk upload</button></div>
-        <div class="zones-wrap"><table class="zones-table"><thead><tr><th style="width:40px">S.No.</th><th style="width:160px">Zones</th><th>Locations</th><th style="width:80px;text-align:center">Action</th></tr></thead><tbody id="zonesBody"></tbody></table></div>
-        <div class="section-divider"><div class="section-divider-title">Expiry Management</div><div class="section-divider-desc">How near-expiry and expired stock are handled.</div></div>
+      return `<div style="border:1px solid var(--border-light);border-radius:var(--radius);overflow:hidden;"><div class="content-header"><div><div class="content-title">Inventory</div><div class="content-subtitle">Zones, expiry, cycle count</div></div><div class="content-count">9 settings</div></div>
+        <div class="section-divider" style="display:flex;align-items:center;justify-content:space-between;"><div><div class="section-divider-title"><span class="material-icons-outlined">arrow_right</span>Zone and Locations</div><div class="section-divider-desc">Configure warehouse zones and their locations.</div></div><button class="btn-bulk" onclick="openUploadModal('Upload locations','bulk_locations')">Bulk upload</button></div>
+        <div style="padding:0 16px 16px;display:none;" id="zonesTableWrap"><div class="zones-wrap"><table class="zones-table"><thead><tr><th style="width:40px">S.No.</th><th style="width:160px">Zones</th><th>Locations</th></tr></thead><tbody id="zonesBody"></tbody></table></div></div>
+        <div class="section-divider"><div class="section-divider-title"><span class="material-icons-outlined">arrow_right</span>Expiry Management</div><div class="section-divider-desc">How near-expiry and expired stock are handled.</div></div>
         <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Shelf-life check</div><div class="cfg-desc">System checks shelf life before moving items from Reserve to Prime.</div><span class="cfg-badge badge-fc">FC</span></div>
           <div class="cfg-row-right"><div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">No</button></div></div></div>
         <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
@@ -774,27 +789,23 @@
           </div>
           <div class="cfg-reveal" id="near-bucket"><span class="cfg-reveal-label">Near-expiry external bucket</span><select class="tds-select"><option value="">Select bucket</option><option>Expired stock</option><option>Damaged</option><option>Do not sell</option></select></div>
         </div>
-        <div class="section-divider"><div class="section-divider-title">Cycle Count</div><div class="section-divider-desc">Thresholds for supervisory approval during cycle counts.</div></div>
+        <div class="section-divider"><div class="section-divider-title"><span class="material-icons-outlined">arrow_right</span>Cycle Count</div><div class="section-divider-desc">Thresholds for supervisory approval during cycle counts.</div></div>
         <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Shortage threshold</div><div class="cfg-desc">Units short above which supervisory approval is needed.</div><span class="cfg-badge badge-fc">FC</span></div>
           <div class="cfg-row-right"><input class="tds-input" placeholder="Add and press enter"></div></div>
         <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Overage threshold</div><div class="cfg-desc">Units extra above which supervisory approval is needed.</div><span class="cfg-badge badge-fc">FC</span></div>
-          <div class="cfg-row-right"><input class="tds-input" placeholder="Add and press enter"></div></div>`;
+          <div class="cfg-row-right"><input class="tds-input" placeholder="Add and press enter"></div></div></div>`;
     }
 
     // Zones table render
     function renderZones(){
       const tbody=document.getElementById('zonesBody');if(!tbody)return;
+      const tableWrap=document.getElementById('zonesTableWrap');
+      if(zonesData.filter(z=>z.saved).length>0&&tableWrap){tableWrap.style.display='block';}
       let html=zonesData.filter(z=>z.saved).map((z,i)=>{
         const pills=z.locations.slice(0,5).map(l=>`<span class="zone-pill">${l}</span>`).join('')+(z.locations.length>5?`<span class="zone-pill">+${z.locations.length-5}</span>`:'');
-        return `<tr><td>${i+1}</td><td style="font-weight:500">${z.name}</td><td><div style="display:flex;gap:4px;flex-wrap:wrap;">${pills}</div></td><td style="text-align:center"><button class="zone-edit-btn" onclick="editZone(${i})"><span class="material-icons-outlined" style="font-size:13px">edit</span></button></td></tr>`;
+        return `<tr><td>${i+1}</td><td style="font-weight:500">${z.name}</td><td><div style="display:flex;gap:4px;flex-wrap:wrap;">${pills}</div></td></tr>`;
       }).join('');
-      // Editable rows
-      zonesData.filter(z=>!z.saved).forEach((z,i)=>{
-        const idx=zonesData.indexOf(z);
-        html+=`<tr><td>${zonesData.filter(x=>x.saved).length+i+1}</td><td><input class="zone-input" value="${z.name||''}" placeholder="Zone name" onchange="zonesData[${idx}].name=this.value;sessionStorage.setItem('zonesData',JSON.stringify(zonesData))"></td><td><input class="zone-input" value="${(z.locations||[]).join(', ')}" placeholder="Locations (comma separated)" onchange="zonesData[${idx}].locations=this.value.split(',').map(s=>s.trim()).filter(Boolean);sessionStorage.setItem('zonesData',JSON.stringify(zonesData))"></td><td style="text-align:center"><button class="zone-save-btn" onclick="zonesData[${idx}].saved=true;sessionStorage.setItem('zonesData',JSON.stringify(zonesData));renderZones();">Save</button></td></tr>`;
-      });
-      // Empty new row
-      html+=`<tr><td>${zonesData.length+1}</td><td><input class="zone-input" placeholder="Zone name" onchange="addZone(this.value)"></td><td><input class="zone-input" placeholder="Locations (comma separated)" disabled></td><td></td></tr>`;
+      tbody.innerHTML=html;
       tbody.innerHTML=html;
     }
     function addZone(name){if(!name.trim())return;zonesData.push({name:name.trim(),locations:[],saved:false});sessionStorage.setItem('zonesData',JSON.stringify(zonesData));renderZones();}
@@ -802,10 +813,32 @@
 
     // ===== OUTBOUND PAGE =====
     function getOutboundPage(){
-      return `<div class="content-header"><div><div class="content-title">Outbound</div><div class="content-subtitle">Allocation, picking, dispatch</div></div><div class="content-count">8 settings</div></div>
-        <div class="section-divider"><div class="section-divider-title">Order Processing</div><div class="section-divider-desc">How orders are allocated and picked.</div></div>
-        <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Ship by date</div><div class="cfg-desc">Configure SBD courier offset and cutoff times per priority.</div><span class="cfg-badge badge-fc">FC</span></div>
-          <div class="cfg-row-right"><button class="btn-bulk" onclick="openSBDModal()">Configure</button></div></div>
+      return `<div style="border:1px solid var(--border-light);border-radius:var(--radius);overflow:hidden;"><div class="content-header"><div><div class="content-title">Outbound</div><div class="content-subtitle">Allocation, picking, dispatch</div></div><div class="content-count">8 settings</div></div>
+        <div class="section-divider"><div class="section-divider-title"><span class="material-icons-outlined">arrow_right</span>Order Processing</div><div class="section-divider-desc">How orders are allocated and picked.</div></div>
+        <div class="cfg-row" style="flex-direction:column;align-items:stretch;padding-right:16px;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+            <div class="cfg-row-left"><div class="cfg-label">Ship by date</div><div class="cfg-desc">Configure SBD courier offset and cutoff times per priority.</div><span class="cfg-badge badge-fc">FC</span></div>
+            <div class="cfg-row-right"><button class="btn-bulk" onclick="openSBDModal()">Edit config</button></div>
+          </div>
+          <div style="margin-top:12px;padding:16px;background:#FAFAFA;border-radius:4px;">
+            <div style="font-size:12px;font-weight:600;margin-bottom:4px;">SBD courier offset</div>
+            <div style="font-size:11px;color:var(--t3);margin-bottom:8px;">Buffer days added per courier for SBD calculation.</div>
+            <table style="width:100%;border-collapse:collapse;margin-bottom:20px;"><thead style="background:#F7F8FA;"><tr><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Couriers</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:right;border-bottom:1px solid var(--border);">Offset days</th></tr></thead><tbody>
+              <tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border-light);">Delhivery FTL</td><td style="padding:8px 12px;font-size:12px;text-align:right;border-bottom:1px solid var(--border-light);">10</td></tr>
+              <tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border-light);">Delhivery LTL</td><td style="padding:8px 12px;font-size:12px;text-align:right;border-bottom:1px solid var(--border-light);">10</td></tr>
+              <tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border-light);">Delhivery standard</td><td style="padding:8px 12px;font-size:12px;text-align:right;border-bottom:1px solid var(--border-light);">10</td></tr>
+              <tr><td style="padding:8px 12px;font-size:12px;">Platform dispatchers</td><td style="padding:8px 12px;font-size:12px;text-align:right;">10</td></tr>
+            </tbody></table>
+            <div style="font-size:12px;font-weight:600;margin-bottom:4px;">SBD Courier cutoff</div>
+            <div style="font-size:11px;color:var(--t3);margin-bottom:8px;">Buffer days added per courier for SBD calculation.</div>
+            <table style="width:100%;border-collapse:collapse;"><thead style="background:#F7F8FA;"><tr><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Couriers</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">P1</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">P2</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">P3</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">P4</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">P5</th></tr></thead><tbody>
+              <tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border-light);">Delhivery FTL</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">10:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">10:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">10:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">10:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">10:00</td></tr>
+              <tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border-light);">Delhivery LTL</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td></tr>
+              <tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border-light);">Delhivery standard</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td></tr>
+              <tr><td style="padding:8px 12px;font-size:12px;">Platform dispatchers</td><td style="padding:8px 12px;font-size:12px;text-align:center;">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;">14:00</td></tr>
+            </tbody></table>
+          </div>
+        </div>
         ${['Pickwave Automation','Enable LR consolidation'].map(s=>{
           if(s==='Pickwave Automation') {
             if(pwConfigured) {
@@ -847,7 +880,7 @@
           }
           return '';
         }).join('')}
-        <div class="section-divider"><div class="section-divider-title">Packing & Dispatch</div><div class="section-divider-desc">Rules for packing, MOQ, and serviceability.</div></div>
+        <div class="section-divider"><div class="section-divider-title"><span class="material-icons-outlined">arrow_right</span>Packing & Dispatch</div><div class="section-divider-desc">Rules for packing, MOQ, and serviceability.</div></div>
         <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Enable parallel pick pack</div><div class="cfg-desc">Allows packing to begin while picking is still in progress for the same order.</div><span class="cfg-badge badge-fc">FC</span></div>
           <div class="cfg-row-right"><div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">No</button></div></div></div>
         <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
@@ -861,7 +894,7 @@
                 <div class="rej-opt" data-name="Paste packing slip on top" onclick="addPackInstr('Paste packing slip on top')"><span>Paste packing slip on top</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
               </div></div></div>
           </div>
-          <div id="packChips" style="display:flex;flex-wrap:wrap;gap:6px;padding:6px 0 0;justify-content:flex-end;"></div>
+          <div id="packChips" style="display:none;"></div>
         </div>
         <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;">
@@ -888,7 +921,7 @@
               </div>`;
             }).join('')}
           </div>
-        </div>`:''}`;
+        </div>`:''}</div>`;
     }
 
     // SBD Modal
