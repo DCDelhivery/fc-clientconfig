@@ -770,7 +770,7 @@
     let zonesData = JSON.parse(sessionStorage.getItem('zonesData')||'[]');
     function getInventoryPage(){
       return `<div style="border:1px solid var(--border-light);border-radius:var(--radius);overflow:hidden;"><div class="content-header"><div><div class="content-title">Inventory</div><div class="content-subtitle">Zones, expiry, cycle count</div></div><div class="content-count">9 settings</div></div>
-        <div class="section-divider" style="display:flex;align-items:center;justify-content:space-between;"><div><div class="section-divider-title"><span class="material-icons-outlined">arrow_right</span>Zone and Locations</div><div class="section-divider-desc">Configure warehouse zones and their locations.</div></div><button class="btn-bulk" onclick="openUploadModal('Upload locations','bulk_locations')">Bulk upload</button></div>
+        <div class="section-divider" style="display:flex;align-items:center;justify-content:space-between;"><div><div class="section-divider-title"><span class="material-icons-outlined">arrow_right</span>Zone and Locations</div><div class="section-divider-desc">Configure warehouse zones and their locations.</div></div><div style="display:flex;gap:8px;"><button class="btn-bulk" id="btnDownloadAll" style="display:none;border:1px solid var(--border);background:var(--surface);color:var(--t1);" onclick="alert('Downloading all zones...')">Download all</button><button class="btn-bulk" onclick="openUploadModal('Upload locations','bulk_locations')">Bulk upload</button></div></div>
         <div style="padding:0 16px 16px;display:none;" id="zonesTableWrap"><div class="zones-wrap"><table class="zones-table"><thead><tr><th style="width:40px">S.No.</th><th style="width:160px">Zones</th><th>Locations</th></tr></thead><tbody id="zonesBody"></tbody></table></div></div>
         <div class="section-divider"><div class="section-divider-title"><span class="material-icons-outlined">arrow_right</span>Expiry Management</div><div class="section-divider-desc">How near-expiry and expired stock are handled.</div></div>
         <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Shelf-life check</div><div class="cfg-desc">System checks shelf life before moving items from Reserve to Prime.</div><span class="cfg-badge badge-fc">FC</span></div>
@@ -800,7 +800,7 @@
     function renderZones(){
       const tbody=document.getElementById('zonesBody');if(!tbody)return;
       const tableWrap=document.getElementById('zonesTableWrap');
-      if(zonesData.filter(z=>z.saved).length>0&&tableWrap){tableWrap.style.display='block';}
+      if(zonesData.filter(z=>z.saved).length>0&&tableWrap){tableWrap.style.display='block';const dlBtn=document.getElementById('btnDownloadAll');if(dlBtn)dlBtn.style.display='';}
       let html=zonesData.filter(z=>z.saved).map((z,i)=>{
         const pills=z.locations.slice(0,5).map(l=>`<span class="zone-pill">${l}</span>`).join('')+(z.locations.length>5?`<span class="zone-pill">+${z.locations.length-5}</span>`:'');
         return `<tr><td>${i+1}</td><td style="font-weight:500">${z.name}</td><td><div style="display:flex;gap:4px;flex-wrap:wrap;">${pills}</div></td></tr>`;
