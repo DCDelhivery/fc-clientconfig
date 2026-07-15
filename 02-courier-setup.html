@@ -1084,8 +1084,12 @@
     function toggleDay(fcName, day) {
       const days = fcData[fcName].days;
       const idx = days.indexOf(day);
-      if (idx >= 0) days.splice(idx, 1);
-      else days.push(day);
+      if (idx >= 0) {
+        if (days.length <= 1) return; // Don't allow all days to be unselected
+        days.splice(idx, 1);
+      } else {
+        days.push(day);
+      }
       renderFCTable();
     }
 

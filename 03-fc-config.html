@@ -368,20 +368,20 @@
         <div class="section-divider"><div class="section-divider-title"><span class="material-icons-outlined">arrow_right</span>Receiving Rules</div><div class="section-divider-desc">How operators receive stock against an AGN.</div></div>
         <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;">
-            <div class="cfg-row-left"><div class="cfg-label">Enable excess receiving</div><div class="cfg-desc">Operators can receive more than the expected AGN quantity.</div><span class="cfg-badge badge-client">Client</span></div>
+            <div class="cfg-row-left"><div class="cfg-label">Enable excess receiving</div><div class="cfg-desc">Allows operators to receive more than the expected AGN quantity, up to the configured tolerance.</div><span class="cfg-badge badge-client">Client</span></div>
             <div class="cfg-row-right"><div class="seg-group" id="excess-seg"><button class="seg-btn" onclick="setSeg('excess-seg','yes',showExcess)">Yes</button><button class="seg-btn" onclick="setSeg('excess-seg','no',hideExcess)">No</button></div></div>
           </div>
           <div class="cfg-reveal" id="excess-reveal">
-            <div><div class="cfg-reveal-label">Excess receiving tolerance</div><div class="cfg-warn">*Manager override required if this value exceeds 15%</div></div>
+            <div><div class="cfg-reveal-label">Excess receiving tolerance %</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">Sets the % qty that can be received above the AGN qty.</div><div class="cfg-warn">*Manager override required if this value exceeds 15%</div></div>
             <div style="display:flex;align-items:center;gap:4px;"><input class="tds-input" placeholder="Add and press enter" style="width:120px;"><span style="font-size:12px;color:var(--t2);">%</span></div>
           </div>
         </div>
-        <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Partial receiving</div><div class="cfg-desc">Receiving can finish even if not all items have arrived.</div><span class="cfg-badge badge-client">Client</span></div>
+        <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Enable partial receiving</div><div class="cfg-desc">Allows receiving of a single AGN in multiple batches.</div><span class="cfg-badge badge-client">Client</span></div>
           <div class="cfg-row-right"><div class="seg-group" id="partial-seg"><button class="seg-btn" onclick="setSeg('partial-seg','yes',null)">Yes</button><button class="seg-btn" onclick="setSeg('partial-seg','no',showPartialWarn)">No</button></div></div></div>
         <div id="partial-warn" style="display:none;padding:0 0 8px;font-size:11px;color:#B45309;font-weight:500;">*The entire expected quantity must be received in a single session.</div>
         <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;">
-            <div class="cfg-row-left"><div class="cfg-label">Rejection reasons</div><div class="cfg-desc">Reasons operators can select when rejecting an item.</div><span class="cfg-badge badge-client">Client</span></div>
+            <div class="cfg-row-left"><div class="cfg-label">Rejection reasons</div><div class="cfg-desc">User will have to select one of the configured reasons while receiving reject inventory.</div><span class="cfg-badge badge-client">Client</span></div>
             <div class="cfg-row-right"><div style="position:relative;" id="rejWrap"><div class="rej-trigger" onclick="toggleRejDD()"><span>Select reasons</span><span class="material-icons-outlined" style="font-size:16px;color:var(--t3);">expand_more</span></div>
               <div class="rej-dd" id="rejDD">
                 <div class="rej-opt" data-name="Major carton damage" onclick="addRej('Major carton damage')"><span>Major carton damage</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
@@ -395,13 +395,13 @@
         <div class="section-divider"><div class="section-divider-title"><span class="material-icons-outlined">arrow_right</span>Quality Check</div><div class="section-divider-desc">Inspection performed during inbound.</div></div>
         <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;">
-            <div class="cfg-row-left"><div class="cfg-label">Enable QC</div><div class="cfg-desc">Turn on the QC process for this client.</div><span class="cfg-badge badge-client">Client</span></div>
+            <div class="cfg-row-left"><div class="cfg-label">Do you perform quality checks during receiving</div><span class="cfg-badge badge-client">Client</span></div>
             <div class="cfg-row-right"><div class="seg-group" id="qc-enable-seg"><button class="seg-btn" onclick="setSeg('qc-enable-seg','yes',showQcSettings)">Yes</button><button class="seg-btn" onclick="setSeg('qc-enable-seg','no',hideQcSettings)">No</button></div></div>
           </div>
           <div class="cfg-reveal" id="qc-settings-reveal" style="flex-direction:column;gap:0;padding:0;margin-top:12px;">
             <div style="display:flex;flex-direction:column;padding:12px 16px;border-bottom:1px solid var(--border-light);">
               <div style="display:flex;align-items:flex-start;justify-content:space-between;">
-                <div class="cfg-row-left"><div class="cfg-label">QC instructions</div><div class="cfg-desc">Select QC instructions shown to operators during receiving.</div></div>
+                <div class="cfg-row-left"><div class="cfg-label">QC instructions</div><div class="cfg-desc">Select the QC instructions to show to operators during receiving.</div></div>
                 <div class="cfg-row-right"><div style="position:relative;" id="qcInstrWrap"><div class="rej-trigger" onclick="toggleQcInstrDD()"><span>Select instructions</span><span class="material-icons-outlined" style="font-size:16px;color:var(--t3);">expand_more</span></div>
                   <div class="rej-dd" id="qcInstrDD">
                     <div class="rej-opt" data-name="Inspect packaging for visible damage" onclick="addQcInstr('Inspect packaging for visible damage')"><span>Inspect packaging for visible damage</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
@@ -414,15 +414,15 @@
               <div id="qcInstrChips" style="display:none;"></div>
             </div>
             <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border-light);">
-              <div class="cfg-row-left"><div class="cfg-label">Enable QC parameters</div><div class="cfg-desc">Show pass/fail parameter fields to operators during QC.</div><div id="qcparam-warn" style="display:none;padding:6px 0 0;font-size:11px;color:#B45309;font-weight:500;">*SKU level QC parameters can be set up in the product catalog</div></div>
+              <div class="cfg-row-left"><div class="cfg-label">Enable QC checklist</div><div class="cfg-desc">Require pass/fail checks using QC parameters during receiving.</div><div id="qcparam-warn" style="display:none;padding:6px 0 0;font-size:11px;color:#B45309;font-weight:500;">*SKU level QC parameters can be set up in the product catalog</div></div>
               <div class="cfg-row-right"><div class="seg-group" id="qcparam-seg"><button class="seg-btn" onclick="setSeg('qcparam-seg','yes',()=>document.getElementById('qcparam-warn').style.display='block')">Yes</button><button class="seg-btn" onclick="setSeg('qcparam-seg','no',()=>document.getElementById('qcparam-warn').style.display='none')">No</button></div></div>
             </div>
             <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border-light);">
-              <div class="cfg-row-left"><div class="cfg-label">Failed parameter images</div><div class="cfg-desc">Require image upload when a QC parameter fails.</div></div>
+              <div class="cfg-row-left"><div class="cfg-label">Enable Failed Parameter Images</div><div class="cfg-desc">Require operators to upload an image when a QC parameter fails.</div></div>
               <div class="cfg-row-right"><div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">No</button></div></div>
             </div>
             <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:12px 16px;">
-              <div class="cfg-row-left"><div class="cfg-label">One unit at a time</div><div class="cfg-desc">Capture QC one unit at a time instead of bulk.</div></div>
+              <div class="cfg-row-left"><div class="cfg-label">One unit at a time</div><div class="cfg-desc">Restrict the operator to receive inventory only one unit at a time.</div></div>
               <div class="cfg-row-right"><div class="seg-group" id="oneunit-seg"><button class="seg-btn" onclick="setSeg('oneunit-seg','yes',showOneUnit)">Yes</button><button class="seg-btn" onclick="setSeg('oneunit-seg','no',hideOneUnit)">No</button></div></div>
             </div>
             <div id="oneunit-warn" style="display:none;padding:0 16px 8px;font-size:11px;color:#B45309;font-weight:500;">*Receiving may take longer because operators must perform QC one unit at a time.</div>
