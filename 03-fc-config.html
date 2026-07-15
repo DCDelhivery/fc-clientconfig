@@ -104,6 +104,11 @@
     .add-link{font-size:12px;font-weight:500;color:#0066CC;cursor:pointer;margin-top:4px;}
     .info-wrap:hover .info-tip{opacity:1!important;}
 
+    /* TDS Tooltip */
+    .info-icon{position:relative;}
+    .info-tooltip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);padding:8px 12px;background:var(--t1);color:#fff;font-size:11px;font-weight:400;border-radius:4px;white-space:normal;width:200px;line-height:1.4;opacity:0;pointer-events:none;transition:opacity 0.15s;z-index:200;text-transform:none;letter-spacing:normal;}
+    .info-icon:hover .info-tooltip{opacity:1;}
+
     /* Zones Table */
     .zones-wrap{border:1px solid var(--border-light);border-radius:var(--radius);overflow:visible;}
     .zones-table{width:100%;border-collapse:collapse;}
@@ -444,15 +449,19 @@
 
     // Shelf life bucket table
     let shelfBuckets=[];
-    function addShelfBucket(){
-      const sel=document.getElementById('shelfBucketSelect');if(!sel||!sel.value)return;
-      if(shelfBuckets.includes(sel.value))return;
-      shelfBuckets.push(sel.value);
-      sel.value='';
+    function addShelfBucket(name){
+      if(!name||shelfBuckets.includes(name))return;
+      shelfBuckets.push(name);
+      // Hide added option
+      document.querySelectorAll('#shelfBucketDD .rej-opt').forEach(o=>{if(o.getAttribute('data-name')===name)o.style.display='none';});
+      document.getElementById('shelfBucketDD').classList.remove('open');
       renderShelfBucketTable();
     }
     function removeShelfBucket(idx){
+      const name=shelfBuckets[idx];
       shelfBuckets.splice(idx,1);
+      // Show option back in dropdown
+      document.querySelectorAll('#shelfBucketDD .rej-opt').forEach(o=>{if(o.getAttribute('data-name')===name)o.style.display='flex';});
       renderShelfBucketTable();
     }
     function renderShelfBucketTable(){
@@ -477,7 +486,8 @@
     function toggleRejDD(){document.getElementById('rejDD').classList.toggle('open');}
     document.addEventListener('click',e=>{const w=document.getElementById('rejWrap');if(w&&!w.contains(e.target))document.getElementById('rejDD')?.classList.remove('open');
       const p=document.getElementById('packWrap');if(p&&!p.contains(e.target))document.getElementById('packDD')?.classList.remove('open');
-      const q=document.getElementById('qcInstrWrap');if(q&&!q.contains(e.target))document.getElementById('qcInstrDD')?.classList.remove('open');});
+      const q=document.getElementById('qcInstrWrap');if(q&&!q.contains(e.target))document.getElementById('qcInstrDD')?.classList.remove('open');
+      const sb=document.getElementById('shelfBucketWrap');if(sb&&!sb.contains(e.target))document.getElementById('shelfBucketDD')?.classList.remove('open');});
     function addRej(n){if(rejReasons.includes(n))return;rejReasons.push(n);sessionStorage.setItem('rejReasons',JSON.stringify(rejReasons));renderRejChips();document.querySelectorAll('#rejDD .rej-opt').forEach(o=>{o.style.display=rejReasons.includes(o.getAttribute('data-name'))?'none':'flex';});}
     function removeRej(n){rejReasons=rejReasons.filter(r=>r!==n);sessionStorage.setItem('rejReasons',JSON.stringify(rejReasons));renderRejChips();document.querySelectorAll('#rejDD .rej-opt').forEach(o=>{o.style.display=rejReasons.includes(o.getAttribute('data-name'))?'none':'flex';});}
 
@@ -881,15 +891,14 @@
               </div>
               <div id="shelflife-config" style="display:none;margin-top:12px;padding:16px;background:#F0F1F3;border-radius:4px;">
                 <div style="font-size:12px;font-weight:600;margin-bottom:8px;">External buckets</div>
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-                  <select class="tds-select" id="shelfBucketSelect" style="flex:1;">
-                    <option value="">Select external bucket</option>
-                    <option>AQUALOGICA_D2C</option>
-                    <option>BBLUNT_D2C</option>
-                    <option>FLIPKART_B2C</option>
-                    <option>NYKAA_B2C</option>
-                  </select>
-                  <button style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:4px;background:var(--surface);cursor:pointer;" onclick="addShelfBucket()"><span class="material-icons-outlined" style="font-size:16px;color:var(--t1);">add</span></button>
+                <div style="position:relative;margin-bottom:12px;" id="shelfBucketWrap">
+                  <div class="rej-trigger" onclick="document.getElementById('shelfBucketDD').classList.toggle('open')"><span>Select external bucket</span><span class="material-icons-outlined" style="font-size:16px;color:var(--t3);">expand_more</span></div>
+                  <div class="rej-dd" id="shelfBucketDD">
+                    <div class="rej-opt" data-name="AQUALOGICA_D2C" onclick="addShelfBucket('AQUALOGICA_D2C')"><span>AQUALOGICA_D2C</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
+                    <div class="rej-opt" data-name="BBLUNT_D2C" onclick="addShelfBucket('BBLUNT_D2C')"><span>BBLUNT_D2C</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
+                    <div class="rej-opt" data-name="FLIPKART_B2C" onclick="addShelfBucket('FLIPKART_B2C')"><span>FLIPKART_B2C</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
+                    <div class="rej-opt" data-name="NYKAA_B2C" onclick="addShelfBucket('NYKAA_B2C')"><span>NYKAA_B2C</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
+                  </div>
                 </div>
                 <div id="shelfBucketTableWrap" style="display:none;">
                   <div style="overflow-x:auto;">
@@ -897,9 +906,9 @@
                       <thead style="background:#F7F8FA;">
                         <tr>
                           <th style="padding:8px 10px;font-size:10px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">External bucket</th>
-                          <th style="padding:8px 10px;font-size:10px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Min shelf life% <span class="material-icons-outlined" style="font-size:12px;color:var(--t3);cursor:help;vertical-align:middle;" title="Minimum remaining shelf life (%) required for inventory to be stored in the Prime location.">info</span></th>
-                          <th style="padding:8px 10px;font-size:10px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Preferred shelf life <span class="material-icons-outlined" style="font-size:12px;color:var(--t3);cursor:help;vertical-align:middle;" title="Inventory with this shelf life or higher is considered fresh and gets priority for Prime locations.">info</span></th>
-                          <th style="padding:8px 10px;font-size:10px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Prime capacity for older inv. <span class="material-icons-outlined" style="font-size:12px;color:var(--t3);cursor:help;vertical-align:middle;" title="Percentage of Prime capacity reserved for inventory with remaining shelf life between the minimum and preferred shelf-life thresholds.">info</span></th>
+                          <th style="padding:8px 10px;font-size:10px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Min shelf life% <span class="material-icons-outlined info-icon" style="font-size:12px;color:var(--t3);cursor:help;vertical-align:middle;position:relative;">info<span class="info-tooltip">Minimum remaining shelf life (%) required for inventory to be stored in the Prime location.</span></span></th>
+                          <th style="padding:8px 10px;font-size:10px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Preferred shelf life <span class="material-icons-outlined info-icon" style="font-size:12px;color:var(--t3);cursor:help;vertical-align:middle;position:relative;">info<span class="info-tooltip">Inventory with this shelf life or higher is considered fresh and gets priority for Prime locations.</span></span></th>
+                          <th style="padding:8px 10px;font-size:10px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Prime capacity for older inv. <span class="material-icons-outlined info-icon" style="font-size:12px;color:var(--t3);cursor:help;vertical-align:middle;position:relative;">info<span class="info-tooltip">Percentage of Prime capacity reserved for inventory with remaining shelf life between the minimum and preferred shelf-life thresholds.</span></span></th>
                           <th style="padding:8px 10px;font-size:10px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">Action</th>
                         </tr>
                       </thead>
