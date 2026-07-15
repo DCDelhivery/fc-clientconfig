@@ -1098,6 +1098,7 @@
       {courier:'Local Fleet Delhivery', p1:'14:00',p2:'14:00',p3:'14:00',p4:'14:00',p5:'14:00', saved:true}
     ];
     let surgePeriod = '30';
+    let surgeMultiplier = '1.5';
 
     function openSBDModal(){
       const existing = document.getElementById('sbdModal');
@@ -1114,7 +1115,6 @@
           <!-- SBD Courier Offset -->
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
             <div><div style="font-size:13px;font-weight:600;">SBD courier offset</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">Buffer days added per courier for SBD calculation.</div></div>
-            <button class="zone-edit-btn" onclick="editSBDOffsets()"><span class="material-icons-outlined" style="font-size:13px">edit</span></button>
           </div>
           <div style="border:1px solid var(--border-light);border-radius:6px;overflow:hidden;margin-bottom:20px;">
             <table style="width:100%;border-collapse:collapse;">
@@ -1125,7 +1125,6 @@
           <!-- SBD Courier Cutoff -->
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
             <div><div style="font-size:13px;font-weight:600;">SBD Courier cutoff</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">Buffer days added per courier for SBD calculation. Surface typically needs more days than Express.</div></div>
-            <button class="zone-edit-btn" onclick="editSBDCutoffs()"><span class="material-icons-outlined" style="font-size:13px">edit</span></button>
           </div>
           <div style="border:1px solid var(--border-light);border-radius:6px;overflow:hidden;margin-bottom:20px;">
             <table style="width:100%;border-collapse:collapse;">
@@ -1137,6 +1136,10 @@
           <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid var(--border-light);">
             <div><div style="font-size:13px;font-weight:600;">Surge period (days)</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">How many end-of-month days the surge config applies to.</div></div>
             <input class="tds-input" value="${surgePeriod}" style="width:100px;text-align:center;" onchange="surgePeriod=this.value"> 
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid var(--border-light);">
+            <div><div style="font-size:13px;font-weight:600;">Surge Multiplier</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">Multiplier applied to daily capacity during surge period.</div></div>
+            <input class="tds-input" value="${surgeMultiplier}" style="width:100px;text-align:center;" onchange="surgeMultiplier=this.value"> 
           </div>
         </div>
         <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:14px 24px;border-top:1px solid var(--border-light);">
@@ -1152,50 +1155,31 @@
     function renderSBDOffsets(){
       const tbody=document.getElementById('sbdOffsetBody');if(!tbody)return;
       tbody.innerHTML=sbdOffsets.map((r,i)=>{
-        if(r.editing){
-          return `<tr style="border-bottom:1px solid var(--border-light);">
-            <td style="padding:8px 14px;font-size:12px;">${r.courier}</td>
-            <td style="padding:8px 14px;"><input class="tds-input" value="${r.days}" style="width:60px;text-align:center;" id="offsetInput${i}"></td>
-            <td style="padding:8px 14px;text-align:center;"><button class="zone-save-btn" onclick="saveOffset(${i})">Save</button></td>
-          </tr>`;
-        }
         return `<tr style="border-bottom:1px solid var(--border-light);">
-          <td style="padding:8px 14px;font-size:12px;">${r.courier}</td>
-          <td style="padding:8px 14px;font-size:12px;">${r.days}</td>
-          <td style="padding:8px 14px;text-align:center;"><button class="zone-edit-btn" onclick="editOffset(${i})"><span class="material-icons-outlined" style="font-size:13px">edit</span></button></td>
-        </tr>`;
+            <td style="padding:8px 14px;font-size:12px;">${r.courier}</td>
+            <td style="padding:8px 14px;"><input class="tds-input" value="${r.days}" style="width:60px;text-align:center;" onchange="sbdOffsets[${i}].days=this.value"></td>
+          </tr>`;
       }).join('');
     }
-    function editOffset(i){sbdOffsets[i].editing=true;renderSBDOffsets();}
-    function saveOffset(i){sbdOffsets[i].days=document.getElementById('offsetInput'+i).value;sbdOffsets[i].editing=false;renderSBDOffsets();}
+    function editOffset(i){renderSBDOffsets();}
+    function saveOffset(i){renderSBDOffsets();}
 
     function renderSBDCutoffs(){
       const tbody=document.getElementById('sbdCutoffBody');if(!tbody)return;
       tbody.innerHTML=sbdCutoffs.map((r,i)=>{
-        if(r.editing){
-          return `<tr style="border-bottom:1px solid var(--border-light);">
-            <td style="padding:8px 12px;font-size:12px;">${r.courier}</td>
-            <td style="padding:8px 12px;"><input class="tds-input" value="${r.p1}" style="width:50px;text-align:center;" id="cutP1_${i}"></td>
-            <td style="padding:8px 12px;"><input class="tds-input" value="${r.p2}" style="width:50px;text-align:center;" id="cutP2_${i}"></td>
-            <td style="padding:8px 12px;"><input class="tds-input" value="${r.p3}" style="width:50px;text-align:center;" id="cutP3_${i}"></td>
-            <td style="padding:8px 12px;"><input class="tds-input" value="${r.p4}" style="width:50px;text-align:center;" id="cutP4_${i}"></td>
-            <td style="padding:8px 12px;"><input class="tds-input" value="${r.p5}" style="width:50px;text-align:center;" id="cutP5_${i}"></td>
-            <td style="padding:8px 12px;text-align:center;"><button class="zone-save-btn" onclick="saveCutoff(${i})">Save</button></td>
-          </tr>`;
-        }
         return `<tr style="border-bottom:1px solid var(--border-light);">
-          <td style="padding:8px 12px;font-size:12px;">${r.courier}</td>
-          <td style="padding:8px 12px;font-size:12px;">${r.p1}</td>
-          <td style="padding:8px 12px;font-size:12px;">${r.p2}</td>
-          <td style="padding:8px 12px;font-size:12px;">${r.p3}</td>
-          <td style="padding:8px 12px;font-size:12px;">${r.p4}</td>
-          <td style="padding:8px 12px;font-size:12px;">${r.p5}</td>
-        </tr>`;
+            <td style="padding:8px 12px;font-size:12px;">${r.courier}</td>
+            <td style="padding:8px 12px;"><input class="tds-input" value="${r.p1}" style="width:50px;text-align:center;" onchange="sbdCutoffs[${i}].p1=this.value"></td>
+            <td style="padding:8px 12px;"><input class="tds-input" value="${r.p2}" style="width:50px;text-align:center;" onchange="sbdCutoffs[${i}].p2=this.value"></td>
+            <td style="padding:8px 12px;"><input class="tds-input" value="${r.p3}" style="width:50px;text-align:center;" onchange="sbdCutoffs[${i}].p3=this.value"></td>
+            <td style="padding:8px 12px;"><input class="tds-input" value="${r.p4}" style="width:50px;text-align:center;" onchange="sbdCutoffs[${i}].p4=this.value"></td>
+            <td style="padding:8px 12px;"><input class="tds-input" value="${r.p5}" style="width:50px;text-align:center;" onchange="sbdCutoffs[${i}].p5=this.value"></td>
+          </tr>`;
       }).join('');
     }
-    function editSBDOffsets(){sbdOffsets.forEach(r=>r.editing=true);renderSBDOffsets();}
-    function editSBDCutoffs(){sbdCutoffs.forEach(r=>r.editing=true);renderSBDCutoffs();}
-    function saveCutoff(i){sbdCutoffs[i].p1=document.getElementById('cutP1_'+i).value;sbdCutoffs[i].p2=document.getElementById('cutP2_'+i).value;sbdCutoffs[i].p3=document.getElementById('cutP3_'+i).value;sbdCutoffs[i].p4=document.getElementById('cutP4_'+i).value;sbdCutoffs[i].p5=document.getElementById('cutP5_'+i).value;sbdCutoffs[i].editing=false;renderSBDCutoffs();}
+    function editSBDOffsets(){renderSBDOffsets();}
+    function editSBDCutoffs(){renderSBDCutoffs();}
+    function saveCutoff(i){renderSBDCutoffs();}
 
     // Observer for zones table
     const _contentEl=document.getElementById('contentArea');
