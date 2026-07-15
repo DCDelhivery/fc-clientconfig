@@ -277,9 +277,35 @@
     function renderAll(){renderFCNav();renderStepper();renderContent();updateFooter();}
     function updateFooter(){
       const btn=document.getElementById('btnContinue');
+      const backBtn=document.getElementById('btnBack');
       if(activeStep==='outbound'){btn.textContent='Review';}
       else{btn.textContent='Save & proceed';}
+      // Previous button: disabled on inbound, enabled on inventory/outbound
+      if(activeStep==='inbound'){
+        backBtn.style.color='var(--t3)';backBtn.style.cursor='not-allowed';backBtn.disabled=true;
+      } else {
+        backBtn.style.color='var(--t2)';backBtn.style.cursor='pointer';backBtn.disabled=false;
+      }
+      // Save & proceed: check if all toggles on current page have been clicked
+      checkAllSettingsFilled();
     }
+    function checkAllSettingsFilled(){
+      const btn=document.getElementById('btnContinue');
+      const segs=document.querySelectorAll('#contentArea .seg-group');
+      let allFilled=true;
+      segs.forEach(seg=>{
+        if(!seg.querySelector('.seg-btn.active'))allFilled=false;
+      });
+      if(allFilled && segs.length>0){
+        btn.style.background='var(--t1)';btn.style.color='#fff';btn.style.cursor='pointer';btn.disabled=false;
+      } else {
+        btn.style.background='var(--border)';btn.style.color='var(--t3)';btn.style.cursor='not-allowed';btn.disabled=true;
+      }
+    }
+    // Listen for toggle clicks to re-check
+    document.addEventListener('click',function(e){
+      if(e.target.classList.contains('seg-btn')){setTimeout(checkAllSettingsFilled,50);}
+    });
 
     // ===== STATE PERSISTENCE =====
     // Store all toggle/input states per FC+step so they persist when navigating
@@ -866,7 +892,24 @@
                 </div>
               </div>`;
             }
-            return `<div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Pickwave Automation</div><div class="cfg-desc">Configure pickwave schedule, order complexity, capacity and grouping.</div><span class="cfg-badge badge-fc">FC</span></div><div class="cfg-row-right"><button class="btn-bulk" onclick="openPickwaveModal()">Configure</button></div></div>`;
+            return `<div class="cfg-row" style="flex-direction:column;align-items:stretch;padding-right:16px;">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+                <div class="cfg-row-left"><div class="cfg-label">Pickwave Automation</div><div class="cfg-desc">Configure pickwave schedule, order complexity, capacity and grouping.</div><span class="cfg-badge badge-fc">FC</span></div>
+                <div class="cfg-row-right"><button class="btn-bulk" onclick="openPickwaveModal()">Edit config</button></div>
+              </div>
+              <div style="margin-top:12px;padding:16px;background:#FAFAFA;border-radius:4px;">
+                <div style="font-size:12px;font-weight:600;margin-bottom:4px;">Pickwave schedule</div>
+                <div style="font-size:11px;color:var(--t3);margin-bottom:8px;">Frequency: Every 30 minutes</div>
+                <div style="font-size:12px;font-weight:600;margin-bottom:4px;margin-top:12px;">Order complexity</div>
+                <table style="width:100%;border-collapse:collapse;margin-bottom:12px;"><thead style="background:#F7F8FA;"><tr><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Type</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">Max SKU</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">Max Qty</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">Picklist Qty</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">Picklist Loc</th></tr></thead><tbody>
+                  <tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border-light);">Simple</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">1</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">8</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">1</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">6</td></tr>
+                  <tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border-light);">Complex</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">2+</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">100</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">1</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">6</td></tr>
+                  <tr><td style="padding:8px 12px;font-size:12px;">Bulk</td><td style="padding:8px 12px;font-size:12px;text-align:center;">—</td><td style="padding:8px 12px;font-size:12px;text-align:center;">1000</td><td style="padding:8px 12px;font-size:12px;text-align:center;">1000</td><td style="padding:8px 12px;font-size:12px;text-align:center;">—</td></tr>
+                </tbody></table>
+                <div style="font-size:12px;font-weight:600;margin-bottom:4px;">Group by</div>
+                <div style="font-size:11px;color:var(--t3);">Priority: Enabled &nbsp;|&nbsp; Channel: Disabled</div>
+              </div>
+            </div>`;
           }
           if(s==='Enable LR consolidation') {
             return `<div class="cfg-row" style="flex-direction:column;align-items:stretch;">
