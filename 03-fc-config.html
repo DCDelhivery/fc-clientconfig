@@ -105,8 +105,8 @@
     .info-wrap:hover .info-tip{opacity:1!important;}
 
     /* TDS Tooltip */
-    .info-icon{position:relative;}
-    .info-tooltip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);padding:8px 12px;background:var(--t1);color:#fff;font-size:11px;font-weight:400;border-radius:4px;white-space:normal;width:200px;line-height:1.4;opacity:0;pointer-events:none;transition:opacity 0.15s;z-index:200;text-transform:none;letter-spacing:normal;}
+    .info-icon{position:relative;display:inline-flex;align-items:center;}
+    .info-tooltip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);padding:8px 12px;background:var(--t1);color:#fff;font-size:11px;font-weight:400;border-radius:4px;white-space:normal;width:220px;line-height:1.4;opacity:0;pointer-events:none;transition:opacity 0.15s;z-index:9999;text-transform:none;letter-spacing:normal;}
     .info-icon:hover .info-tooltip{opacity:1;}
 
     /* Zones Table */
@@ -464,19 +464,30 @@
       document.querySelectorAll('#shelfBucketDD .rej-opt').forEach(o=>{if(o.getAttribute('data-name')===name)o.style.display='flex';});
       renderShelfBucketTable();
     }
+    let shelfBucketData={};
     function renderShelfBucketTable(){
       const wrap=document.getElementById('shelfBucketTableWrap');
       const tbody=document.getElementById('shelfBucketBody');
       if(!wrap||!tbody)return;
       if(shelfBuckets.length===0){wrap.style.display='none';return;}
       wrap.style.display='block';
-      tbody.innerHTML=shelfBuckets.map((b,i)=>`<tr>
+      // Save current input values before re-render
+      shelfBuckets.forEach(b=>{
+        const row=document.querySelector(`[data-bucket="${b}"]`);
+        if(row){
+          const inputs=row.querySelectorAll('input');
+          shelfBucketData[b]={min:inputs[0]?.value||'',pref:inputs[1]?.value||'',prime:inputs[2]?.value||''};
+        }
+      });
+      tbody.innerHTML=shelfBuckets.map((b,i)=>{
+        const d=shelfBucketData[b]||{min:'',pref:'',prime:''};
+        return `<tr data-bucket="${b}">
         <td style="padding:8px 10px;font-size:12px;font-weight:500;border-bottom:1px solid var(--border-light);">${b}</td>
-        <td style="padding:8px 10px;border-bottom:1px solid var(--border-light);"><input class="tds-input" type="text" style="width:80px;" placeholder="%" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value==='0')this.value=''"></td>
-        <td style="padding:8px 10px;border-bottom:1px solid var(--border-light);"><input class="tds-input" type="text" style="width:80px;" placeholder="%" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value==='0')this.value=''"></td>
-        <td style="padding:8px 10px;border-bottom:1px solid var(--border-light);"><input class="tds-input" type="text" style="width:80px;" placeholder="%" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value==='0')this.value=''"></td>
+        <td style="padding:8px 10px;border-bottom:1px solid var(--border-light);"><input class="tds-input" type="text" style="width:80px;" placeholder="%" value="${d.min}" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value==='0')this.value=''"></td>
+        <td style="padding:8px 10px;border-bottom:1px solid var(--border-light);"><input class="tds-input" type="text" style="width:80px;" placeholder="%" value="${d.pref}" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value==='0')this.value=''"></td>
+        <td style="padding:8px 10px;border-bottom:1px solid var(--border-light);"><input class="tds-input" type="text" style="width:80px;" placeholder="%" value="${d.prime}" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value==='0')this.value=''"></td>
         <td style="padding:8px 10px;text-align:center;border-bottom:1px solid var(--border-light);"><button style="border:1px solid var(--border);border-radius:4px;background:var(--surface);width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;" onclick="removeShelfBucket(${i})"><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">delete</span></button></td>
-      </tr>`).join('');
+      </tr>`;}).join('');
     }
     function showPartialWarn(){document.getElementById('partial-warn').style.display='block';}
     function showOneUnit(){document.getElementById('oneunit-warn').style.display='block';document.getElementById('oneunit-scope').classList.add('show');}
@@ -889,7 +900,7 @@
                 <div class="cfg-row-left"><div class="cfg-label">Shelf-life check</div><div class="cfg-desc">System checks shelf life before moving items from Reserve to Prime.</div></div>
                 <div class="cfg-row-right"><div class="seg-group" id="shelflife-seg"><button class="seg-btn" onclick="setSeg('shelflife-seg','yes',showShelfLifeConfig)">Yes</button><button class="seg-btn" onclick="setSeg('shelflife-seg','no',hideShelfLifeConfig)">No</button></div></div>
               </div>
-              <div id="shelflife-config" style="display:none;margin-top:12px;padding:16px;background:#F0F1F3;border-radius:4px;">
+              <div id="shelflife-config" style="display:none;margin-top:12px;padding:16px;background:#F0F1F3;border-radius:4px;overflow:visible;">
                 <div style="font-size:12px;font-weight:600;margin-bottom:8px;">External buckets</div>
                 <div style="position:relative;margin-bottom:12px;width:250px;" id="shelfBucketWrap">
                   <div class="rej-trigger" onclick="document.getElementById('shelfBucketDD').classList.toggle('open')"><span>Select external bucket</span><span class="material-icons-outlined" style="font-size:16px;color:var(--t3);">expand_more</span></div>
@@ -901,7 +912,7 @@
                   </div>
                 </div>
                 <div id="shelfBucketTableWrap" style="display:none;">
-                  <div style="overflow-x:auto;">
+                  <div style="overflow:visible;">
                     <table style="width:100%;border-collapse:collapse;font-size:12px;">
                       <thead style="background:#F7F8FA;">
                         <tr>
