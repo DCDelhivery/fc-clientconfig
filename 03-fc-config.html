@@ -276,8 +276,8 @@
 
     function renderAll(){renderFCNav();renderStepper();renderContent();updateFooter();}
     function updateFooter(){
-      const btn=document.getElementById('btnContinue');
-      const backBtn=document.getElementById('btnBack');
+      const btn=document.getElementById('btnContinue');if(!btn)return;
+      const backBtn=document.getElementById('btnBack');if(!backBtn)return;
       if(activeStep==='outbound'){btn.textContent='Review';}
       else{btn.textContent='Save & proceed';}
       // Previous button: disabled on inbound, enabled on inventory/outbound
@@ -290,7 +290,7 @@
       checkAllSettingsFilled();
     }
     function checkAllSettingsFilled(){
-      const btn=document.getElementById('btnContinue');
+      const btn=document.getElementById('btnContinue');if(!btn)return;
       const segs=document.querySelectorAll('#contentArea .seg-group');
       let allFilled=true;
       segs.forEach(seg=>{
@@ -1092,8 +1092,8 @@
     function saveCutoff(i){sbdCutoffs[i].p1=document.getElementById('cutP1_'+i).value;sbdCutoffs[i].p2=document.getElementById('cutP2_'+i).value;sbdCutoffs[i].p3=document.getElementById('cutP3_'+i).value;sbdCutoffs[i].p4=document.getElementById('cutP4_'+i).value;sbdCutoffs[i].p5=document.getElementById('cutP5_'+i).value;sbdCutoffs[i].editing=false;renderSBDCutoffs();}
 
     // Observer for zones table
-    const obs=new MutationObserver(()=>{if(document.getElementById('zonesBody'))renderZones();});
-    obs.observe(document.getElementById('contentArea'),{childList:true});
+    const _contentEl=document.getElementById('contentArea');
+    if(_contentEl){const obs=new MutationObserver(()=>{if(document.getElementById('zonesBody'))renderZones();});obs.observe(_contentEl,{childList:true});}
 
     renderAll();
     setTimeout(restoreState, 100);
