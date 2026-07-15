@@ -470,7 +470,7 @@
   <!-- ===== Creation Module Header ===== -->
   <header class="creation-header">
     <div class="creation-header-left">
-      <h1>Mamaearth Ltd</h1>
+      <h1 id="clientNameHeader">Mamaearth Ltd</h1>
       <div class="subtitle">
         Client & FC configuration
         <span class="pill">Draft</span>
@@ -808,6 +808,22 @@
   </div>
 
   <script>
+    // ===== Set client name from localStorage =====
+    const activeClientName = localStorage.getItem('activeClient') || 'Mamaearth Ltd';
+    document.getElementById('clientNameHeader').textContent = activeClientName;
+
+    // ===== Pre-fill data for Mahindra (active client) =====
+    const clientStatus = localStorage.getItem('clientStatus');
+    if (clientStatus === 'active') {
+      // Set default data for active client
+      localStorage.setItem('clientMappingState', JSON.stringify({
+        currentStep: 'courier',
+        steps: ['courier', 'channel', 'fc'],
+        items: { courier: ['DELHIVERY_LTL', 'DELHIVERY_FTL', 'PLATFORM_DISPATCHER'], channel: ['Flipkart', 'Paytm'], fc: ['GGNFC14', 'BLRFC14'] },
+        pendingDelete: null
+      }));
+    }
+
     // ===== State (persisted in localStorage) =====
     const savedState = JSON.parse(localStorage.getItem('clientMappingState') || 'null');
     const state = savedState || {

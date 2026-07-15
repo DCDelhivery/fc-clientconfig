@@ -141,7 +141,7 @@
 <body>
   <header class="header">
     <div class="header-left">
-      <h1>Mamaearth Ltd</h1>
+      <h1 id="fcClientNameHeader">Mamaearth Ltd</h1>
       <div class="subtitle">Client & FC configuration <span class="pill">Draft</span></div>
     </div>
     <div class="header-right">
@@ -175,6 +175,10 @@
   </footer>
 
   <script>
+    // Set client name
+    const fcClientName = localStorage.getItem('activeClient') || 'Mamaearth Ltd';
+    document.getElementById('fcClientNameHeader').textContent = fcClientName;
+
     const selectedFCs = JSON.parse(localStorage.getItem('selectedFCs')||'["GGNFC14","GGNFC12"]');
     const steps = [
       {id:'inbound', label:'Inbound', desc:'Receiving, QC'},
