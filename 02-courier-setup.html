@@ -1108,9 +1108,9 @@
               <td>${idx + 1}</td>
               <td>${fc}</td>
               <td><div class="day-pills">${dayPillsHtml}</div></td>
-              <td><input class="capacity-input" type="number" value="${data.orderCap}" onchange="fcData['${fc}'].orderCap=this.value"></td>
-              <td><input class="capacity-input" type="number" value="${data.orderlineCap}" onchange="fcData['${fc}'].orderlineCap=this.value"></td>
-              <td><input class="capacity-input" type="number" value="${data.qtyCap}" onchange="fcData['${fc}'].qtyCap=this.value"></td>
+              <td><input class="capacity-input" type="number" min="1" step="1" value="${data.orderCap}" onchange="this.value=Math.max(1,Math.round(Math.abs(this.value)));fcData['${fc}'].orderCap=this.value"></td>
+              <td><input class="capacity-input" type="number" min="1" step="1" value="${data.orderlineCap}" onchange="this.value=Math.max(1,Math.round(Math.abs(this.value)));fcData['${fc}'].orderlineCap=this.value"></td>
+              <td><input class="capacity-input" type="number" min="1" step="1" value="${data.qtyCap}" onchange="this.value=Math.max(1,Math.round(Math.abs(this.value)));fcData['${fc}'].qtyCap=this.value"></td>
               <td style="text-align:center">
                 <button class="btn-delete" onclick="confirmDelete('fc', '${fc}')">
                   <span class="material-icons-outlined">delete_outline</span>

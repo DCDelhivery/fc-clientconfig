@@ -98,7 +98,7 @@
     .tds-select:focus{outline:none;border-color:var(--t1);}
 
     /* Pills */
-    .pill-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#F5F5F7;border:1px solid var(--border-light);border-radius:100px;font-size:11px;font-weight:500;color:var(--t1);}
+    .pill-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#F0F1F3;border:1px solid var(--border);border-radius:100px;font-size:11px;font-weight:500;color:var(--t1);}
     .pill-chip .remove{font-size:13px;color:var(--t3);cursor:pointer;}
     .pill-chip .remove:hover{color:var(--primary);}
     .add-link{font-size:12px;font-weight:500;color:#0066CC;cursor:pointer;margin-top:4px;}
@@ -269,7 +269,7 @@
     // Content
     function renderContent(){
       const area = document.getElementById('contentArea');
-      if(activeStep==='inbound') { area.innerHTML = getInboundPage(); setTimeout(()=>renderRejChips(),50); }
+      if(activeStep==='inbound') { area.innerHTML = getInboundPage(); setTimeout(()=>{renderRejChips();renderQcInstrChips();},50); }
       else if(activeStep==='inventory') { area.innerHTML = getInventoryPage(); }
       else { area.innerHTML = getOutboundPage(); setTimeout(()=>renderPackChips(),50); }
     }
@@ -399,9 +399,19 @@
             <div class="cfg-row-right"><div class="seg-group" id="qc-enable-seg"><button class="seg-btn" onclick="setSeg('qc-enable-seg','yes',showQcSettings)">Yes</button><button class="seg-btn" onclick="setSeg('qc-enable-seg','no',hideQcSettings)">No</button></div></div>
           </div>
           <div class="cfg-reveal" id="qc-settings-reveal" style="flex-direction:column;gap:0;padding:0;margin-top:12px;">
-            <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border-light);">
-              <div class="cfg-row-left"><div class="cfg-label" style="display:flex;align-items:center;gap:6px;">QC instructions <span style="position:relative;display:inline-flex;" class="info-wrap"><span class="material-icons-outlined" style="font-size:15px;color:var(--t3);cursor:help;">info</span><span class="info-tip" style="position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);padding:8px 12px;background:var(--t1);color:#fff;font-size:11px;border-radius:4px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity 0.15s;z-index:200;">SKU level QC instructions can be set up in the product catalog</span></span></div><div class="cfg-desc">Show QC instructions to operators during receiving.</div></div>
-              <div class="cfg-row-right"><div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">No</button></div></div>
+            <div style="display:flex;flex-direction:column;padding:12px 16px;border-bottom:1px solid var(--border-light);">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+                <div class="cfg-row-left"><div class="cfg-label">QC instructions</div><div class="cfg-desc">Select QC instructions shown to operators during receiving.</div></div>
+                <div class="cfg-row-right"><div style="position:relative;" id="qcInstrWrap"><div class="rej-trigger" onclick="toggleQcInstrDD()"><span>Select instructions</span><span class="material-icons-outlined" style="font-size:16px;color:var(--t3);">expand_more</span></div>
+                  <div class="rej-dd" id="qcInstrDD">
+                    <div class="rej-opt" data-name="Inspect packaging for visible damage" onclick="addQcInstr('Inspect packaging for visible damage')"><span>Inspect packaging for visible damage</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
+                    <div class="rej-opt" data-name="Verify SKU matches label" onclick="addQcInstr('Verify SKU matches label')"><span>Verify SKU matches label</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
+                    <div class="rej-opt" data-name="Check MFG/expiry dates are within range" onclick="addQcInstr('Check MFG/expiry dates are within range')"><span>Check MFG/expiry dates are within range</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
+                    <div class="rej-opt" data-name="Confirm seal is intact and unopened" onclick="addQcInstr('Confirm seal is intact and unopened')"><span>Confirm seal is intact and unopened</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
+                    <div class="rej-opt" data-name="Reject items with torn labels or missing barcode" onclick="addQcInstr('Reject items with torn labels or missing barcode')"><span>Reject items with torn labels or missing barcode</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
+                  </div></div></div>
+              </div>
+              <div id="qcInstrChips" style="display:none;"></div>
             </div>
             <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border-light);">
               <div class="cfg-row-left"><div class="cfg-label">Enable QC parameters</div><div class="cfg-desc">Show pass/fail parameter fields to operators during QC.</div><div id="qcparam-warn" style="display:none;padding:6px 0 0;font-size:11px;color:#B45309;font-weight:500;">*SKU level QC parameters can be set up in the product catalog</div></div>
@@ -434,9 +444,18 @@
     let rejReasons=JSON.parse(sessionStorage.getItem('rejReasons')||'[]');
     function toggleRejDD(){document.getElementById('rejDD').classList.toggle('open');}
     document.addEventListener('click',e=>{const w=document.getElementById('rejWrap');if(w&&!w.contains(e.target))document.getElementById('rejDD')?.classList.remove('open');
-      const p=document.getElementById('packWrap');if(p&&!p.contains(e.target))document.getElementById('packDD')?.classList.remove('open');});
+      const p=document.getElementById('packWrap');if(p&&!p.contains(e.target))document.getElementById('packDD')?.classList.remove('open');
+      const q=document.getElementById('qcInstrWrap');if(q&&!q.contains(e.target))document.getElementById('qcInstrDD')?.classList.remove('open');});
     function addRej(n){if(rejReasons.includes(n))return;rejReasons.push(n);sessionStorage.setItem('rejReasons',JSON.stringify(rejReasons));renderRejChips();document.querySelectorAll('#rejDD .rej-opt').forEach(o=>{o.style.display=rejReasons.includes(o.getAttribute('data-name'))?'none':'flex';});}
     function removeRej(n){rejReasons=rejReasons.filter(r=>r!==n);sessionStorage.setItem('rejReasons',JSON.stringify(rejReasons));renderRejChips();document.querySelectorAll('#rejDD .rej-opt').forEach(o=>{o.style.display=rejReasons.includes(o.getAttribute('data-name'))?'none':'flex';});}
+
+    // QC Instructions dropdown
+    let qcInstr=JSON.parse(sessionStorage.getItem('qcInstr')||'[]');
+    function toggleQcInstrDD(){document.getElementById('qcInstrDD').classList.toggle('open');}
+    function addQcInstr(n){if(qcInstr.includes(n))return;qcInstr.push(n);sessionStorage.setItem('qcInstr',JSON.stringify(qcInstr));renderQcInstrChips();document.querySelectorAll('#qcInstrDD .rej-opt').forEach(o=>{o.style.display=qcInstr.includes(o.getAttribute('data-name'))?'none':'flex';});}
+    function removeQcInstr(n){qcInstr=qcInstr.filter(r=>r!==n);sessionStorage.setItem('qcInstr',JSON.stringify(qcInstr));renderQcInstrChips();document.querySelectorAll('#qcInstrDD .rej-opt').forEach(o=>{o.style.display=qcInstr.includes(o.getAttribute('data-name'))?'none':'flex';});}
+    function renderQcInstrChips(){const c=document.getElementById('qcInstrChips');if(!c)return;if(qcInstr.length===0){c.style.display='none';c.innerHTML='';}else{c.style.display='flex';c.style.cssText='display:flex;align-items:center;gap:8px;padding:12px 16px;background:#F9FAFB;border-radius:4px;margin:8px 0 0;flex-wrap:wrap;';c.innerHTML=`<span style="font-size:12px;font-weight:600;color:var(--t1);white-space:nowrap;">Selected instructions:</span>`+qcInstr.map(r=>`<span class="pill-chip">${r}<span class="material-icons-outlined remove" onclick="removeQcInstr('${r}')">close</span></span>`).join('');}
+      document.querySelectorAll('#qcInstrDD .rej-opt').forEach(o=>{if(o)o.style.display=qcInstr.includes(o.getAttribute('data-name'))?'none':'flex';});}
     function renderRejChips(){const c=document.getElementById('rejChips');if(!c)return;if(rejReasons.length===0){c.style.display='none';c.innerHTML='';}else{c.style.display='flex';c.style.cssText='display:flex;align-items:center;gap:8px;padding:12px 16px;background:#F9FAFB;border-radius:4px;margin:8px 0 0;flex-wrap:wrap;';c.innerHTML=`<span style="font-size:12px;font-weight:600;color:var(--t1);white-space:nowrap;">Selected reasons:</span>`+rejReasons.map(r=>`<span class="pill-chip">${r}<span class="material-icons-outlined remove" onclick="removeRej('${r}')">close</span></span>`).join('');}
       document.querySelectorAll('#rejDD .rej-opt').forEach(o=>{o.style.display=rejReasons.includes(o.getAttribute('data-name'))?'none':'flex';});}
 
@@ -835,9 +854,9 @@
         </div>
         <div class="section-divider"><div class="section-divider-title"><span class="material-icons-outlined">arrow_right</span>Cycle Count</div><div class="section-divider-desc">Thresholds for supervisory approval during cycle counts.</div></div>
         <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Shortage threshold</div><div class="cfg-desc">Units short above which supervisory approval is needed.</div><span class="cfg-badge badge-fc">FC</span></div>
-          <div class="cfg-row-right"><input class="tds-input" placeholder="Add and press enter"></div></div>
+          <div class="cfg-row-right"><input class="tds-input" type="number" min="1" step="1" placeholder="Add and press enter" oninput="this.value=Math.max(1,Math.round(Math.abs(this.value)))"></div></div>
         <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Overage threshold</div><div class="cfg-desc">Units extra above which supervisory approval is needed.</div><span class="cfg-badge badge-fc">FC</span></div>
-          <div class="cfg-row-right"><input class="tds-input" placeholder="Add and press enter"></div></div></div>`;
+          <div class="cfg-row-right"><input class="tds-input" type="number" min="1" step="1" placeholder="Add and press enter" oninput="this.value=Math.max(1,Math.round(Math.abs(this.value)))"></div></div></div>`;
     }
 
     // Zones table render
