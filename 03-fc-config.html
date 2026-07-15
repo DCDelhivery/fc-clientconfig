@@ -854,9 +854,9 @@
         </div>
         <div class="section-divider"><div class="section-divider-title"><span class="material-icons-outlined">arrow_right</span>Cycle Count</div><div class="section-divider-desc">Thresholds for supervisory approval during cycle counts.</div></div>
         <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Shortage threshold</div><div class="cfg-desc">Units short above which supervisory approval is needed.</div><span class="cfg-badge badge-fc">FC</span></div>
-          <div class="cfg-row-right"><input class="tds-input" type="number" min="1" step="1" placeholder="Add and press enter" oninput="this.value=Math.max(1,Math.round(Math.abs(this.value)))"></div></div>
+          <div class="cfg-row-right"><input class="tds-input" type="text" placeholder="Add and press enter" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value==='0')this.value=''"></div></div>
         <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Overage threshold</div><div class="cfg-desc">Units extra above which supervisory approval is needed.</div><span class="cfg-badge badge-fc">FC</span></div>
-          <div class="cfg-row-right"><input class="tds-input" type="number" min="1" step="1" placeholder="Add and press enter" oninput="this.value=Math.max(1,Math.round(Math.abs(this.value)))"></div></div></div>`;
+          <div class="cfg-row-right"><input class="tds-input" type="text" placeholder="Add and press enter" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value==='0')this.value=''"></div></div></div>`;
     }
 
     // Zones table render

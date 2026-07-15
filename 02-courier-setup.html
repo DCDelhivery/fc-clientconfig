@@ -1108,9 +1108,9 @@
               <td>${idx + 1}</td>
               <td>${fc}</td>
               <td><div class="day-pills">${dayPillsHtml}</div></td>
-              <td><input class="capacity-input" type="number" min="1" step="1" value="${data.orderCap}" onchange="this.value=Math.max(1,Math.round(Math.abs(this.value)));fcData['${fc}'].orderCap=this.value"></td>
-              <td><input class="capacity-input" type="number" min="1" step="1" value="${data.orderlineCap}" onchange="this.value=Math.max(1,Math.round(Math.abs(this.value)));fcData['${fc}'].orderlineCap=this.value"></td>
-              <td><input class="capacity-input" type="number" min="1" step="1" value="${data.qtyCap}" onchange="this.value=Math.max(1,Math.round(Math.abs(this.value)));fcData['${fc}'].qtyCap=this.value"></td>
+              <td><input class="capacity-input" type="number" min="1" step="1" value="${data.orderCap}" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value==='0'||this.value==='')this.value=''" onblur="if(!this.value||parseInt(this.value)<1)this.value=1;fcData['${fc}'].orderCap=this.value"></td>
+              <td><input class="capacity-input" type="number" min="1" step="1" value="${data.orderlineCap}" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value==='0'||this.value==='')this.value=''" onblur="if(!this.value||parseInt(this.value)<1)this.value=1;fcData['${fc}'].orderlineCap=this.value"></td>
+              <td><input class="capacity-input" type="number" min="1" step="1" value="${data.qtyCap}" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value==='0'||this.value==='')this.value=''" onblur="if(!this.value||parseInt(this.value)<1)this.value=1;fcData['${fc}'].qtyCap=this.value"></td>
               <td style="text-align:center">
                 <button class="btn-delete" onclick="confirmDelete('fc', '${fc}')">
                   <span class="material-icons-outlined">delete_outline</span>
