@@ -18,7 +18,8 @@
     .header-left .subtitle{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--t2);}
     .header-left .subtitle .pill{display:inline-flex;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:500;background:var(--warning-bg);color:var(--warning);}
     .header-right{display:flex;align-items:center;gap:12px;}
-    .btn-draft{padding:8px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);font-family:inherit;font-size:13px;font-weight:500;color:var(--t1);cursor:pointer;}
+    .btn-draft{padding:8px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);font-family:inherit;font-size:13px;font-weight:500;color:var(--t1);cursor:pointer;transition:all .15s;}
+    .btn-draft:disabled{color:var(--t3);border-color:var(--border-light);cursor:not-allowed;background:var(--surface);}
     .btn-close{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);cursor:pointer;color:var(--t2);}
 
     /* Layout */
@@ -145,7 +146,7 @@
       <div class="subtitle">Client & FC configuration <span class="pill">Draft</span></div>
     </div>
     <div class="header-right">
-      <button class="btn-draft">Save as draft</button>
+      <button class="btn-draft" id="btnSaveDraft" onclick="saveDraft()">Save as draft</button>
       <button class="btn-close" onclick="window.location.href='01-client-list.html'"><span class="material-icons-outlined" style="font-size:18px;">close</span></button>
     </div>
   </header>
@@ -1216,6 +1217,38 @@
 
     renderAll();
     setTimeout(restoreState, 100);
+
+    // ===== Save as Draft =====
+    let draftDirty = false;
+    function saveDraft(){
+      saveAllState();
+      sessionStorage.setItem('fcSaved',JSON.stringify(saved));
+      draftDirty = false;
+      const btn = document.getElementById('btnSaveDraft');
+      btn.disabled = true;
+      // Show snackbar if exists
+      const sb = document.createElement('div');
+      sb.style.cssText='position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#0D7A3F;color:white;padding:12px 24px;border-radius:8px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,0.2);z-index:500;';
+      sb.innerHTML='<span class="material-icons-outlined" style="font-size:18px;">check_circle</span>Draft saved';
+      document.body.appendChild(sb);
+      setTimeout(()=>sb.remove(),3000);
+    }
+    function markDraftDirty(){
+      draftDirty = true;
+      const btn = document.getElementById('btnSaveDraft');
+      if(btn) btn.disabled = false;
+    }
+    // Listen for any change to mark dirty
+    document.addEventListener('click',function(e){
+      if(e.target.classList.contains('seg-btn')||e.target.classList.contains('rej-opt')||e.target.classList.contains('day-pill')){
+        markDraftDirty();
+      }
+    });
+    document.addEventListener('input',function(e){
+      if(e.target.classList.contains('tds-input')||e.target.classList.contains('tds-select')||e.target.tagName==='SELECT'){
+        markDraftDirty();
+      }
+    });
   </script>
 </body>
 </html>
