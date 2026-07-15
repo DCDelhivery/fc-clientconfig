@@ -598,12 +598,12 @@
       return `<div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border-light);">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><span style="font-size:13px;font-weight:600;">Order Type :</span><span style="padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:#E6F5ED;color:#0D7A3F;">Simple</span></div>
           <div style="display:flex;gap:16px;"><div style="flex:1;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Maximum SKU in order</div><input class="tds-input" id="simpleMaxSKU" placeholder="Type here..." style="width:100%;" oninput="updateComplexMsg();checkPWSave()"></div>
-          <div style="flex:1;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Maximum quantity in order</div><input class="tds-input" placeholder="Type here..." style="width:100%;" oninput="checkPWSave()"></div></div>
+          <div style="flex:1;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Maximum quantity in order</div><input class="tds-input" id="simpleMaxQty" placeholder="Type here..." style="width:100%;" oninput="checkPWSave()"></div></div>
         </div>
         <div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border-light);">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span style="font-size:13px;font-weight:600;">Order Type :</span><span style="padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:var(--warning-bg);color:var(--warning);">Complex</span></div>
           <div id="complexMsg" style="font-size:11px;color:var(--t3);margin-bottom:12px;"></div>
-          <div style="display:flex;gap:16px;margin-bottom:16px;"><div style="flex:1;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Maximum SKU in order</div><input class="tds-input" placeholder="Type here..." style="width:100%;" oninput="checkPWSave()"></div><div style="flex:1;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Maximum quantity in order</div><input class="tds-input" value="100" style="width:100%;" oninput="checkPWSave()"></div></div>
+          <div style="display:flex;gap:16px;margin-bottom:16px;"><div style="flex:1;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Maximum SKU in order</div><input class="tds-input" id="complexMaxSKU" placeholder="Type here..." style="width:100%;" oninput="checkPWSave()"></div><div style="flex:1;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Maximum quantity in order</div><input class="tds-input" id="complexMaxQty" value="100" style="width:100%;" oninput="checkPWSave()"></div></div>
           <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:12px 0;border-top:1px solid var(--border-light);">
             <div style="flex:1;max-width:70%;"><div style="font-size:13px;font-weight:600;">Order bundling</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">When enabled, pickwaves will be divided into picklists based on zones</div></div>
             <div class="seg-group" id="bundling-seg"><button class="seg-btn" onclick="setSeg('bundling-seg','yes',showBundlingParams);checkPWSave()">Yes</button><button class="seg-btn" onclick="setSeg('bundling-seg','no',hideBundlingParams);checkPWSave()">No</button></div>
@@ -620,7 +620,7 @@
             <div style="flex:1;max-width:70%;"><div style="font-size:13px;font-weight:600;">Consolidation</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">Enable consolidation of Bulk orders in staging area. Set minimum order quantity above which consolidation is required.</div></div>
             <div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');checkPWSave()">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');checkPWSave()">No</button></div>
           </div>
-          <div style="padding-top:12px;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Minimum quantity for consolidation <span style="color:var(--primary);">*</span></div><input class="tds-input" value="100" style="width:200px;" oninput="checkPWSave()"></div>
+          <div style="padding-top:12px;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Minimum quantity for consolidation <span style="color:var(--primary);">*</span></div><input class="tds-input" id="bulkMinQty" value="100" style="width:200px;" oninput="checkPWSave()"></div>
         </div>`;
     }
     function updateComplexMsg(){
@@ -634,9 +634,9 @@
         <table style="width:100%;border-collapse:collapse;">
           <thead style="background:#F9FAFB;"><tr><th style="padding:10px 14px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Order type</th><th style="padding:10px 14px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);" colspan="2">Picklist limit</th></tr></thead>
           <tbody>
-            <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:10px 14px;font-size:12px;font-weight:500;" rowspan="1">Simple</td><td style="padding:10px 14px;"><div style="font-size:11px;color:var(--t3);margin-bottom:4px;">Maximum quantity</div><input class="tds-input" value="1" style="width:100px;" oninput="checkPWSave()"></td><td style="padding:10px 14px;"><div style="font-size:11px;color:var(--t3);margin-bottom:4px;">Maximum locations</div><input class="tds-input" value="6" style="width:100px;" oninput="checkPWSave()"></td></tr>
-            <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:10px 14px;font-size:12px;font-weight:500;">Complex</td><td style="padding:10px 14px;"><div style="font-size:11px;color:var(--t3);margin-bottom:4px;">Maximum quantity</div><input class="tds-input" value="1" style="width:100px;" oninput="checkPWSave()"></td><td style="padding:10px 14px;"><div style="font-size:11px;color:var(--t3);margin-bottom:4px;">Maximum locations</div><input class="tds-input" value="6" style="width:100px;" oninput="checkPWSave()"></td></tr>
-            <tr><td style="padding:10px 14px;font-size:12px;font-weight:500;">Bulk</td><td style="padding:10px 14px;"><div style="font-size:11px;color:var(--t3);margin-bottom:4px;">Maximum quantity</div><input class="tds-input" value="1000" style="width:100px;" oninput="checkPWSave()"></td><td></td></tr>
+            <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:10px 14px;font-size:12px;font-weight:500;" rowspan="1">Simple</td><td style="padding:10px 14px;"><div style="font-size:11px;color:var(--t3);margin-bottom:4px;">Maximum quantity</div><input class="tds-input" id="plSimpleQty" value="1" style="width:100px;" oninput="checkPWSave()"></td><td style="padding:10px 14px;"><div style="font-size:11px;color:var(--t3);margin-bottom:4px;">Maximum locations</div><input class="tds-input" id="plSimpleLoc" value="6" style="width:100px;" oninput="checkPWSave()"></td></tr>
+            <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:10px 14px;font-size:12px;font-weight:500;">Complex</td><td style="padding:10px 14px;"><div style="font-size:11px;color:var(--t3);margin-bottom:4px;">Maximum quantity</div><input class="tds-input" id="plComplexQty" value="1" style="width:100px;" oninput="checkPWSave()"></td><td style="padding:10px 14px;"><div style="font-size:11px;color:var(--t3);margin-bottom:4px;">Maximum locations</div><input class="tds-input" id="plComplexLoc" value="6" style="width:100px;" oninput="checkPWSave()"></td></tr>
+            <tr><td style="padding:10px 14px;font-size:12px;font-weight:500;">Bulk</td><td style="padding:10px 14px;"><div style="font-size:11px;color:var(--t3);margin-bottom:4px;">Maximum quantity</div><input class="tds-input" id="plBulkQty" value="1000" style="width:100px;" oninput="checkPWSave()"></td><td></td></tr>
           </tbody>
         </table></div>`;
     }
@@ -648,11 +648,11 @@
     function getGroupByTab(){
       return `<div style="padding:12px 0;border-bottom:1px solid var(--border-light);">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;"><div style="flex:1;max-width:70%;"><div style="font-size:13px;font-weight:600;">Priority</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">Enable this to create separate pickwaves for each priority type.</div></div>
-            <div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');checkPWSave()">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');checkPWSave()">No</button></div></div>
+            <div class="seg-group" id="groupby-priority-seg"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');checkPWSave()">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');checkPWSave()">No</button></div></div>
         </div>
         <div style="padding:12px 0;border-bottom:1px solid var(--border-light);">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;"><div style="flex:1;max-width:70%;"><div style="font-size:13px;font-weight:600;">Channel</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">Enable this to create separate pickwaves for every channel. Channels can be grouped to create single pickwave for grouped channels.</div></div>
-            <div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');checkPWSave()">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');checkPWSave()">No</button></div></div>
+            <div class="seg-group" id="groupby-channel-seg"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');checkPWSave()">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');checkPWSave()">No</button></div></div>
           <div style="margin-top:8px;font-size:11px;color:#B45309;font-weight:500;">*Note: Unassigned channels will have their separate pickwaves</div>
           <div style="margin-top:12px;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Group channel for pickwave <span style="color:var(--primary);">*</span></div>
             <div style="border:1px solid var(--border);border-radius:4px;padding:8px 12px;">
@@ -682,24 +682,43 @@
 
     function checkPWSave(){
       const btn=document.getElementById('pwSaveBtn');if(!btn)return;
-      btn.style.background='var(--t1)';btn.style.color='#fff';btn.style.cursor='pointer';
-      btn.onclick=()=>savePWConfig();
+      // Check mandatory: schedule must be set
+      let valid = true;
+      if(pwScheduleMode==='frequency' && !pwFrequency) valid = false;
+      if(pwScheduleMode==='custom' && pwCustomTimes.length===0) valid = false;
+      // Check simple max SKU
+      const simpleInput = document.getElementById('simpleMaxSKU');
+      if(simpleInput && !simpleInput.value.trim()) valid = false;
+      if(valid){
+        btn.style.background='var(--t1)';btn.style.color='#fff';btn.style.cursor='pointer';btn.disabled=false;
+        btn.onclick=()=>savePWConfig();
+      } else {
+        btn.style.background='var(--border)';btn.style.color='var(--t3)';btn.style.cursor='not-allowed';btn.disabled=true;
+        btn.onclick=null;
+      }
     }
     function savePWConfig(){
       pwConfigured = true;
+      // Capture all values from the modal
+      const simpleMaxSKU = document.getElementById('simpleMaxSKU')?.value || '1';
+      const simpleMaxQty = document.getElementById('simpleMaxQty')?.value || '8';
+      const complexMaxSKU = document.getElementById('complexMaxSKU')?.value || '2+';
+      const complexMaxQty = document.getElementById('complexMaxQty')?.value || '100';
+      const bulkMinQty = document.getElementById('bulkMinQty')?.value || '1000';
+      const plSimpleQty = document.getElementById('plSimpleQty')?.value || '1';
+      const plSimpleLoc = document.getElementById('plSimpleLoc')?.value || '6';
+      const plComplexQty = document.getElementById('plComplexQty')?.value || '1';
+      const plComplexLoc = document.getElementById('plComplexLoc')?.value || '6';
+      const plBulkQty = document.getElementById('plBulkQty')?.value || '1000';
+      const groupPriority = document.getElementById('groupby-priority-seg')?.querySelector('.seg-btn.active')?.textContent || 'Yes';
+      const groupChannel = document.getElementById('groupby-channel-seg')?.querySelector('.seg-btn.active')?.textContent || 'No';
+
       pwSummary = {
         scheduleType: pwScheduleMode === 'frequency' ? 'Frequency' : 'Custom times',
-        schedule: pwScheduleMode === 'frequency' ? (pwFrequency || 'Not set') : (pwCustomTimes.length ? pwCustomTimes.join(', ') : 'Not set'),
-        simpleMaxSKU: document.getElementById('simpleMaxSKU')?.value || '-',
-        complexMaxQty: '100',
-        orderBundling: document.getElementById('bundling-seg')?.querySelector('.seg-btn.active')?.textContent || '-',
-        bulkConsolidation: 'Yes',
-        bulkMinQty: '100',
-        picklistSimple: 'Qty: 1, Locations: 6',
-        picklistComplex: 'Qty: 1, Locations: 6',
-        picklistBulk: 'Qty: 1000',
-        groupByPriority: '-',
-        groups: channelGroups.length ? channelGroups.map(g=>g.join(' + ')).join('; ') : 'None'
+        schedule: pwScheduleMode === 'frequency' ? (pwFrequency || 'Every 30 minutes') : (pwCustomTimes.length ? pwCustomTimes.join(', ') : 'Not set'),
+        simpleMaxSKU, simpleMaxQty, complexMaxSKU, complexMaxQty, bulkMinQty,
+        plSimpleQty, plSimpleLoc, plComplexQty, plComplexLoc, plBulkQty,
+        groupPriority, groupChannel
       };
       closePWModal();
       renderContent();
@@ -867,29 +886,24 @@
         ${['Pickwave Automation','Enable LR consolidation'].map(s=>{
           if(s==='Pickwave Automation') {
             if(pwConfigured) {
-              return `<div class="cfg-row" style="flex-direction:column;align-items:stretch;">
+              return `<div class="cfg-row" style="flex-direction:column;align-items:stretch;padding-right:16px;">
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;">
                   <div class="cfg-row-left"><div class="cfg-label">Pickwave Automation</div><div class="cfg-desc">Pickwave schedule, order complexity, capacity and grouping configured.</div><span class="cfg-badge badge-fc">FC</span></div>
-                  <div class="cfg-row-right"><button class="btn-bulk" onclick="openPickwaveModal()">Edit details</button></div>
+                  <div class="cfg-row-right"><button class="btn-bulk" onclick="openPickwaveModal()">Edit config</button></div>
                 </div>
-                <div style="margin-top:12px;background:#F9FAFB;border-radius:6px;padding:12px 16px;">
-                  <table style="width:100%;border-collapse:collapse;font-size:12px;">
-                    <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:6px 0;font-weight:600;color:var(--t2);" colspan="2">Schedule</td></tr>
-                    <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:6px 0;color:var(--t3);width:200px;">Type</td><td style="padding:6px 0;color:var(--t1);">${pwSummary.scheduleType}</td></tr>
-                    <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:6px 0;color:var(--t3);">Value</td><td style="padding:6px 0;color:var(--t1);">${pwSummary.schedule}</td></tr>
-                    <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:6px 0;font-weight:600;color:var(--t2);" colspan="2">Order Complexity</td></tr>
-                    <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:6px 0;color:var(--t3);">Simple - Max SKU</td><td style="padding:6px 0;color:var(--t1);">${pwSummary.simpleMaxSKU}</td></tr>
-                    <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:6px 0;color:var(--t3);">Complex - Max quantity</td><td style="padding:6px 0;color:var(--t1);">${pwSummary.complexMaxQty}</td></tr>
-                    <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:6px 0;color:var(--t3);">Order bundling</td><td style="padding:6px 0;color:var(--t1);">${pwSummary.orderBundling}</td></tr>
-                    <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:6px 0;color:var(--t3);">Bulk - Consolidation</td><td style="padding:6px 0;color:var(--t1);">${pwSummary.bulkConsolidation} (Min qty: ${pwSummary.bulkMinQty})</td></tr>
-                    <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:6px 0;font-weight:600;color:var(--t2);" colspan="2">Picklist Capacity</td></tr>
-                    <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:6px 0;color:var(--t3);">Simple</td><td style="padding:6px 0;color:var(--t1);">${pwSummary.picklistSimple}</td></tr>
-                    <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:6px 0;color:var(--t3);">Complex</td><td style="padding:6px 0;color:var(--t1);">${pwSummary.picklistComplex}</td></tr>
-                    <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:6px 0;color:var(--t3);">Bulk</td><td style="padding:6px 0;color:var(--t1);">${pwSummary.picklistBulk}</td></tr>
-                    <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:6px 0;font-weight:600;color:var(--t2);" colspan="2">Group By</td></tr>
-                    <tr><td style="padding:6px 0;color:var(--t3);">Channel groups</td><td style="padding:6px 0;color:var(--t1);">${pwSummary.groups}</td></tr>
-                  </table>
+                <div style="margin-top:12px;padding:16px;background:#FAFAFA;border-radius:4px;">
+                  <div style="font-size:12px;font-weight:600;margin-bottom:4px;">Pickwave schedule</div>
+                  <div style="font-size:11px;color:var(--t3);margin-bottom:8px;">${pwSummary.scheduleType}: ${pwSummary.schedule}</div>
+                  <div style="font-size:12px;font-weight:600;margin-bottom:4px;margin-top:12px;">Order complexity</div>
+                  <table style="width:100%;border-collapse:collapse;margin-bottom:12px;"><thead style="background:#F7F8FA;"><tr><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Type</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">Max SKU</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">Max Qty</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">Picklist Qty</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">Picklist Loc</th></tr></thead><tbody>
+                    <tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border-light);">Simple</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">${pwSummary.simpleMaxSKU}</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">${pwSummary.simpleMaxQty}</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">${pwSummary.plSimpleQty}</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">${pwSummary.plSimpleLoc}</td></tr>
+                    <tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border-light);">Complex</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">${pwSummary.complexMaxSKU}</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">${pwSummary.complexMaxQty}</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">${pwSummary.plComplexQty}</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">${pwSummary.plComplexLoc}</td></tr>
+                    <tr><td style="padding:8px 12px;font-size:12px;">Bulk</td><td style="padding:8px 12px;font-size:12px;text-align:center;">—</td><td style="padding:8px 12px;font-size:12px;text-align:center;">${pwSummary.bulkMinQty}</td><td style="padding:8px 12px;font-size:12px;text-align:center;">${pwSummary.plBulkQty}</td><td style="padding:8px 12px;font-size:12px;text-align:center;">—</td></tr>
+                  </tbody></table>
+                  <div style="font-size:12px;font-weight:600;margin-bottom:4px;">Group by</div>
+                  <div style="font-size:11px;color:var(--t3);">Priority: ${pwSummary.groupPriority} &nbsp;|&nbsp; Channel: ${pwSummary.groupChannel}</div>
                 </div>
+              </div>`;
               </div>`;
             }
             return `<div class="cfg-row" style="flex-direction:column;align-items:stretch;padding-right:16px;">
