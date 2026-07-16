@@ -328,13 +328,30 @@
       segs.forEach(seg=>{
         if(!seg.querySelector('.seg-btn.active'))allFilled=false;
       });
+      // Check shelf-life bucket values if buckets exist (inventory step)
+      if(activeStep==='inventory' && shelfBuckets.length>0){
+        const rows=document.querySelectorAll('#shelfBucketBody tr');
+        rows.forEach(row=>{
+          const inputs=row.querySelectorAll('input');
+          inputs.forEach(inp=>{if(!inp.value.trim())allFilled=false;});
+        });
+        // Validate min < preferred for each bucket
+        rows.forEach(row=>{
+          const inputs=row.querySelectorAll('input');
+          if(inputs.length>=2){
+            const min=parseInt(inputs[0].value)||0;
+            const pref=parseInt(inputs[1].value)||0;
+            if(min>0 && pref>0 && min>=pref)allFilled=false;
+          }
+        });
+      }
       if(allFilled && segs.length>0){
         btn.style.background='var(--t1)';btn.style.color='#fff';btn.style.cursor='pointer';btn.disabled=false;
       } else {
         btn.style.background='var(--border)';btn.style.color='var(--t3)';btn.style.cursor='not-allowed';btn.disabled=true;
       }
     }
-    // Listen for toggle clicks to re-check
+    // Listen for toggle clicks and input changes to re-check
     document.addEventListener('click',function(e){
       if(e.target.classList.contains('seg-btn')){setTimeout(checkAllSettingsFilled,50);}
     });
@@ -513,6 +530,24 @@
       // Show option back in dropdown
       document.querySelectorAll('#shelfBucketDD .rej-opt').forEach(o=>{if(o.getAttribute('data-name')===name)o.style.display='flex';});
       renderShelfBucketTable();
+      setTimeout(checkAllSettingsFilled,50);
+    }
+    function validateShelfLife(input){
+      const row=input.closest('tr');
+      const minInput=row.querySelector('.shelf-min');
+      const prefInput=row.querySelector('.shelf-pref');
+      if(minInput&&prefInput&&minInput.value&&prefInput.value){
+        const min=parseInt(minInput.value);
+        const pref=parseInt(prefInput.value);
+        if(min>=pref){
+          prefInput.style.borderColor='#DC2626';
+          prefInput.title='Preferred shelf life must be greater than Min shelf life';
+        } else {
+          prefInput.style.borderColor='';
+          prefInput.title='';
+        }
+      }
+      setTimeout(checkAllSettingsFilled,50);
     }
     let shelfBucketData={};
     function renderShelfBucketTable(){
@@ -533,8 +568,8 @@
         const d=shelfBucketData[b]||{min:'',pref:'',prime:''};
         return `<tr data-bucket="${b}">
         <td style="padding:8px 10px;font-size:12px;font-weight:500;border-bottom:1px solid var(--border-light);">${b}</td>
-        <td style="padding:8px 10px;border-bottom:1px solid var(--border-light);"><input class="tds-input" type="text" style="width:80px;" placeholder="%" value="${d.min}" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(parseInt(this.value)>100)this.value='100'"></td>
-        <td style="padding:8px 10px;border-bottom:1px solid var(--border-light);"><input class="tds-input" type="text" style="width:80px;" placeholder="%" value="${d.pref}" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(parseInt(this.value)>100)this.value='100'"></td>
+        <td style="padding:8px 10px;border-bottom:1px solid var(--border-light);"><input class="tds-input shelf-min" data-bucket="${b}" type="text" style="width:80px;" placeholder="%" value="${d.min}" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(parseInt(this.value)>100)this.value='100'" onblur="validateShelfLife(this)"></td>
+        <td style="padding:8px 10px;border-bottom:1px solid var(--border-light);"><input class="tds-input shelf-pref" data-bucket="${b}" type="text" style="width:80px;" placeholder="%" value="${d.pref}" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(parseInt(this.value)>100)this.value='100'" onblur="validateShelfLife(this)"></td>
         <td style="padding:8px 10px;border-bottom:1px solid var(--border-light);"><input class="tds-input" type="text" style="width:80px;" placeholder="%" value="${d.prime}" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(parseInt(this.value)>100)this.value='100'"></td>
         <td style="padding:8px 10px;text-align:center;border-bottom:1px solid var(--border-light);"><button style="border:1px solid var(--border);border-radius:4px;background:var(--surface);width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;" onclick="removeShelfBucket(${i})"><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">delete</span></button></td>
       </tr>`;}).join('');
@@ -1294,6 +1329,7 @@
     document.addEventListener('input',function(e){
       if(e.target.classList.contains('tds-input')||e.target.classList.contains('tds-select')||e.target.tagName==='SELECT'){
         markDraftDirty();
+        setTimeout(checkAllSettingsFilled,50);
       }
     });
   </script>
