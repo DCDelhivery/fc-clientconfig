@@ -328,6 +328,12 @@
       segs.forEach(seg=>{
         if(!seg.querySelector('.seg-btn.active'))allFilled=false;
       });
+      // Check all required text inputs on the current page (those with placeholder containing "Add and press enter" or "Type here")
+      if(activeStep==='inventory'){
+        document.querySelectorAll('#contentArea .tds-input[placeholder]').forEach(inp=>{
+          if(!inp.value.trim())allFilled=false;
+        });
+      }
       // Check shelf-life bucket values if buckets exist (inventory step)
       if(activeStep==='inventory' && shelfBuckets.length>0){
         const rows=document.querySelectorAll('#shelfBucketBody tr');
