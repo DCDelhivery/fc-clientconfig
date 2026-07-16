@@ -247,8 +247,18 @@
     function cloneFC(fc){
       const source=document.getElementById('cloneSource').value;
       document.getElementById('cloneModal').remove();
-      // In a real app, this would copy all settings from source FC
-      activeFC=fc;activeStep='inbound';renderAll();
+      // Copy all settings from source FC to new FC
+      const st = JSON.parse(sessionStorage.getItem('allConfigState')||'{}');
+      ['inbound','inventory','outbound'].forEach(step=>{
+        if(st[`${source}-${step}`]){
+          st[`${fc}-${step}`] = JSON.parse(JSON.stringify(st[`${source}-${step}`]));
+        }
+      });
+      sessionStorage.setItem('allConfigState', JSON.stringify(st));
+      // Also mark steps as saved
+      saved[`${fc}-inbound`]=true;saved[`${fc}-inventory`]=true;
+      sessionStorage.setItem('fcSaved',JSON.stringify(saved));
+      activeFC=fc;activeStep='inbound';renderAll();restoreState();
     }
 
     // Stepper
@@ -318,20 +328,26 @@
     // Store all toggle/input states per FC+step so they persist when navigating
     const allState = JSON.parse(sessionStorage.getItem('allConfigState')||'{}');
     function saveAllState(){
-      // Capture all seg-btn active states and input values on current page
       const key = `${activeFC}-${activeStep}`;
       const state = {};
-      document.querySelectorAll('.seg-group').forEach((g,i)=>{
+      // Save all seg-group states
+      document.querySelectorAll('#contentArea .seg-group').forEach((g,i)=>{
         const active = g.querySelector('.seg-btn.active');
         state[`seg_${i}`] = active ? active.textContent : '';
       });
-      document.querySelectorAll('.tds-input, .tds-select, .zone-input').forEach((inp,i)=>{
+      // Save all inputs (text, number)
+      document.querySelectorAll('#contentArea .tds-input, #contentArea .zone-input').forEach((inp,i)=>{
         state[`inp_${i}`] = inp.value;
       });
-      // Save reveal/warn visibility
-      document.querySelectorAll('.cfg-reveal, [id$="-warn"]').forEach((el,i)=>{
-        state[`vis_${i}`] = el.style.display || (el.classList.contains('show')?'show':'');
+      // Save all selects
+      document.querySelectorAll('#contentArea .tds-select, #contentArea select').forEach((sel,i)=>{
+        state[`sel_${i}`] = sel.value;
       });
+      // Save rejection reasons and QC instructions
+      state.rejReasons = JSON.stringify(rejReasons);
+      state.qcInstr = JSON.stringify(qcInstr);
+      // Save packInstr for outbound
+      state.packInstr = JSON.stringify(packInstr);
       allState[key] = state;
       sessionStorage.setItem('allConfigState', JSON.stringify(allState));
     }
@@ -340,20 +356,37 @@
       const state = allState[key];
       if(!state) return;
       setTimeout(()=>{
-        document.querySelectorAll('.seg-group').forEach((g,i)=>{
+        // Restore seg-groups (toggles)
+        document.querySelectorAll('#contentArea .seg-group').forEach((g,i)=>{
           const val = state[`seg_${i}`];
           if(val){
             g.querySelectorAll('.seg-btn').forEach(b=>{b.classList.remove('active');if(b.textContent===val)b.classList.add('active');});
-            // Trigger reveals
-            if(val==='Yes'){
-              const yesBtn = g.querySelector('.seg-btn.active');
-              if(yesBtn && yesBtn.onclick) yesBtn.click();
-            }
           }
         });
-        document.querySelectorAll('.tds-input, .tds-select, .zone-input').forEach((inp,i)=>{
+        // Trigger Yes buttons to show reveals (after a small delay)
+        setTimeout(()=>{
+          document.querySelectorAll('#contentArea .seg-group').forEach((g,i)=>{
+            const val = state[`seg_${i}`];
+            if(val==='Yes'){
+              const yesBtn = g.querySelector('.seg-btn:first-child');
+              if(yesBtn && yesBtn.classList.contains('active') && yesBtn.onclick) yesBtn.click();
+            }
+          });
+        },30);
+        // Restore inputs
+        document.querySelectorAll('#contentArea .tds-input, #contentArea .zone-input').forEach((inp,i)=>{
           if(state[`inp_${i}`]!==undefined) inp.value = state[`inp_${i}`];
         });
+        // Restore selects
+        setTimeout(()=>{
+          document.querySelectorAll('#contentArea .tds-select, #contentArea select').forEach((sel,i)=>{
+            if(state[`sel_${i}`]!==undefined) sel.value = state[`sel_${i}`];
+          });
+        },80);
+        // Restore rejection reasons & QC instructions
+        if(state.rejReasons){rejReasons=JSON.parse(state.rejReasons);sessionStorage.setItem('rejReasons',JSON.stringify(rejReasons));}
+        if(state.qcInstr){qcInstr=JSON.parse(state.qcInstr);sessionStorage.setItem('qcInstr',JSON.stringify(qcInstr));}
+        setTimeout(()=>{if(typeof renderRejChips==='function')renderRejChips();if(typeof renderQcInstrChips==='function')renderQcInstrChips();},100);
       },50);
     }
     // Save state before navigating away
@@ -548,11 +581,12 @@
               <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">Enable excess receiving</td><td style="padding:5px 0;text-align:right;">${inboundState.seg_0||'—'}</td></tr>
               <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">Partial receiving</td><td style="padding:5px 0;text-align:right;">${inboundState.seg_1||'—'}</td></tr>
               <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">Rejection reasons</td><td style="padding:5px 0;text-align:right;">${rr.length?rr.join(', '):'—'}</td></tr>
-              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">Enable QC</td><td style="padding:5px 0;text-align:right;">${inboundState.seg_3||'—'}</td></tr>
-              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">QC instructions</td><td style="padding:5px 0;text-align:right;">${inboundState.seg_4||'—'}</td></tr>
-              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">Enable QC parameters</td><td style="padding:5px 0;text-align:right;">${inboundState.seg_5||'—'}</td></tr>
-              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">Failed parameter images</td><td style="padding:5px 0;text-align:right;">${inboundState.seg_6||'—'}</td></tr>
-              <tr><td style="padding:5px 0;font-weight:500;">One unit at a time</td><td style="padding:5px 0;text-align:right;">${inboundState.seg_7||'—'}</td></tr>
+              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">QC instructions</td><td style="padding:5px 0;text-align:right;">${(JSON.parse(inboundState.qcInstr||'[]')).join(', ')||'—'}</td></tr>
+              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">Do you perform quality checks</td><td style="padding:5px 0;text-align:right;">${inboundState.seg_2||'—'}</td></tr>
+              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">Enable QC checklist</td><td style="padding:5px 0;text-align:right;">${inboundState.seg_4||'—'}</td></tr>
+              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">Failed parameter images</td><td style="padding:5px 0;text-align:right;">${inboundState.seg_5||'—'}</td></tr>
+              <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:5px 0;font-weight:500;">One unit at a time</td><td style="padding:5px 0;text-align:right;">${inboundState.seg_6||'—'}</td></tr>
+              <tr><td style="padding:5px 0;font-weight:500;">Scope of one unit at a time</td><td style="padding:5px 0;text-align:right;">${inboundState.sel_0||'—'}</td></tr>
             </table>
           </div>
           <!-- Inventory -->
