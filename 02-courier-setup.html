@@ -1065,7 +1065,8 @@
     }
 
     function formatCourierName(name) {
-      return name.split('_').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ');
+      const abbrevs = ['LTL','FTL','LR'];
+      return name.split('_').map(w => abbrevs.includes(w) ? w : w.charAt(0) + w.slice(1).toLowerCase()).join(' ');
     }
 
     // ===== FC Mapping (with day pills and capacity inputs) =====
