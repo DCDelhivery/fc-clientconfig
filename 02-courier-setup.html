@@ -675,7 +675,7 @@
               <span class="tooltip">Please select FCs from the dropdown to add to the list</span>
             </span>
           </label>
-          <button class="btn-create-new" onclick="openCreateFCModal()">Create FC</button>
+          <button class="btn-create-new" onclick="openCreateFCModal()">Create New FC</button>
         </div>
 
         <div class="select-wrap" id="fcSelect">
@@ -784,14 +784,16 @@
   <div class="modal-overlay" id="createFCModal">
     <div class="modal">
       <div class="modal-header">
-        <h3>Create FC</h3>
+        <h3>Create New FC</h3>
         <button class="modal-close" onclick="closeCreateFCModal()">
           <span class="material-icons-outlined">close</span>
         </button>
       </div>
       <div class="modal-body">
-        <label class="form-label" style="margin-bottom:6px;">FC name</label>
-        <input type="text" class="tds-input" id="newFCName" placeholder="Enter FC name..." oninput="document.getElementById('btnFetchFC').disabled=!this.value.trim()">
+        <div class="modal-field">
+          <label>FC name <span class="required">*</span></label>
+          <input class="modal-input" type="text" id="newFCName" placeholder="Enter FC name" oninput="document.getElementById('btnFetchFC').disabled=!this.value.trim()">
+        </div>
       </div>
       <div class="modal-footer">
         <button class="btn-modal-cancel" onclick="closeCreateFCModal()">Cancel</button>
