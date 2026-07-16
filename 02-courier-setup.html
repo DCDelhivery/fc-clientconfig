@@ -478,7 +478,7 @@
     </div>
     <div class="creation-header-right">
       <button class="btn-mark-inactive" id="btnMarkInactive" style="display:none;padding:8px 16px;border:1px solid #E31E24;border-radius:4px;background:#fff;font-family:inherit;font-size:13px;font-weight:500;color:#E31E24;cursor:pointer;">Mark as inactive</button>
-      <button class="btn-save-draft">Save as draft</button>
+      <button class="btn-save-draft" onclick="persistState(); alert('Draft saved!'); this.disabled=true; this.style.opacity='0.5';">Save as draft</button>
       <button class="btn-close" onclick="window.location.href='01-client-list.html'">
         <span class="material-icons-outlined">close</span>
       </button>
@@ -814,8 +814,8 @@
 
     // ===== Pre-fill data for Mahindra (active client) =====
     const clientStatus = localStorage.getItem('clientStatus');
-    if (clientStatus === 'active') {
-      // Set default data for active client
+    if (clientStatus === 'active' && !localStorage.getItem('clientMappingState')) {
+      // Set default data for active client only if no existing state
       localStorage.setItem('clientMappingState', JSON.stringify({
         currentStep: 'courier',
         steps: ['courier', 'channel', 'fc'],

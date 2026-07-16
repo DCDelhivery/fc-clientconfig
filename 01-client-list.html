@@ -426,7 +426,7 @@
               </td>
               <td><span class="pill pill-active">Active</span></td>
               <td style="text-align:center">
-                <button class="btn-outline" onclick="localStorage.clear(); sessionStorage.clear(); localStorage.setItem('activeClient','Mahindra & Mahindra Ltd'); localStorage.setItem('clientStatus','active'); window.location.href='02-courier-setup.html'">Edit</button>
+                <button class="btn-outline" onclick="localStorage.setItem('activeClient','Mahindra & Mahindra Ltd'); localStorage.setItem('clientStatus','active'); window.location.href='02-courier-setup.html'">Edit</button>
               </td>
             </tr>
             <tr data-status="draft">
@@ -435,7 +435,7 @@
               <td><span class="fc-na" id="mamaearth-fcs">NA</span></td>
               <td><span class="pill pill-draft" id="mamaearth-status">Draft</span></td>
               <td style="text-align:center">
-                <button class="btn-outline" id="mamaearth-action" onclick="localStorage.clear(); sessionStorage.clear(); localStorage.setItem('activeClient','Mamaearth Ltd'); window.location.href='02-courier-setup.html'">Configure</button>
+                <button class="btn-outline" id="mamaearth-action" onclick="localStorage.setItem('activeClient','Mamaearth Ltd'); window.location.href='02-courier-setup.html'">Configure</button>
               </td>
             </tr>
             <tr data-status="draft">
@@ -444,7 +444,7 @@
               <td><span class="fc-na">NA</span></td>
               <td><span class="pill pill-draft">Draft</span></td>
               <td style="text-align:center">
-                <button class="btn-outline" onclick="localStorage.clear(); sessionStorage.clear(); localStorage.setItem('activeClient','Lenskart Solutions'); window.location.href='02-courier-setup.html'">Configure</button>
+                <button class="btn-outline" onclick="localStorage.setItem('activeClient','Lenskart Solutions'); window.location.href='02-courier-setup.html'">Configure</button>
               </td>
             </tr>
             <tr data-status="inactive">
@@ -453,7 +453,7 @@
               <td><span class="fc-na">NA</span></td>
               <td><span class="pill pill-inactive">Inactive</span></td>
               <td style="text-align:center">
-                <button class="btn-outline" onclick="localStorage.clear(); sessionStorage.clear(); localStorage.setItem('activeClient','Boat Lifestyle Ltd'); window.location.href='02-courier-setup.html'">Configure</button>
+                <button class="btn-outline" onclick="localStorage.setItem('activeClient','Boat Lifestyle Ltd'); window.location.href='02-courier-setup.html'">Configure</button>
               </td>
             </tr>
           </tbody>
@@ -532,6 +532,26 @@
       row.style.transition = 'background-color 0.5s ease';
       row.style.backgroundColor = '#E6F5ED';
       setTimeout(() => { row.style.backgroundColor = ''; }, 3000);
+    }
+
+    // Check if Mamaearth has draft FCs mapped (not yet active)
+    if (localStorage.getItem('mamaearth_status') !== 'active') {
+      const savedMapping = JSON.parse(localStorage.getItem('clientMappingState') || 'null');
+      const savedClient = localStorage.getItem('activeClient');
+      if (savedClient === 'Mamaearth Ltd' && savedMapping && savedMapping.items && savedMapping.items.fc && savedMapping.items.fc.length > 0) {
+        const fcsEl = document.getElementById('mamaearth-fcs');
+        const statusEl = document.getElementById('mamaearth-status');
+        if (fcsEl) {
+          fcsEl.outerHTML = '<div class="fc-badges">' + savedMapping.items.fc.map(fc => {
+            return '<span class="fc-badge" style="background:transparent;border:1px dashed #CBD5E1;color:#94A3B8;">' + fc + '</span>';
+          }).join('') + '</div>';
+        }
+        if (statusEl && statusEl.textContent === 'Draft') {
+          statusEl.textContent = 'In-progress';
+          statusEl.className = 'pill pill-progress';
+          statusEl.closest('tr').setAttribute('data-status', 'progress');
+        }
+      }
     }
 
     // Search functionality
