@@ -719,6 +719,7 @@
             </div>
           </div>
         </div>
+        <button class="btn-create-new" onclick="openCreateFCModal()">Create FC</button>
 
         <!-- Selected FCs Table -->
         <div class="selected-table-wrap">
@@ -728,7 +729,7 @@
                 <th class="col-sno">S.No.</th>
                 <th class="col-fc">Selected FCs</th>
                 <th class="col-days">Operating days</th>
-                <th class="col-capacity">Daily order capacity</th>
+                <th class="col-capacity">Daily order capacity <span class="material-icons-outlined" style="font-size:13px;color:var(--t3);vertical-align:middle;cursor:help;" title="Max Orders must be ≤ Max Orderlines.">info</span></th>
                 <th class="col-capacity">Daily orderline capacity</th>
                 <th class="col-capacity">Daily quantity capacity</th>
                 <th class="col-action">Action</th>
@@ -776,6 +777,26 @@
       <div class="modal-footer">
         <button class="btn-modal-cancel" onclick="closeCreateChannelModal()">Cancel</button>
         <button class="btn-modal-primary" id="btnAddChannel" disabled onclick="addNewChannel()">Add channel and map</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Create FC Modal ===== -->
+  <div class="modal-overlay" id="createFCModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Create FC</h3>
+        <button class="modal-close" onclick="closeCreateFCModal()">
+          <span class="material-icons-outlined">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label" style="margin-bottom:6px;">FC name</label>
+        <input type="text" class="tds-input" id="newFCName" placeholder="Enter FC name..." oninput="document.getElementById('btnFetchFC').disabled=!this.value.trim()">
+      </div>
+      <div class="modal-footer">
+        <button class="btn-modal-cancel" onclick="closeCreateFCModal()">Cancel</button>
+        <button class="btn-modal-primary" id="btnFetchFC" disabled onclick="fetchFromFAAS()">Fetch from FAAS</button>
       </div>
     </div>
   </div>
@@ -1171,6 +1192,23 @@
         updateAllStepStatuses();
       }
       closeCreateChannelModal();
+    }
+
+    // ===== Create FC Modal =====
+    function openCreateFCModal() {
+      document.getElementById('createFCModal').classList.add('open');
+      document.getElementById('newFCName').value = '';
+      document.getElementById('btnFetchFC').disabled = true;
+    }
+    function closeCreateFCModal() {
+      document.getElementById('createFCModal').classList.remove('open');
+    }
+    function fetchFromFAAS() {
+      const name = document.getElementById('newFCName').value.trim();
+      if (name && !state.items.fc.includes(name)) {
+        addFCItem(name);
+      }
+      closeCreateFCModal();
     }
 
     // Initialize
