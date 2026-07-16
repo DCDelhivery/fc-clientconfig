@@ -533,9 +533,9 @@
         const d=shelfBucketData[b]||{min:'',pref:'',prime:''};
         return `<tr data-bucket="${b}">
         <td style="padding:8px 10px;font-size:12px;font-weight:500;border-bottom:1px solid var(--border-light);">${b}</td>
-        <td style="padding:8px 10px;border-bottom:1px solid var(--border-light);"><input class="tds-input" type="text" style="width:80px;" placeholder="%" value="${d.min}" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value==='0')this.value=''"></td>
-        <td style="padding:8px 10px;border-bottom:1px solid var(--border-light);"><input class="tds-input" type="text" style="width:80px;" placeholder="%" value="${d.pref}" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value==='0')this.value=''"></td>
-        <td style="padding:8px 10px;border-bottom:1px solid var(--border-light);"><input class="tds-input" type="text" style="width:80px;" placeholder="%" value="${d.prime}" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value==='0')this.value=''"></td>
+        <td style="padding:8px 10px;border-bottom:1px solid var(--border-light);"><input class="tds-input" type="text" style="width:80px;" placeholder="%" value="${d.min}" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(parseInt(this.value)>100)this.value='100'"></td>
+        <td style="padding:8px 10px;border-bottom:1px solid var(--border-light);"><input class="tds-input" type="text" style="width:80px;" placeholder="%" value="${d.pref}" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(parseInt(this.value)>100)this.value='100'"></td>
+        <td style="padding:8px 10px;border-bottom:1px solid var(--border-light);"><input class="tds-input" type="text" style="width:80px;" placeholder="%" value="${d.prime}" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(parseInt(this.value)>100)this.value='100'"></td>
         <td style="padding:8px 10px;text-align:center;border-bottom:1px solid var(--border-light);"><button style="border:1px solid var(--border);border-radius:4px;background:var(--surface);width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;" onclick="removeShelfBucket(${i})"><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">delete</span></button></td>
       </tr>`;}).join('');
     }
@@ -1026,26 +1026,24 @@
             <div class="cfg-row-right"><button class="btn-bulk" onclick="openSBDModal()">Edit config</button></div>
           </div>
           <div style="margin-top:12px;padding:16px;background:#FAFAFA;border-radius:4px;">
-            <div style="font-size:12px;font-weight:600;margin-bottom:4px;">SBD courier offset</div>
-            <div style="font-size:11px;color:var(--t3);margin-bottom:8px;">Buffer days added per courier for SBD calculation.</div>
-            <table style="width:100%;border-collapse:collapse;margin-bottom:20px;background:var(--surface);border-radius:4px;"><thead style="background:#F7F8FA;"><tr><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Couriers</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:right;border-bottom:1px solid var(--border);">Offset days</th></tr></thead><tbody>
-              <tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border-light);">Delhivery FTL</td><td style="padding:8px 12px;font-size:12px;text-align:right;border-bottom:1px solid var(--border-light);">10</td></tr>
-              <tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border-light);">Delhivery LTL</td><td style="padding:8px 12px;font-size:12px;text-align:right;border-bottom:1px solid var(--border-light);">10</td></tr>
-              <tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border-light);">Delhivery standard</td><td style="padding:8px 12px;font-size:12px;text-align:right;border-bottom:1px solid var(--border-light);">10</td></tr>
-              <tr><td style="padding:8px 12px;font-size:12px;">Platform dispatchers</td><td style="padding:8px 12px;font-size:12px;text-align:right;">10</td></tr>
-            </tbody></table>
+            <div style="font-size:12px;margin-bottom:4px;"><strong>Surge period (days):</strong> ${surgePeriod} days</div>
+            <div style="font-size:12px;margin-bottom:16px;"><strong>Surge multiplier (decimal):</strong> ${surgeMultiplier}</div>
             <div style="font-size:12px;font-weight:600;margin-bottom:4px;">SBD Courier cutoff</div>
             <div style="font-size:11px;color:var(--t3);margin-bottom:8px;">Buffer days added per courier for SBD calculation.</div>
-            <table style="width:100%;border-collapse:collapse;background:var(--surface);border-radius:4px;"><thead style="background:#F7F8FA;"><tr><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Couriers</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">P1</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">P2</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">P3</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">P4</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">P5</th></tr></thead><tbody>
+            <table style="width:100%;border-collapse:collapse;margin-bottom:20px;background:var(--surface);border-radius:4px;"><thead style="background:#F7F8FA;"><tr><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Couriers</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">P1</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">P2</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">P3</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">P4</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">P5</th></tr></thead><tbody>
               <tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border-light);">Delhivery FTL</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">10:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">10:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">10:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">10:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">10:00</td></tr>
               <tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border-light);">Delhivery LTL</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td></tr>
               <tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border-light);">Delhivery standard</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td></tr>
               <tr><td style="padding:8px 12px;font-size:12px;">Platform dispatchers</td><td style="padding:8px 12px;font-size:12px;text-align:center;">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;">14:00</td></tr>
             </tbody></table>
-            <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border-light);">
-              <div style="font-size:12px;margin-bottom:4px;"><strong>Surge period (days):</strong> ${surgePeriod} days</div>
-              <div style="font-size:12px;"><strong>Surge multiplier (decimal):</strong> ${surgeMultiplier}</div>
-            </div>
+            <div style="font-size:12px;font-weight:600;margin-bottom:4px;">SBD courier offset</div>
+            <div style="font-size:11px;color:var(--t3);margin-bottom:8px;">Buffer days added per courier for SBD calculation.</div>
+            <table style="width:100%;border-collapse:collapse;background:var(--surface);border-radius:4px;"><thead style="background:#F7F8FA;"><tr><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Couriers</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:right;border-bottom:1px solid var(--border);">Offset days</th></tr></thead><tbody>
+              <tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border-light);">Delhivery FTL</td><td style="padding:8px 12px;font-size:12px;text-align:right;border-bottom:1px solid var(--border-light);">10</td></tr>
+              <tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border-light);">Delhivery LTL</td><td style="padding:8px 12px;font-size:12px;text-align:right;border-bottom:1px solid var(--border-light);">10</td></tr>
+              <tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border-light);">Delhivery standard</td><td style="padding:8px 12px;font-size:12px;text-align:right;border-bottom:1px solid var(--border-light);">10</td></tr>
+              <tr><td style="padding:8px 12px;font-size:12px;">Platform dispatchers</td><td style="padding:8px 12px;font-size:12px;text-align:right;">10</td></tr>
+            </tbody></table>
           </div>
         </div>
         ${['Pickwave Automation','Enable LR consolidation'].map(s=>{
@@ -1191,19 +1189,18 @@
           <button onclick="document.getElementById('sbdModal').remove()" style="border:none;background:none;cursor:pointer;color:var(--t3);"><span class="material-icons-outlined" style="font-size:18px;">close</span></button>
         </div>
         <div style="padding:20px 24px;overflow-y:auto;flex:1;">
-          <!-- SBD Courier Offset -->
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-            <div><div style="font-size:13px;font-weight:600;">SBD courier offset</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">Buffer days added per courier for SBD calculation.</div></div>
+          <!-- Surge Period -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border-light);">
+            <div><div style="font-size:13px;font-weight:600;">Surge period (days)</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">How many end-of-month days the surge config applies to.</div><div style="font-size:10px;color:var(--warning);margin-top:4px;">Max value is 10 days</div></div>
+            <input class="tds-input" value="${surgePeriod}" style="width:100px;text-align:center;" oninput="let v=parseInt(this.value)||0;if(v>10)this.value=10;surgePeriod=this.value"> 
           </div>
-          <div style="border:1px solid var(--border-light);border-radius:6px;overflow:hidden;margin-bottom:20px;">
-            <table style="width:100%;border-collapse:collapse;">
-              <thead style="background:#F9FAFB;"><tr><th style="padding:8px 14px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Courier</th><th style="padding:8px 14px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Offset days</th><th style="padding:8px 14px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);width:60px;">Action</th></tr></thead>
-              <tbody id="sbdOffsetBody"></tbody>
-            </table>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border-light);margin-bottom:20px;">
+            <div><div style="font-size:13px;font-weight:600;">Surge Multiplier</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">Multiplier applied to daily capacity during surge period.</div><div style="font-size:10px;color:var(--warning);margin-top:4px;">Max value is 5</div></div>
+            <input class="tds-input" value="${surgeMultiplier}" style="width:100px;text-align:center;" oninput="let v=parseFloat(this.value)||0;if(v>5)this.value=5;surgeMultiplier=this.value"> 
           </div>
           <!-- SBD Courier Cutoff -->
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-            <div><div style="font-size:13px;font-weight:600;">SBD Courier cutoff</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">Buffer days added per courier for SBD calculation. Surface typically needs more days than Express.</div></div>
+            <div><div style="font-size:13px;font-weight:600;">SBD Courier cutoff</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">Buffer days added per courier for SBD calculation.</div></div>
           </div>
           <div style="border:1px solid var(--border-light);border-radius:6px;overflow:hidden;margin-bottom:20px;">
             <table style="width:100%;border-collapse:collapse;">
@@ -1211,14 +1208,15 @@
               <tbody id="sbdCutoffBody"></tbody>
             </table>
           </div>
-          <!-- Surge Period -->
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid var(--border-light);">
-            <div><div style="font-size:13px;font-weight:600;">Surge period (days)</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">How many end-of-month days the surge config applies to.</div></div>
-            <input class="tds-input" value="${surgePeriod}" style="width:100px;text-align:center;" onchange="surgePeriod=this.value"> 
+          <!-- SBD Courier Offset -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <div><div style="font-size:13px;font-weight:600;">SBD courier offset</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">Buffer days added per courier for SBD calculation.</div></div>
           </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid var(--border-light);">
-            <div><div style="font-size:13px;font-weight:600;">Surge Multiplier</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">Multiplier applied to daily capacity during surge period.</div></div>
-            <input class="tds-input" value="${surgeMultiplier}" style="width:100px;text-align:center;" onchange="surgeMultiplier=this.value"> 
+          <div style="border:1px solid var(--border-light);border-radius:6px;overflow:hidden;margin-bottom:20px;">
+            <table style="width:100%;border-collapse:collapse;">
+              <thead style="background:#F9FAFB;"><tr><th style="padding:8px 14px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Courier</th><th style="padding:8px 14px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Offset days</th></tr></thead>
+              <tbody id="sbdOffsetBody"></tbody>
+            </table>
           </div>
         </div>
         <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:14px 24px;border-top:1px solid var(--border-light);">
