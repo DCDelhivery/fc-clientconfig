@@ -230,7 +230,7 @@
           <div style="font-size:12px;font-weight:500;margin-bottom:6px;">Clone from <span style="color:var(--primary);">*</span></div>
           <select class="tds-select" id="cloneSource" style="width:100%;">
             <option value="">Select FC to clone from</option>
-            ${selectedFCs.filter(f=>f!==fc).map(f=>`<option value="${f}">${f}${configuredFCs[f]?' (configured)':''}</option>`).join('')}
+            ${configuredList.map(f=>`<option value="${f}">${f} (configured)</option>`).join('')}
           </select>
         </div>
         <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:14px 24px;border-top:1px solid var(--border-light);">
@@ -246,19 +246,34 @@
     }
     function cloneFC(fc){
       const source=document.getElementById('cloneSource').value;
+      if(!source){alert('Please select an FC to clone from');return;}
       document.getElementById('cloneModal').remove();
-      // Copy all settings from source FC to new FC
+      // Copy all settings from source FC to new FC (except zones/serviceability)
       const st = JSON.parse(sessionStorage.getItem('allConfigState')||'{}');
       ['inbound','inventory','outbound'].forEach(step=>{
         if(st[`${source}-${step}`]){
-          st[`${fc}-${step}`] = JSON.parse(JSON.stringify(st[`${source}-${step}`]));
+          const cloned = JSON.parse(JSON.stringify(st[`${source}-${step}`]));
+          // For inventory, remove zone data (user must upload separately)
+          if(step==='inventory'){
+            // Keep toggle states but zones will be empty
+          }
+          st[`${fc}-${step}`] = cloned;
         }
       });
       sessionStorage.setItem('allConfigState', JSON.stringify(st));
-      // Also mark steps as saved
+      // Also copy rejection reasons, QC instructions, pack instructions
+      const sourceInbound = st[`${source}-inbound`]||{};
+      if(sourceInbound.rejReasons) sessionStorage.setItem('rejReasons', sourceInbound.rejReasons);
+      if(sourceInbound.qcInstr) sessionStorage.setItem('qcInstr', sourceInbound.qcInstr);
+      const sourceOutbound = st[`${source}-outbound`]||{};
+      if(sourceOutbound.packInstr) sessionStorage.setItem('packInstr', sourceOutbound.packInstr);
+      // Mark steps as saved
       saved[`${fc}-inbound`]=true;saved[`${fc}-inventory`]=true;
       sessionStorage.setItem('fcSaved',JSON.stringify(saved));
-      activeFC=fc;activeStep='inbound';renderAll();restoreState();
+      // Clear zones for new FC (must be uploaded fresh)
+      sessionStorage.removeItem('zonesData');
+      activeFC=fc;activeStep='inbound';renderAll();
+      setTimeout(restoreState, 150);
     }
 
     // Stepper
