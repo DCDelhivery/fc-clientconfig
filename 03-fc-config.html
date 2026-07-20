@@ -497,13 +497,13 @@
         <div class="section-divider"><div class="section-divider-title">Quality Check</div><div class="section-divider-desc">Inspection performed during inbound.</div></div>
         <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;">
-            <div class="cfg-row-left"><div class="cfg-label">Do you perform quality checks during receiving</div><span class="cfg-badge badge-client">Client</span></div>
+            <div class="cfg-row-left"><div class="cfg-label">Do you perform quality checks during receiving</div></div>
             <div class="cfg-row-right"><div class="seg-group" id="qc-enable-seg"><button class="seg-btn" onclick="setSeg('qc-enable-seg','yes',showQcSettings)">Yes</button><button class="seg-btn" onclick="setSeg('qc-enable-seg','no',hideQcSettings)">No</button></div></div>
           </div>
           <div class="cfg-reveal" id="qc-settings-reveal" style="flex-direction:column;gap:0;padding:0;margin-top:12px;">
             <div style="display:flex;flex-direction:column;padding:12px 16px;border-bottom:1px solid var(--border-light);">
               <div style="display:flex;align-items:flex-start;justify-content:space-between;">
-                <div class="cfg-row-left"><div class="cfg-label">QC instructions</div><div class="cfg-desc">Select the QC instructions to show to operators during receiving.</div><div style="font-size:11px;color:#B45309;font-weight:500;margin-top:4px;">*SKU level QC instructions can be set up in the product catalog</div></div>
+                <div class="cfg-row-left"><div class="cfg-label">QC instructions</div><div class="cfg-desc">Select the QC instructions to show to operators during receiving.</div><div style="font-size:11px;color:#B45309;font-weight:500;margin-top:4px;">*SKU level QC instructions can be set up in the product catalog</div><span class="cfg-badge badge-client">Client</span></div>
                 <div class="cfg-row-right"><div style="position:relative;" id="qcInstrWrap"><div class="rej-trigger" onclick="toggleQcInstrDD()"><span>Select instructions</span><span class="material-icons-outlined" style="font-size:16px;color:var(--t3);">expand_more</span></div>
                   <div class="rej-dd" id="qcInstrDD">
                     <div class="rej-opt" data-name="Inspect packaging for visible damage" onclick="addQcInstr('Inspect packaging for visible damage')"><span>Inspect packaging for visible damage</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
@@ -516,15 +516,15 @@
               <div id="qcInstrChips" style="display:none;"></div>
             </div>
             <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border-light);">
-              <div class="cfg-row-left"><div class="cfg-label">Enable QC checklist</div><div class="cfg-desc">Require pass/fail checks using QC parameters during receiving.</div><div id="qcparam-warn" style="display:none;padding:6px 0 0;font-size:11px;color:#B45309;font-weight:500;">*SKU level QC parameters can be set up in the product catalog</div></div>
+              <div class="cfg-row-left"><div class="cfg-label">Enable QC checklist</div><div class="cfg-desc">Require pass/fail checks using QC parameters during receiving.</div><span class="cfg-badge badge-client">Client</span><div id="qcparam-warn" style="display:none;padding:6px 0 0;font-size:11px;color:#B45309;font-weight:500;">*SKU level QC parameters can be set up in the product catalog</div></div>
               <div class="cfg-row-right"><div class="seg-group" id="qcparam-seg"><button class="seg-btn" onclick="setSeg('qcparam-seg','yes',()=>document.getElementById('qcparam-warn').style.display='block')">Yes</button><button class="seg-btn" onclick="setSeg('qcparam-seg','no',()=>document.getElementById('qcparam-warn').style.display='none')">No</button></div></div>
             </div>
             <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border-light);">
-              <div class="cfg-row-left"><div class="cfg-label">Enable Failed Parameter Images</div><div class="cfg-desc">Require operators to upload an image when a QC parameter fails.</div></div>
+              <div class="cfg-row-left"><div class="cfg-label">Enable Failed Parameter Images</div><div class="cfg-desc">Require operators to upload an image when a QC parameter fails.</div><span class="cfg-badge badge-client">Client</span></div>
               <div class="cfg-row-right"><div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">No</button></div></div>
             </div>
             <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:12px 16px;">
-              <div class="cfg-row-left"><div class="cfg-label">One unit at a time</div><div class="cfg-desc">Restrict the operator to receive inventory only one unit at a time.</div></div>
+              <div class="cfg-row-left"><div class="cfg-label">One unit at a time</div><div class="cfg-desc">Restrict the operator to receive inventory only one unit at a time.</div><span class="cfg-badge badge-client">Client</span></div>
               <div class="cfg-row-right"><div class="seg-group" id="oneunit-seg"><button class="seg-btn" onclick="setSeg('oneunit-seg','yes',showOneUnit)">Yes</button><button class="seg-btn" onclick="setSeg('oneunit-seg','no',hideOneUnit)">No</button></div></div>
             </div>
             <div id="oneunit-warn" style="display:none;padding:0 16px 8px;font-size:11px;color:#B45309;font-weight:500;">*Receiving may take longer because operators must perform QC one unit at a time.</div>
@@ -1002,7 +1002,7 @@
     let zonesData = JSON.parse(sessionStorage.getItem('zonesData')||'[]');
     function getInventoryPage(){
       return `<div style="border:1px solid var(--border-light);border-radius:var(--radius);overflow:hidden;"><div class="content-header"><div><div class="content-title">Inventory</div><div class="content-subtitle">Zones, expiry, cycle count</div></div><div class="content-count">9 settings</div></div>
-        <div class="section-divider" style="display:flex;align-items:center;justify-content:space-between;" id="zonesSectionDiv"><div><div class="section-divider-title">Zone and Locations</div><div class="section-divider-desc">Configure warehouse zones and their locations.</div></div><div style="display:flex;gap:8px;"><button class="btn-bulk" id="btnDownloadAll" style="display:none;border:1px solid var(--border);background:var(--surface);color:var(--t1);" onclick="alert('Downloading all zones...')">Download all</button><button class="btn-bulk" onclick="openUploadModal('Upload locations','bulk_locations')">Bulk upload</button></div></div>
+        <div class="section-divider" style="display:flex;align-items:center;justify-content:space-between;" id="zonesSectionDiv"><div><div class="section-divider-title">Zone and Locations</div><div class="section-divider-desc">Configure warehouse zones and their locations.</div><span class="cfg-badge badge-fc" style="margin-top:4px;">FC</span></div><div style="display:flex;gap:8px;"><button class="btn-bulk" id="btnDownloadAll" style="display:none;border:1px solid var(--border);background:var(--surface);color:var(--t1);" onclick="alert('Downloading all zones...')">Download all</button><button class="btn-bulk" onclick="openUploadModal('Upload locations','bulk_locations')">Bulk upload</button></div></div>
         <div style="padding:0 16px 16px 38px;display:none;border-bottom:1px solid var(--border-light);margin:0 16px;" id="zonesTableWrap"><div class="zones-wrap"><table class="zones-table"><thead><tr><th style="width:40px">S.No.</th><th style="width:160px">Zones</th><th>Locations</th></tr></thead><tbody id="zonesBody"></tbody></table></div></div>
         <div class="section-divider"><div class="section-divider-title">Expiry Management</div><div class="section-divider-desc">How near-expiry and expired stock are handled.</div></div>
         <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
@@ -1013,7 +1013,7 @@
           <div class="cfg-reveal" id="expiry-settings-reveal" style="flex-direction:column;gap:0;padding:0;margin-top:12px;">
             <div style="padding:12px 16px;border-bottom:1px solid var(--border-light);">
               <div style="display:flex;align-items:flex-start;justify-content:space-between;">
-                <div class="cfg-row-left"><div class="cfg-label">Shelf-life check</div><div class="cfg-desc">System checks shelf life before moving items from Reserve to Prime.</div></div>
+                <div class="cfg-row-left"><div class="cfg-label">Shelf-life check</div><div class="cfg-desc">System checks shelf life before moving items from Reserve to Prime.</div><span class="cfg-badge badge-fc">FC</span></div>
                 <div class="cfg-row-right"><div class="seg-group" id="shelflife-seg"><button class="seg-btn" onclick="setSeg('shelflife-seg','yes',showShelfLifeConfig)">Yes</button><button class="seg-btn" onclick="setSeg('shelflife-seg','no',hideShelfLifeConfig)">No</button></div></div>
               </div>
               <div id="shelflife-config" style="display:none;margin-top:12px;padding:16px;background:#F0F1F3;border-radius:4px;overflow:visible;">
@@ -1047,14 +1047,14 @@
             </div>
             <div style="padding:12px 16px;border-bottom:1px solid var(--border-light);">
               <div style="display:flex;align-items:flex-start;justify-content:space-between;">
-                <div class="cfg-row-left"><div class="cfg-label">Auto-move expired stock</div><div class="cfg-desc">Expired products are automatically moved into an expired bucket.</div></div>
+                <div class="cfg-row-left"><div class="cfg-label">Auto-move expired stock</div><div class="cfg-desc">Expired products are automatically moved into an expired bucket.</div><span class="cfg-badge badge-client">Client</span></div>
                 <div class="cfg-row-right"><div class="seg-group" id="auto-exp-seg"><button class="seg-btn" onclick="setSeg('auto-exp-seg','yes',()=>document.getElementById('exp-bucket').classList.add('show'))">Yes</button><button class="seg-btn" onclick="setSeg('auto-exp-seg','no',()=>document.getElementById('exp-bucket').classList.remove('show'))">No</button></div></div>
               </div>
               <div class="cfg-reveal" id="exp-bucket" style="background:#F0F1F3;"><span class="cfg-reveal-label">Expired external bucket</span><select class="tds-select"><option value="">Select bucket</option><option>Expired stock</option><option>Damaged</option><option>Do not sell</option></select></div>
             </div>
             <div style="padding:12px 16px;">
               <div style="display:flex;align-items:flex-start;justify-content:space-between;">
-                <div class="cfg-row-left"><div class="cfg-label">Auto-move near-expiry stock</div><div class="cfg-desc">Near-expiry products are moved into a near-expiry bucket.</div></div>
+                <div class="cfg-row-left"><div class="cfg-label">Auto-move near-expiry stock</div><div class="cfg-desc">Near-expiry products are moved into a near-expiry bucket.</div><span class="cfg-badge badge-client">Client</span></div>
                 <div class="cfg-row-right"><div class="seg-group" id="auto-near-seg"><button class="seg-btn" onclick="setSeg('auto-near-seg','yes',()=>document.getElementById('near-bucket').classList.add('show'))">Yes</button><button class="seg-btn" onclick="setSeg('auto-near-seg','no',()=>document.getElementById('near-bucket').classList.remove('show'))">No</button></div></div>
               </div>
               <div class="cfg-reveal" id="near-bucket" style="background:#F0F1F3;"><span class="cfg-reveal-label">Near-expiry external bucket</span><select class="tds-select"><option value="">Select bucket</option><option>Expired stock</option><option>Damaged</option><option>Do not sell</option></select></div>
