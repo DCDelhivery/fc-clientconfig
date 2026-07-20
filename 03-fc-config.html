@@ -477,9 +477,10 @@
             <div style="display:flex;align-items:center;gap:4px;"><input class="tds-input" placeholder="Add and press enter" style="width:120px;"><span style="font-size:12px;color:var(--t2);">%</span></div>
           </div>
         </div>
-        <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Enable partial receiving</div><div class="cfg-desc">Allows receiving of a single AGN in multiple batches.</div><span class="cfg-badge badge-client">Client</span></div>
+        <div class="cfg-row" style="flex-direction:column;align-items:stretch;"><div style="display:flex;align-items:flex-start;justify-content:space-between;"><div class="cfg-row-left"><div class="cfg-label">Enable partial receiving</div><div class="cfg-desc">Allows receiving of a single AGN in multiple batches.</div><span class="cfg-badge badge-client">Client</span></div>
           <div class="cfg-row-right"><div class="seg-group" id="partial-seg"><button class="seg-btn" onclick="setSeg('partial-seg','yes',null)">Yes</button><button class="seg-btn" onclick="setSeg('partial-seg','no',showPartialWarn)">No</button></div></div></div>
-        <div id="partial-warn" style="display:none;padding:0 0 8px;font-size:11px;color:#B45309;font-weight:500;">*The entire expected quantity must be received in a single session.</div>
+          <div id="partial-warn" style="display:none;padding:6px 0 0;font-size:11px;color:#B45309;font-weight:500;">*The entire expected quantity must be received in a single session.</div>
+        </div>
         <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;">
             <div class="cfg-row-left"><div class="cfg-label">Rejection reasons</div><div class="cfg-desc">User will have to select one of the configured reasons while receiving reject inventory.</div><span class="cfg-badge badge-client">Client</span></div>
