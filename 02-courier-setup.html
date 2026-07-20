@@ -854,6 +854,8 @@
       items: { courier: [], channel: [], fc: [] },
       pendingDelete: null
     };
+    // Always start from courier step when page loads
+    state.currentStep = 'courier';
     function persistState() {
       localStorage.setItem('clientMappingState', JSON.stringify(state));
     }
