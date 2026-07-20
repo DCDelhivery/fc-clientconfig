@@ -1236,8 +1236,8 @@
         hideSelectedOptions('fc');
       }
       updateAllStepStatuses();
-      // Go to saved step
-      if (state.currentStep !== 'courier') goToStep(state.currentStep);
+      // Always show courier step first
+      goToStep('courier');
     }
     // Show "Mark as inactive" if client is active
     if (localStorage.getItem('mamaearth_status') === 'active') {
