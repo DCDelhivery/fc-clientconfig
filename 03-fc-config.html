@@ -163,6 +163,11 @@
     </nav>
 
     <div class="main">
+      <!-- Clone Banner (shown for unconfigured FCs) -->
+      <div id="cloneBanner" style="display:none;padding:12px 32px;background:#F0F1F3;display:none;align-items:center;justify-content:space-between;">
+        <span style="font-size:13px;color:var(--t1);">Do you want to clone the settings from other active FCs to this FC?</span>
+        <button style="padding:7px 16px;border:none;border-radius:4px;background:var(--t1);font-family:inherit;font-size:12px;font-weight:600;color:#fff;cursor:pointer;" onclick="showClonePrompt(activeFC)">Clone</button>
+      </div>
       <!-- Top Stepper -->
       <div class="top-stepper" id="topStepper"></div>
       <!-- Scrollable Content -->
@@ -278,6 +283,16 @@
 
     // Stepper
     function renderStepper(){
+      // Show/hide clone banner
+      const banner = document.getElementById('cloneBanner');
+      const configuredList = selectedFCs.filter(f=>configuredFCs[f]);
+      if(banner){
+        if(!configuredFCs[activeFC] && configuredList.length > 0){
+          banner.style.display='flex';
+        } else {
+          banner.style.display='none';
+        }
+      }
       const stepIdx = steps.findIndex(s=>s.id===activeStep);
       document.getElementById('topStepper').innerHTML = steps.map((s,i)=>{
         let cls='';
