@@ -929,10 +929,7 @@
         const navItem = document.querySelector(`.step-nav-item[data-step="${step}"]`);
         if (state.items[step].length > 0) {
           navItem.classList.add('has-items');
-          // FC mapping gets checkmark immediately when items are added
-          if (step === 'fc') {
-            navItem.classList.add('completed');
-          }
+          navItem.classList.add('completed');
         } else {
           navItem.classList.remove('has-items');
           navItem.classList.remove('completed');
