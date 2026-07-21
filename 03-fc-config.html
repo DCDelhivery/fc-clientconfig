@@ -480,7 +480,7 @@
         <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;">
             <div class="cfg-row-left"><div class="cfg-label">Rejection reasons</div><div class="cfg-desc">User will have to select one of the configured reasons while receiving reject inventory.</div><span class="cfg-badge badge-client">Client</span></div>
-            <div class="cfg-row-right"><div style="position:relative;" id="rejWrap"><div class="rej-trigger" onclick="toggleRejDD()"><span>Select reasons</span><span class="material-icons-outlined" style="font-size:16px;color:var(--t3);">expand_more</span></div>
+            <div class="cfg-row-right"><div style="position:relative;" id="rejWrap"><div class="rej-trigger" onclick="toggleRejDD()"><span>Select reasons</span><span class="material-icons-outlined" style="font-size:16px;color:var(--t3);">keyboard_arrow_down</span></div>
               <div class="rej-dd" id="rejDD">
                 <div class="rej-opt" data-name="Major carton damage" onclick="addRej('Major carton damage')"><span>Major carton damage</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
                 <div class="rej-opt" data-name="Expired Product" onclick="addRej('Expired Product')"><span>Expired Product</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
@@ -500,7 +500,7 @@
             <div style="display:flex;flex-direction:column;padding:12px 16px;border-bottom:1px solid var(--border-light);">
               <div style="display:flex;align-items:flex-start;justify-content:space-between;">
                 <div class="cfg-row-left"><div class="cfg-label">QC instructions</div><div class="cfg-desc">Select the QC instructions to show to operators during receiving.</div><div style="font-size:11px;color:#B45309;font-weight:500;margin-top:4px;">*SKU level QC instructions can be set up in the product catalog</div><span class="cfg-badge badge-client">Client</span></div>
-                <div class="cfg-row-right"><div style="position:relative;" id="qcInstrWrap"><div class="rej-trigger" onclick="toggleQcInstrDD()"><span>Select instructions</span><span class="material-icons-outlined" style="font-size:16px;color:var(--t3);">expand_more</span></div>
+                <div class="cfg-row-right"><div style="position:relative;" id="qcInstrWrap"><div class="rej-trigger" onclick="toggleQcInstrDD()"><span>Select instructions</span><span class="material-icons-outlined" style="font-size:16px;color:var(--t3);">keyboard_arrow_down</span></div>
                   <div class="rej-dd" id="qcInstrDD">
                     <div class="rej-opt" data-name="Inspect packaging for visible damage" onclick="addQcInstr('Inspect packaging for visible damage')"><span>Inspect packaging for visible damage</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
                     <div class="rej-opt" data-name="Verify SKU matches label" onclick="addQcInstr('Verify SKU matches label')"><span>Verify SKU matches label</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
@@ -1016,7 +1016,7 @@
               <div id="shelflife-config" style="display:none;margin-top:12px;padding:16px;background:#F0F1F3;border-radius:4px;overflow:visible;">
                 <div style="font-size:12px;font-weight:600;margin-bottom:8px;">External buckets</div>
                 <div style="position:relative;margin-bottom:12px;width:250px;" id="shelfBucketWrap">
-                  <div class="rej-trigger" onclick="document.getElementById('shelfBucketDD').classList.toggle('open')"><span>Select external bucket</span><span class="material-icons-outlined" style="font-size:16px;color:var(--t3);">expand_more</span></div>
+                  <div class="rej-trigger" onclick="document.getElementById('shelfBucketDD').classList.toggle('open')"><span>Select external bucket</span><span class="material-icons-outlined" style="font-size:16px;color:var(--t3);">keyboard_arrow_down</span></div>
                   <div class="rej-dd" id="shelfBucketDD">
                     <div class="rej-opt" data-name="AQUALOGICA_D2C" onclick="addShelfBucket('AQUALOGICA_D2C')"><span>AQUALOGICA_D2C</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
                     <div class="rej-opt" data-name="BBLUNT_D2C" onclick="addShelfBucket('BBLUNT_D2C')"><span>BBLUNT_D2C</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
@@ -1200,7 +1200,7 @@
         <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;">
             <div class="cfg-row-left"><div class="cfg-label">Packaging instructions</div><div class="cfg-desc">Select the packing instructions shown to operators during packing.</div><span class="cfg-badge badge-client">Client</span></div>
-            <div class="cfg-row-right"><div style="position:relative;" id="packWrap"><div class="rej-trigger" onclick="togglePackDD()"><span>Select instructions</span><span class="material-icons-outlined" style="font-size:16px;color:var(--t3);">expand_more</span></div>
+            <div class="cfg-row-right"><div style="position:relative;" id="packWrap"><div class="rej-trigger" onclick="togglePackDD()"><span>Select instructions</span><span class="material-icons-outlined" style="font-size:16px;color:var(--t3);">keyboard_arrow_down</span></div>
               <div class="rej-dd" id="packDD">
                 <div class="rej-opt" data-name="Wrap item in bubble wrap" onclick="addPackInstr('Wrap item in bubble wrap')"><span>Wrap item in bubble wrap</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>
                 <div class="rej-opt" data-name="Use double plastic roll wrapping" onclick="addPackInstr('Use double plastic roll wrapping')"><span>Use double plastic roll wrapping</span><span class="material-icons-outlined" style="font-size:14px;color:var(--t3);">add</span></div>

@@ -350,7 +350,7 @@
         <span class="topnav-user-name">Jhonathan Smith</span>
         <span class="topnav-user-role">Admin</span>
       </div>
-      <span class="material-icons-outlined topnav-user-chevron">expand_more</span>
+      <span class="material-icons-outlined topnav-user-chevron">keyboard_arrow_down</span>
     </div>
   </nav>
 
@@ -360,7 +360,7 @@
       <a class="sidenav-item" href="#">Select FC</a>
       <a class="sidenav-item" href="#">
         Organisations
-        <span class="material-icons-outlined chevron">expand_more</span>
+        <span class="material-icons-outlined chevron">keyboard_arrow_down</span>
       </a>
       <a class="sidenav-item" href="#">Channels</a>
       <a class="sidenav-item active" href="#">Client configuration</a>
@@ -371,7 +371,7 @@
       </a>
       <a class="sidenav-item" href="#">
         Workflow Management
-        <span class="material-icons-outlined chevron">expand_more</span>
+        <span class="material-icons-outlined chevron">keyboard_arrow_down</span>
       </a>
       <a class="sidenav-item" href="#">Serial Configurations</a>
       <a class="sidenav-item" href="#">Client onboarding</a>
@@ -392,7 +392,7 @@
         </div>
         <div class="filter-dropdown-wrap" id="statusFilter">
           <button class="filter-dropdown" onclick="toggleFilter()">
-            Status <span class="material-icons-outlined">expand_more</span>
+            Status <span class="material-icons-outlined">keyboard_arrow_down</span>
           </button>
           <div class="filter-dropdown-menu">
             <div class="filter-dropdown-item selected" onclick="filterByStatus('all')">All</div>
@@ -494,11 +494,11 @@
       event.target.classList.add('selected');
 
       if (status === 'all') {
-        btn.innerHTML = 'Status <span class="material-icons-outlined">expand_more</span>';
+        btn.innerHTML = 'Status <span class="material-icons-outlined">keyboard_arrow_down</span>';
         rows.forEach(r => r.style.display = '');
       } else {
         const labels = { active: 'Active', draft: 'Draft', inactive: 'Inactive' };
-        btn.innerHTML = `${labels[status]} <span class="material-icons-outlined">expand_more</span>`;
+        btn.innerHTML = `${labels[status]} <span class="material-icons-outlined">keyboard_arrow_down</span>`;
         rows.forEach(r => {
           if (r.dataset.status === status) {
             r.style.display = '';
