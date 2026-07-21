@@ -921,12 +921,12 @@
 
     // Serviceability - check if platform_dispatcher or self_pick was selected in courier mapping
     function hasServiceabilityCouriers(){
-      const couriers=JSON.parse(localStorage.getItem('selectedCouriers')||'["PLATFORM_DISPATCHER","SELF_PICK"]');
-      return couriers.some(c=>c==='PLATFORM_DISPATCHER'||c==='SELF_PICK');
+      const couriers=JSON.parse(localStorage.getItem('selectedCouriers')||'["LTL","FTL","LOCAL"]');
+      return couriers.some(c=>c==='LOCAL'||c==='SELF_PICK');
     }
     function getServiceabilityCouriers(){
-      const couriers=JSON.parse(localStorage.getItem('selectedCouriers')||'["PLATFORM_DISPATCHER","SELF_PICK"]');
-      return couriers.filter(c=>c==='PLATFORM_DISPATCHER'||c==='SELF_PICK').map(c=>c==='PLATFORM_DISPATCHER'?'Platform dispatcher':'Self pickup');
+      const couriers=JSON.parse(localStorage.getItem('selectedCouriers')||'["LTL","FTL","LOCAL"]');
+      return couriers.filter(c=>c==='LOCAL'||c==='SELF_PICK').map(c=>c==='LOCAL'?'Local':'Self pickup');
     }
 
     // File Upload Modal
@@ -1192,7 +1192,6 @@
           }
           return '';
         }).join('')}
-        <div class="section-divider"><div class="section-divider-title">Serviceability</div><div class="section-divider-desc">Set of couriers for which serviceability is needed for this FC.</div></div>
         <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Enable parallel pick pack</div><div class="cfg-desc">Allows packing to begin while picking is still in progress for the same order.</div><span class="cfg-badge badge-fc">FC</span></div>
           <div class="cfg-row-right"><div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">No</button></div></div></div>
         <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
@@ -1218,6 +1217,7 @@
         <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Enable combo / kit orders</div><div class="cfg-desc">Allows combo and kit products to be processed during order fulfillment.</div><span class="cfg-badge badge-fc">FC</span></div>
           <div class="cfg-row-right"><div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">No</button></div></div></div>
         ${hasServiceabilityCouriers()?`
+        <div class="section-divider"><div class="section-divider-title">Serviceability</div><div class="section-divider-desc">Set of couriers for which serviceability is needed for this FC.</div></div>
         <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;">
             <div class="cfg-row-left"><div class="cfg-label">Serviceability</div><div class="cfg-desc">Set of couriers for which serviceability is needed for this FC.</div><span class="cfg-badge badge-fc">FC</span></div>
