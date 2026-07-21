@@ -185,7 +185,7 @@
     const steps = [
       {id:'inbound', label:'Inbound', desc:'Receiving, QC'},
       {id:'inventory', label:'Inventory', desc:'Zones, expiry, cycle count'},
-      {id:'outbound', label:'Outbound', desc:'Allocation, picking, dispatch'}
+      {id:'outbound', label:'Outbound', desc:'Order processing'}
     ];
     let activeFC = selectedFCs[0];
     let activeStep = 'inbound';
@@ -785,7 +785,7 @@
         <div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border-light);">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span style="font-size:13px;font-weight:600;">Order Type :</span><span style="padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:var(--warning-bg);color:var(--warning);">Complex</span></div>
           <div id="complexMsg" style="font-size:11px;color:var(--t3);margin-bottom:12px;"></div>
-          <div style="display:flex;gap:16px;margin-bottom:16px;"><div style="flex:1;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Maximum SKU in order</div><input class="tds-input" id="complexMaxSKU" placeholder="Type here..." style="width:100%;" oninput="checkPWSave()"></div><div style="flex:1;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Maximum quantity in order</div><input class="tds-input" id="complexMaxQty" value="100" style="width:100%;" oninput="checkPWSave()"></div></div>
+          <div style="display:flex;gap:16px;margin-bottom:16px;"><div style="flex:1;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Maximum quantity in order</div><input class="tds-input" id="complexMaxQty" value="100" style="width:100%;" oninput="checkPWSave()"></div></div>
           <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:12px 0;border-top:1px solid var(--border-light);">
             <div style="flex:1;max-width:70%;"><div style="font-size:13px;font-weight:600;">Order bundling</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">When enabled, pickwaves will be divided into picklists based on zones</div></div>
             <div class="seg-group" id="bundling-seg"><button class="seg-btn" onclick="setSeg('bundling-seg','yes',showBundlingParams);checkPWSave()">Yes</button><button class="seg-btn" onclick="setSeg('bundling-seg','no',hideBundlingParams);checkPWSave()">No</button></div>
@@ -1077,7 +1077,7 @@
 
     // ===== OUTBOUND PAGE =====
     function getOutboundPage(){
-      return `<div style="border:1px solid var(--border-light);border-radius:var(--radius);overflow:hidden;"><div class="content-header"><div><div class="content-title">Outbound</div><div class="content-subtitle">Allocation, picking, dispatch</div></div><div class="content-count">8 settings</div></div>
+      return `<div style="border:1px solid var(--border-light);border-radius:var(--radius);overflow:hidden;"><div class="content-header"><div><div class="content-title">Outbound</div><div class="content-subtitle">Order processing</div></div><div class="content-count">8 settings</div></div>
         <div class="section-divider"><div class="section-divider-title">Order Processing</div><div class="section-divider-desc">How orders are allocated and picked.</div></div>
         <div class="cfg-row" style="flex-direction:column;align-items:stretch;padding-right:16px;">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;">
@@ -1197,7 +1197,7 @@
           }
           return '';
         }).join('')}
-        <div class="section-divider"><div class="section-divider-title">Packing & Dispatch</div><div class="section-divider-desc">Rules for packing, MOQ, and serviceability.</div></div>
+        <div class="section-divider"><div class="section-divider-title">Serviceability</div><div class="section-divider-desc">Set of couriers for which serviceability is needed for this FC.</div></div>
         <div class="cfg-row"><div class="cfg-row-left"><div class="cfg-label">Enable parallel pick pack</div><div class="cfg-desc">Allows packing to begin while picking is still in progress for the same order.</div><span class="cfg-badge badge-fc">FC</span></div>
           <div class="cfg-row-right"><div class="seg-group"><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">Yes</button><button class="seg-btn" onclick="this.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">No</button></div></div></div>
         <div class="cfg-row" style="flex-direction:column;align-items:stretch;">
@@ -1252,7 +1252,7 @@
       {courier:'Kerry_Indev', p1:'14:00',p2:'14:00',p3:'14:00',p4:'14:00',p5:'14:00', saved:true},
       {courier:'Local Fleet Delhivery', p1:'14:00',p2:'14:00',p3:'14:00',p4:'14:00',p5:'14:00', saved:true}
     ];
-    let surgePeriod = '30';
+    let surgePeriod = '10';
     let surgeMultiplier = '1.5';
 
     function openSBDModal(){
