@@ -1449,25 +1449,36 @@
 
     function applyTemplate(){
       sessionStorage.setItem('templateShown_'+activeFC,'1');
-      // Pre-fill settings based on template
-      const tplData={
-        FMCD:{seg_0:'Yes',seg_1:'No',seg_2:'Yes',seg_3:'Yes',seg_4:'Yes',seg_5:'Yes',seg_6:'Yes'},
-        FMCG:{seg_0:'Yes',seg_1:'Yes',seg_2:'Yes',seg_3:'Yes',seg_4:'Yes',seg_5:'No',seg_6:'Yes'},
-        Auto:{seg_0:'No',seg_1:'Yes',seg_2:'No',seg_3:'No',seg_4:'Yes',seg_5:'Yes',seg_6:'No'}
+      // Pre-fill settings based on template data from spec
+      // Inbound seg indices: 0=excess receiving, 1=partial receiving, 2=QC checks, 3=QC instructions(inside reveal), 4=QC checklist, 5=Failed images, 6=One unit
+      const tplInbound={
+        FMCG:{seg_0:'Yes',seg_1:'No',seg_2:'Yes',seg_3:'Yes',seg_4:'No',seg_5:'No',seg_6:'No'},
+        FMCD:{seg_0:'No',seg_1:'No',seg_2:'Yes',seg_3:'Yes',seg_4:'No',seg_5:'No',seg_6:'No'},
+        Auto:{seg_0:'No',seg_1:'No',seg_2:'Yes',seg_3:'Yes',seg_4:'No',seg_5:'No',seg_6:'No'}
       };
-      const invData={seg_0:'Yes',seg_1:'Yes',seg_2:'Yes',seg_3:'Yes',inp_0:'50',inp_1:'50'};
-      const outData={seg_0:'Yes',seg_1:'Yes',seg_3:'No',seg_4:'No'};
+      // Inventory seg indices: 0=Do SKUs have expiry, 1=Shelf-life check, 2=Auto-move expired, 3=Auto-move near-expiry
+      const tplInventory={
+        FMCG:{seg_0:'Yes',seg_1:'Yes',seg_2:'Yes',seg_3:'Yes',inp_0:'10',inp_1:'10'},
+        FMCD:{seg_0:'No',inp_0:'5',inp_1:'5'},
+        Auto:{seg_0:'No',inp_0:'5',inp_1:'5'}
+      };
+      // Outbound seg indices: 0=LR consolidation, 1=parallel pick pack, 3=Enforce MOQ, 4=combo/kit
+      const tplOutbound={
+        FMCG:{seg_0:'No',seg_1:'No',seg_3:'No',seg_4:'Yes'},
+        FMCD:{seg_0:'No',seg_1:'No',seg_3:'No',seg_4:'Yes'},
+        Auto:{seg_0:'No',seg_1:'No',seg_3:'No',seg_4:'No'}
+      };
 
       const st=JSON.parse(sessionStorage.getItem('allConfigState')||'{}');
-      if(selectedTemplate && tplData[selectedTemplate]){
-        st[`${activeFC}-inbound`]=tplData[selectedTemplate];
-        st[`${activeFC}-inventory`]=invData;
-        st[`${activeFC}-outbound`]=outData;
+      if(selectedTemplate && tplInbound[selectedTemplate]){
+        st[`${activeFC}-inbound`]=tplInbound[selectedTemplate];
+        st[`${activeFC}-inventory`]=tplInventory[selectedTemplate];
+        st[`${activeFC}-outbound`]=tplOutbound[selectedTemplate];
       } else {
-        // Client-FC selection — use same defaults
-        st[`${activeFC}-inbound`]=tplData['FMCG'];
-        st[`${activeFC}-inventory`]=invData;
-        st[`${activeFC}-outbound`]=outData;
+        // Client-FC selection — use FMCG defaults
+        st[`${activeFC}-inbound`]=tplInbound['FMCG'];
+        st[`${activeFC}-inventory`]=tplInventory['FMCG'];
+        st[`${activeFC}-outbound`]=tplOutbound['FMCG'];
       }
       sessionStorage.setItem('allConfigState',JSON.stringify(st));
       const m=document.getElementById('templateModal');if(m)m.remove();
