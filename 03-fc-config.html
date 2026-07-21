@@ -1350,6 +1350,131 @@
     renderAll();
     setTimeout(restoreState, 100);
 
+    // ===== Template Selection Modal =====
+    // Show on first load for unconfigured FC
+    const templateShown = sessionStorage.getItem('templateShown_'+activeFC);
+    if(!templateShown && !configuredFCs[activeFC]){
+      setTimeout(showTemplateModal, 300);
+    }
+
+    function showTemplateModal(){
+      const existing=document.getElementById('templateModal');if(existing)existing.remove();
+      const modal=document.createElement('div');modal.id='templateModal';
+      modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:500;';
+      modal.innerHTML=`<div style="background:#fff;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.15);width:680px;max-width:90vw;max-height:85vh;display:flex;flex-direction:column;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--border-light);">
+          <div><h3 style="font-size:16px;font-weight:600;margin-bottom:2px;">Set template</h3><div style="font-size:12px;color:var(--t3);">Select a template or a Client - FC combination to replicate their settings.</div></div>
+          <button onclick="closeTemplateModal()" style="border:none;background:none;cursor:pointer;color:var(--t3);"><span class="material-icons-outlined" style="font-size:18px;">close</span></button>
+        </div>
+        <div style="padding:24px;overflow-y:auto;flex:1;">
+          <div style="font-size:12px;font-weight:500;margin-bottom:6px;">Name of FC <span style="color:var(--primary);">*</span></div>
+          <div style="padding:8px 14px;background:#F5F5F7;border-radius:4px;font-size:13px;font-weight:500;margin-bottom:20px;width:fit-content;">${activeFC}</div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:12px;">Template selection</div>
+          <div style="display:flex;gap:12px;margin-bottom:20px;" id="templateCards">
+            <div class="tpl-card" data-tpl="FMCD" onclick="selectTemplate('FMCD')" style="flex:1;padding:14px 16px;border:2px solid var(--border-light);border-radius:6px;cursor:pointer;transition:all .15s;">
+              <div style="font-size:13px;font-weight:600;">FMCD</div>
+              <div style="font-size:11px;color:var(--t3);margin:4px 0 8px;">Fast moving consumer durables</div>
+              <div style="font-size:10px;font-weight:600;color:var(--info);background:var(--info-bg);padding:3px 8px;border-radius:100px;display:inline-block;">16 default settings</div>
+            </div>
+            <div class="tpl-card" data-tpl="FMCG" onclick="selectTemplate('FMCG')" style="flex:1;padding:14px 16px;border:2px solid var(--border-light);border-radius:6px;cursor:pointer;transition:all .15s;">
+              <div style="font-size:13px;font-weight:600;">FMCG</div>
+              <div style="font-size:11px;color:var(--t3);margin:4px 0 8px;">Fast moving consumer goods</div>
+              <div style="font-size:10px;font-weight:600;color:var(--info);background:var(--info-bg);padding:3px 8px;border-radius:100px;display:inline-block;">16 default settings</div>
+            </div>
+            <div class="tpl-card" data-tpl="Auto" onclick="selectTemplate('Auto')" style="flex:1;padding:14px 16px;border:2px solid var(--border-light);border-radius:6px;cursor:pointer;transition:all .15s;">
+              <div style="font-size:13px;font-weight:600;">Auto</div>
+              <div style="font-size:11px;color:var(--t3);margin:4px 0 8px;">Auto industries</div>
+              <div style="font-size:10px;font-weight:600;color:var(--info);background:var(--info-bg);padding:3px 8px;border-radius:100px;display:inline-block;">16 default settings</div>
+            </div>
+          </div>
+          <div style="text-align:center;font-size:13px;color:var(--t3);margin-bottom:20px;font-weight:500;">Or</div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:12px;">Client - FC combination selection</div>
+          <div style="display:flex;gap:12px;">
+            <div style="flex:1;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Select client <span style="color:var(--primary);">*</span></div>
+              <select class="tds-select" style="width:100%;" id="tplClientSelect" onchange="onTplClientChange()">
+                <option value="">Select an option</option>
+                <option value="Havells India Ltd">Havells India Ltd</option>
+                <option value="Voltas Limited">Voltas Limited</option>
+                <option value="Mahindra & Mahindra">Mahindra & Mahindra</option>
+              </select>
+            </div>
+            <div style="flex:1;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Select FC <span style="color:var(--primary);">*</span></div>
+              <select class="tds-select" style="width:100%;" id="tplFCSelect" disabled onchange="onTplFCChange()">
+                <option value="">BLRFC11</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:14px 24px;border-top:1px solid var(--border-light);">
+          <button onclick="closeTemplateModal()" style="padding:8px 18px;border:1px solid var(--border);border-radius:4px;background:#fff;font-family:inherit;font-size:12px;font-weight:500;color:var(--t1);cursor:pointer;">Skip</button>
+          <button id="btnSetTemplate" disabled style="padding:8px 18px;border:none;border-radius:4px;background:var(--border);font-family:inherit;font-size:12px;font-weight:600;color:var(--t3);cursor:not-allowed;" onclick="applyTemplate()">Set template</button>
+        </div>
+      </div>`;
+      document.body.appendChild(modal);
+    }
+
+    let selectedTemplate='';
+    function selectTemplate(tpl){
+      selectedTemplate=tpl;
+      document.querySelectorAll('.tpl-card').forEach(c=>{c.style.borderColor=c.dataset.tpl===tpl?'var(--t1)':'var(--border-light)';});
+      document.getElementById('btnSetTemplate').disabled=false;
+      document.getElementById('btnSetTemplate').style.background='var(--t1)';
+      document.getElementById('btnSetTemplate').style.color='#fff';
+      document.getElementById('btnSetTemplate').style.cursor='pointer';
+      // Clear client selection
+      document.getElementById('tplClientSelect').value='';
+      document.getElementById('tplFCSelect').disabled=true;
+    }
+    function onTplClientChange(){
+      const client=document.getElementById('tplClientSelect').value;
+      const fcSel=document.getElementById('tplFCSelect');
+      if(client){
+        fcSel.disabled=false;
+        const fcMap={'Havells India Ltd':['BLRFC11','DELFC03'],'Voltas Limited':['MUMFC08','GGNFC16'],'Mahindra & Mahindra':['BLRFC14','GGNFC10']};
+        fcSel.innerHTML=(fcMap[client]||['BLRFC11']).map(f=>`<option value="${f}">${f}</option>`).join('');
+        selectedTemplate='';
+        document.querySelectorAll('.tpl-card').forEach(c=>{c.style.borderColor='var(--border-light)';});
+        document.getElementById('btnSetTemplate').disabled=false;
+        document.getElementById('btnSetTemplate').style.background='var(--t1)';
+        document.getElementById('btnSetTemplate').style.color='#fff';
+        document.getElementById('btnSetTemplate').style.cursor='pointer';
+      } else {fcSel.disabled=true;}
+    }
+    function onTplFCChange(){}
+
+    function closeTemplateModal(){
+      sessionStorage.setItem('templateShown_'+activeFC,'1');
+      const m=document.getElementById('templateModal');if(m)m.remove();
+    }
+
+    function applyTemplate(){
+      sessionStorage.setItem('templateShown_'+activeFC,'1');
+      // Pre-fill settings based on template
+      const tplData={
+        FMCD:{seg_0:'Yes',seg_1:'No',seg_2:'Yes',seg_3:'Yes',seg_4:'Yes',seg_5:'Yes',seg_6:'Yes'},
+        FMCG:{seg_0:'Yes',seg_1:'Yes',seg_2:'Yes',seg_3:'Yes',seg_4:'Yes',seg_5:'No',seg_6:'Yes'},
+        Auto:{seg_0:'No',seg_1:'Yes',seg_2:'No',seg_3:'No',seg_4:'Yes',seg_5:'Yes',seg_6:'No'}
+      };
+      const invData={seg_0:'Yes',seg_1:'Yes',seg_2:'Yes',seg_3:'Yes',inp_0:'50',inp_1:'50'};
+      const outData={seg_0:'Yes',seg_1:'Yes',seg_3:'No',seg_4:'No'};
+
+      const st=JSON.parse(sessionStorage.getItem('allConfigState')||'{}');
+      if(selectedTemplate && tplData[selectedTemplate]){
+        st[`${activeFC}-inbound`]=tplData[selectedTemplate];
+        st[`${activeFC}-inventory`]=invData;
+        st[`${activeFC}-outbound`]=outData;
+      } else {
+        // Client-FC selection — use same defaults
+        st[`${activeFC}-inbound`]=tplData['FMCG'];
+        st[`${activeFC}-inventory`]=invData;
+        st[`${activeFC}-outbound`]=outData;
+      }
+      sessionStorage.setItem('allConfigState',JSON.stringify(st));
+      const m=document.getElementById('templateModal');if(m)m.remove();
+      renderAll();
+      setTimeout(restoreState,150);
+    }
+
     // ===== Save as Draft =====
     let draftDirty = false;
     function saveDraft(){
