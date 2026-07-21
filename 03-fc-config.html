@@ -163,11 +163,6 @@
     </nav>
 
     <div class="main">
-      <!-- Clone Banner (shown for unconfigured FCs) -->
-      <div id="cloneBanner" style="display:none;padding:12px 32px;background:#F0F1F3;display:none;align-items:center;justify-content:space-between;">
-        <span style="font-size:13px;color:var(--t1);">Do you want to clone the settings from other active FCs to this FC?</span>
-        <button style="padding:7px 16px;border:none;border-radius:4px;background:var(--t1);font-family:inherit;font-size:12px;font-weight:600;color:#fff;cursor:pointer;" onclick="showClonePrompt(activeFC)">Clone</button>
-      </div>
       <!-- Top Stepper -->
       <div class="top-stepper" id="topStepper"></div>
       <!-- Scrollable Content -->
@@ -257,12 +252,7 @@
       const st = JSON.parse(sessionStorage.getItem('allConfigState')||'{}');
       ['inbound','inventory','outbound'].forEach(step=>{
         if(st[`${source}-${step}`]){
-          const cloned = JSON.parse(JSON.stringify(st[`${source}-${step}`]));
-          // For inventory, remove zone data (user must upload separately)
-          if(step==='inventory'){
-            // Keep toggle states but zones will be empty
-          }
-          st[`${fc}-${step}`] = cloned;
+          st[`${fc}-${step}`] = JSON.parse(JSON.stringify(st[`${source}-${step}`]));
         }
       });
       sessionStorage.setItem('allConfigState', JSON.stringify(st));
@@ -277,22 +267,26 @@
       sessionStorage.setItem('fcSaved',JSON.stringify(saved));
       // Clear zones for new FC (must be uploaded fresh)
       sessionStorage.removeItem('zonesData');
+      // Mark template as shown so it doesn't pop up
+      sessionStorage.setItem('templateShown_'+fc,'1');
       activeFC=fc;activeStep='inbound';renderAll();
-      setTimeout(restoreState, 150);
+      // Restore with longer delay to ensure DOM is ready, then trigger clicks
+      setTimeout(()=>{
+        restoreState();
+        // After restore, trigger all active Yes buttons to show reveals
+        setTimeout(()=>{
+          document.querySelectorAll('#contentArea .seg-group').forEach(g=>{
+            const activeBtn=g.querySelector('.seg-btn.active');
+            if(activeBtn && activeBtn.textContent==='Yes' && activeBtn.onclick){
+              activeBtn.click();
+            }
+          });
+        },100);
+      }, 200);
     }
 
     // Stepper
     function renderStepper(){
-      // Show/hide clone banner
-      const banner = document.getElementById('cloneBanner');
-      const configuredList = selectedFCs.filter(f=>configuredFCs[f]);
-      if(banner){
-        if(!configuredFCs[activeFC] && configuredList.length > 0){
-          banner.style.display='flex';
-        } else {
-          banner.style.display='none';
-        }
-      }
       const stepIdx = steps.findIndex(s=>s.id===activeStep);
       document.getElementById('topStepper').innerHTML = steps.map((s,i)=>{
         let cls='';
