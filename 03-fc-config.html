@@ -338,23 +338,19 @@
     }
     function checkAllSettingsFilled(){
       const btn=document.getElementById('btnContinue');if(!btn)return;
-      // Only check VISIBLE seg-groups (not ones inside hidden reveals)
       const segs=document.querySelectorAll('#contentArea .seg-group');
       let allFilled=true;
       let visibleSegCount=0;
       segs.forEach(seg=>{
-        // Skip if inside a hidden parent
-        const parent=seg.closest('.cfg-reveal, [style*="display: none"], [style*="display:none"]');
-        if(parent && (parent.style.display==='none' || (!parent.classList.contains('show') && parent.classList.contains('cfg-reveal')))) return;
+        // Skip if not visible (hidden by parent display:none)
+        if(seg.offsetParent===null) return;
         visibleSegCount++;
         if(!seg.querySelector('.seg-btn.active'))allFilled=false;
       });
       // Check all required text inputs on the current page (inventory)
       if(activeStep==='inventory'){
         document.querySelectorAll('#contentArea .tds-input[placeholder]').forEach(inp=>{
-          // Skip if inside a hidden parent
-          const parent=inp.closest('[style*="display: none"], [style*="display:none"]');
-          if(parent) return;
+          if(inp.offsetParent===null) return;
           if(!inp.value.trim())allFilled=false;
         });
       }
@@ -362,10 +358,12 @@
       if(activeStep==='inventory' && shelfBuckets.length>0){
         const rows=document.querySelectorAll('#shelfBucketBody tr');
         rows.forEach(row=>{
+          if(row.offsetParent===null) return;
           const inputs=row.querySelectorAll('input');
           inputs.forEach(inp=>{if(!inp.value.trim())allFilled=false;});
         });
         rows.forEach(row=>{
+          if(row.offsetParent===null) return;
           const inputs=row.querySelectorAll('input');
           if(inputs.length>=2){
             const min=parseInt(inputs[0].value)||0;
