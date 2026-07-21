@@ -1077,6 +1077,7 @@
 
     // ===== OUTBOUND PAGE =====
     function getOutboundPage(){
+      const selectedCouriersList = JSON.parse(localStorage.getItem('selectedCouriers')||'["LTL","FTL","LOCAL"]');
       return `<div style="border:1px solid var(--border-light);border-radius:var(--radius);overflow:hidden;"><div class="content-header"><div><div class="content-title">Outbound</div><div class="content-subtitle">Order processing</div></div><div class="content-count">8 settings</div></div>
         <div class="section-divider"><div class="section-divider-title">Order Processing</div><div class="section-divider-desc">How orders are allocated and picked.</div></div>
         <div class="cfg-row" style="flex-direction:column;align-items:stretch;padding-right:16px;">
@@ -1098,18 +1099,12 @@
             <div style="font-size:12px;font-weight:600;margin-bottom:4px;">SBD Courier cutoff</div>
             <div style="font-size:11px;color:var(--t3);margin-bottom:8px;">Buffer days added per courier for SBD calculation.</div>
             <table style="width:100%;border-collapse:collapse;margin-bottom:20px;background:var(--surface);border-radius:4px;"><thead style="background:#F7F8FA;"><tr><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Couriers</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">P1</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">P2</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">P3</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">P4</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">P5</th></tr></thead><tbody>
-              <tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border-light);">Delhivery FTL</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">10:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">10:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">10:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">10:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">10:00</td></tr>
-              <tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border-light);">Delhivery LTL</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td></tr>
-              <tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border-light);">Delhivery standard</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;border-bottom:1px solid var(--border-light);">14:00</td></tr>
-              <tr><td style="padding:8px 12px;font-size:12px;">Platform dispatchers</td><td style="padding:8px 12px;font-size:12px;text-align:center;">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;">14:00</td></tr>
+              ${selectedCouriersList.map((c,i)=>`<tr><td style="padding:8px 12px;font-size:12px;${i<selectedCouriersList.length-1?'border-bottom:1px solid var(--border-light);':''}">${c}</td><td style="padding:8px 12px;font-size:12px;text-align:center;${i<selectedCouriersList.length-1?'border-bottom:1px solid var(--border-light);':''}">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;${i<selectedCouriersList.length-1?'border-bottom:1px solid var(--border-light);':''}">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;${i<selectedCouriersList.length-1?'border-bottom:1px solid var(--border-light);':''}">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;${i<selectedCouriersList.length-1?'border-bottom:1px solid var(--border-light);':''}">14:00</td><td style="padding:8px 12px;font-size:12px;text-align:center;${i<selectedCouriersList.length-1?'border-bottom:1px solid var(--border-light);':''}">14:00</td></tr>`).join('')}
             </tbody></table>
             <div style="font-size:12px;font-weight:600;margin-bottom:4px;">SBD courier offset</div>
             <div style="font-size:11px;color:var(--t3);margin-bottom:8px;">Buffer days added per courier for SBD calculation.</div>
             <table style="width:100%;border-collapse:collapse;background:var(--surface);border-radius:4px;"><thead style="background:#F7F8FA;"><tr><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Couriers</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:right;border-bottom:1px solid var(--border);">Offset days</th></tr></thead><tbody>
-              <tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border-light);">Delhivery FTL</td><td style="padding:8px 12px;font-size:12px;text-align:right;border-bottom:1px solid var(--border-light);">10</td></tr>
-              <tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border-light);">Delhivery LTL</td><td style="padding:8px 12px;font-size:12px;text-align:right;border-bottom:1px solid var(--border-light);">10</td></tr>
-              <tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border-light);">Delhivery standard</td><td style="padding:8px 12px;font-size:12px;text-align:right;border-bottom:1px solid var(--border-light);">10</td></tr>
-              <tr><td style="padding:8px 12px;font-size:12px;">Platform dispatchers</td><td style="padding:8px 12px;font-size:12px;text-align:right;">10</td></tr>
+              ${selectedCouriersList.map((c,i)=>`<tr><td style="padding:8px 12px;font-size:12px;${i<selectedCouriersList.length-1?'border-bottom:1px solid var(--border-light);':''}">${c}</td><td style="padding:8px 12px;font-size:12px;text-align:right;${i<selectedCouriersList.length-1?'border-bottom:1px solid var(--border-light);':''}">10</td></tr>`).join('')}
             </tbody></table>
           </div>
         </div>
@@ -1242,16 +1237,9 @@
     }
 
     // SBD Modal
-    let sbdOffsets = [
-      {courier:'FTL', days:0, saved:true},
-      {courier:'Kerry_Indev', days:0, saved:true},
-      {courier:'Local Fleet Delhivery', days:0, saved:true}
-    ];
-    let sbdCutoffs = [
-      {courier:'FTL', p1:'10:00',p2:'10:00',p3:'10:00',p4:'10:00',p5:'10:00', saved:true},
-      {courier:'Kerry_Indev', p1:'14:00',p2:'14:00',p3:'14:00',p4:'14:00',p5:'14:00', saved:true},
-      {courier:'Local Fleet Delhivery', p1:'14:00',p2:'14:00',p3:'14:00',p4:'14:00',p5:'14:00', saved:true}
-    ];
+    const sbdCouriersList = JSON.parse(localStorage.getItem('selectedCouriers')||'["LTL","FTL","LOCAL"]');
+    let sbdOffsets = sbdCouriersList.map(c=>({courier:c, days:10, saved:true}));
+    let sbdCutoffs = sbdCouriersList.map(c=>({courier:c, p1:'14:00',p2:'14:00',p3:'14:00',p4:'14:00',p5:'14:00', saved:true}));
     let surgePeriod = '10';
     let surgeMultiplier = '1.5';
 
