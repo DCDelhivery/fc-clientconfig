@@ -541,28 +541,20 @@
               <input type="text" placeholder="Search..." oninput="filterOptions('courierSelect', this.value)">
             </div>
             <div class="select-options">
-              <div class="select-option" data-name="DELHIVERY_LTL" onclick="addItem('courier', 'DELHIVERY_LTL')">
-                <span>DELHIVERY_LTL</span>
+              <div class="select-option" data-name="LTL" onclick="addItem('courier', 'LTL')">
+                <span>LTL</span>
                 <span class="material-icons-outlined add-icon">add</span>
               </div>
-              <div class="select-option" data-name="DELHIVERY_ORION" onclick="addItem('courier', 'DELHIVERY_ORION')">
-                <span>DELHIVERY_ORION</span>
+              <div class="select-option" data-name="FTL" onclick="addItem('courier', 'FTL')">
+                <span>FTL</span>
                 <span class="material-icons-outlined add-icon">add</span>
               </div>
-              <div class="select-option" data-name="DELHIVERY_FTL" onclick="addItem('courier', 'DELHIVERY_FTL')">
-                <span>DELHIVERY_FTL</span>
-                <span class="material-icons-outlined add-icon">add</span>
-              </div>
-              <div class="select-option" data-name="PLATFORM_DISPATCHER" onclick="addItem('courier', 'PLATFORM_DISPATCHER')">
-                <span>PLATFORM_DISPATCHER</span>
+              <div class="select-option" data-name="LOCAL" onclick="addItem('courier', 'LOCAL')">
+                <span>LOCAL</span>
                 <span class="material-icons-outlined add-icon">add</span>
               </div>
               <div class="select-option" data-name="SELF_PICK" onclick="addItem('courier', 'SELF_PICK')">
                 <span>SELF_PICK</span>
-                <span class="material-icons-outlined add-icon">add</span>
-              </div>
-              <div class="select-option" data-name="BLUEDART" onclick="addItem('courier', 'BLUEDART')">
-                <span>BLUEDART</span>
                 <span class="material-icons-outlined add-icon">add</span>
               </div>
               <div class="select-option" data-name="ECOM_EXPRESS" onclick="addItem('courier', 'ECOM_EXPRESS')">
@@ -675,7 +667,6 @@
               <span class="tooltip">Please select FCs from the dropdown to add to the list</span>
             </span>
           </label>
-          <button class="btn-create-new" onclick="openCreateFCModal()">Create New FC</button>
         </div>
 
         <div class="select-wrap" id="fcSelect">
@@ -764,40 +755,11 @@
           <label>Channel name <span class="required">*</span></label>
           <input class="modal-input" type="text" id="newChannelName" placeholder="Enter channel name" oninput="validateChannelModal()">
         </div>
-        <div class="modal-field">
-          <label>Return address <span class="required">*</span></label>
-          <select class="modal-select" id="newChannelReturn" onchange="validateChannelModal()">
-            <option value="">Select return address</option>
-            <option value="FC">FC</option>
-            <option value="Client">Client</option>
-          </select>
-        </div>
+
       </div>
       <div class="modal-footer">
         <button class="btn-modal-cancel" onclick="closeCreateChannelModal()">Cancel</button>
         <button class="btn-modal-primary" id="btnAddChannel" disabled onclick="addNewChannel()">Add channel and map</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== Create FC Modal ===== -->
-  <div class="modal-overlay" id="createFCModal">
-    <div class="modal">
-      <div class="modal-header">
-        <h3>Create New FC</h3>
-        <button class="modal-close" onclick="closeCreateFCModal()">
-          <span class="material-icons-outlined">close</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="modal-field">
-          <label>FC name <span class="required">*</span></label>
-          <input class="modal-input" type="text" id="newFCName" placeholder="Enter FC name" oninput="document.getElementById('btnFetchFC').disabled=!this.value.trim()">
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-modal-cancel" onclick="closeCreateFCModal()">Cancel</button>
-        <button class="btn-modal-primary" id="btnFetchFC" disabled onclick="fetchFromFAAS()">Fetch from FAAS</button>
       </div>
     </div>
   </div>
@@ -841,7 +803,7 @@
       localStorage.setItem('clientMappingState', JSON.stringify({
         currentStep: 'courier',
         steps: ['courier', 'channel', 'fc'],
-        items: { courier: ['DELHIVERY_LTL', 'DELHIVERY_FTL', 'PLATFORM_DISPATCHER'], channel: ['Flipkart', 'Paytm'], fc: ['GGNFC14', 'BLRFC14'] },
+        items: { courier: ['LTL', 'FTL', 'LOCAL'], channel: ['Flipkart', 'Paytm'], fc: ['GGNFC14', 'BLRFC14'] },
         pendingDelete: null
       }));
     }
@@ -1086,8 +1048,9 @@
     }
 
     function formatCourierName(name) {
-      const abbrevs = ['LTL','FTL','LR'];
-      return name.split('_').map(w => abbrevs.includes(w) ? w : w.charAt(0) + w.slice(1).toLowerCase()).join(' ');
+      const keepUpper = ['LTL','FTL','LOCAL','LR'];
+      if (keepUpper.includes(name)) return name;
+      return name.split('_').map(w => keepUpper.includes(w) ? w : w.charAt(0) + w.slice(1).toLowerCase()).join(' ');
     }
 
     // ===== FC Mapping (with day pills and capacity inputs) =====
@@ -1097,7 +1060,7 @@
       if (state.items.fc.includes(name)) return;
       state.items.fc.push(name);
       fcData[name] = {
-        days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+        days: [],
         orderCap: 100,
         orderlineCap: 100,
         qtyCap: 100
@@ -1123,7 +1086,6 @@
       const days = fcData[fcName].days;
       const idx = days.indexOf(day);
       if (idx >= 0) {
-        if (days.length <= 1) return; // Don't allow all days to be unselected
         days.splice(idx, 1);
       } else {
         days.push(day);
@@ -1139,7 +1101,7 @@
         empty.style.display = 'block';
       } else {
         empty.style.display = 'none';
-        const allDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        const allDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         tbody.innerHTML = state.items.fc.map((fc, idx) => {
           const data = fcData[fc];
           const dayPillsHtml = allDays.map(d =>
@@ -1169,7 +1131,6 @@
     function openCreateChannelModal() {
       document.getElementById('createChannelModal').classList.add('open');
       document.getElementById('newChannelName').value = '';
-      document.getElementById('newChannelReturn').value = '';
       document.getElementById('btnAddChannel').disabled = true;
     }
 
@@ -1179,8 +1140,7 @@
 
     function validateChannelModal() {
       const name = document.getElementById('newChannelName').value.trim();
-      const returnAddr = document.getElementById('newChannelReturn').value;
-      document.getElementById('btnAddChannel').disabled = !(name && returnAddr);
+      document.getElementById('btnAddChannel').disabled = !name;
     }
 
     function addNewChannel() {
@@ -1192,23 +1152,6 @@
         updateAllStepStatuses();
       }
       closeCreateChannelModal();
-    }
-
-    // ===== Create FC Modal =====
-    function openCreateFCModal() {
-      document.getElementById('createFCModal').classList.add('open');
-      document.getElementById('newFCName').value = '';
-      document.getElementById('btnFetchFC').disabled = true;
-    }
-    function closeCreateFCModal() {
-      document.getElementById('createFCModal').classList.remove('open');
-    }
-    function fetchFromFAAS() {
-      const name = document.getElementById('newFCName').value.trim();
-      if (name && !state.items.fc.includes(name)) {
-        addFCItem(name);
-      }
-      closeCreateFCModal();
     }
 
     // Initialize
@@ -1226,7 +1169,7 @@
         // Rebuild fcData for existing FCs
         state.items.fc.forEach(name => {
           if (!fcData[name]) {
-            fcData[name] = { days: ['Mon','Tue','Wed','Thu','Fri'], orderCap: 100, orderlineCap: 100, qtyCap: 100 };
+            fcData[name] = { days: [], orderCap: 100, orderlineCap: 100, qtyCap: 100 };
           }
         });
         renderFCTable();
