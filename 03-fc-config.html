@@ -146,6 +146,7 @@
       <div class="subtitle">Client & FC configuration <span class="pill">Draft</span></div>
     </div>
     <div class="header-right">
+      <button id="btnResetAll" disabled style="padding:8px 16px;border:none;background:transparent;font-family:inherit;font-size:13px;font-weight:500;color:var(--t3);cursor:not-allowed;text-decoration:underline;" onclick="resetAll()">Reset all</button>
       <button class="btn-draft" id="btnSaveDraft" onclick="saveDraft()">Save as draft</button>
       <button class="btn-close" onclick="window.location.href='01-client-list.html'"><span class="material-icons-outlined" style="font-size:18px;">close</span></button>
     </div>
@@ -1441,41 +1442,71 @@
 
     function applyTemplate(){
       sessionStorage.setItem('templateShown_'+activeFC,'1');
+      const m=document.getElementById('templateModal');if(m)m.remove();
+      // Show loading overlay
+      const loader=document.createElement('div');loader.id='templateLoader';
+      loader.style.cssText='position:fixed;inset:0;background:rgba(255,255,255,0.95);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:600;';
+      loader.innerHTML='<div style="width:32px;height:32px;border:3px solid #E0E0E0;border-top-color:#0D7A3F;border-radius:50%;animation:spin 0.7s linear infinite;"></div><span style="font-size:14px;color:#666;font-weight:500;">Applying template...</span>';
+      document.body.appendChild(loader);
       // Pre-fill settings based on template data from spec
-      // Inbound seg indices: 0=excess receiving, 1=partial receiving, 2=QC checks, 3=QC instructions(inside reveal), 4=QC checklist, 5=Failed images, 6=One unit
       const tplInbound={
         FMCG:{seg_0:'Yes',seg_1:'No',seg_2:'Yes',seg_3:'Yes',seg_4:'No',seg_5:'No',seg_6:'No'},
         FMCD:{seg_0:'No',seg_1:'No',seg_2:'Yes',seg_3:'Yes',seg_4:'No',seg_5:'No',seg_6:'No'},
         Auto:{seg_0:'No',seg_1:'No',seg_2:'Yes',seg_3:'Yes',seg_4:'No',seg_5:'No',seg_6:'No'}
       };
-      // Inventory seg indices: 0=Do SKUs have expiry, 1=Shelf-life check, 2=Auto-move expired, 3=Auto-move near-expiry
       const tplInventory={
         FMCG:{seg_0:'Yes',seg_1:'Yes',seg_2:'Yes',seg_3:'Yes',inp_0:'10',inp_1:'10'},
         FMCD:{seg_0:'No',inp_0:'5',inp_1:'5'},
         Auto:{seg_0:'No',inp_0:'5',inp_1:'5'}
       };
-      // Outbound seg indices: 0=LR consolidation, 1=parallel pick pack, 3=Enforce MOQ, 4=combo/kit
       const tplOutbound={
         FMCG:{seg_0:'No',seg_1:'No',seg_3:'No',seg_4:'Yes'},
         FMCD:{seg_0:'No',seg_1:'No',seg_3:'No',seg_4:'Yes'},
         Auto:{seg_0:'No',seg_1:'No',seg_3:'No',seg_4:'No'}
       };
-
       const st=JSON.parse(sessionStorage.getItem('allConfigState')||'{}');
       if(selectedTemplate && tplInbound[selectedTemplate]){
         st[`${activeFC}-inbound`]=tplInbound[selectedTemplate];
         st[`${activeFC}-inventory`]=tplInventory[selectedTemplate];
         st[`${activeFC}-outbound`]=tplOutbound[selectedTemplate];
       } else {
-        // Client-FC selection — use FMCG defaults
         st[`${activeFC}-inbound`]=tplInbound['FMCG'];
         st[`${activeFC}-inventory`]=tplInventory['FMCG'];
         st[`${activeFC}-outbound`]=tplOutbound['FMCG'];
       }
       sessionStorage.setItem('allConfigState',JSON.stringify(st));
-      const m=document.getElementById('templateModal');if(m)m.remove();
+      // Reload page after short delay to ensure clean render
+      setTimeout(()=>{
+        loader.remove();
+        renderAll();
+        setTimeout(()=>{restoreState();markDraftDirty();},150);
+      },1500);
+    }
+
+    // ===== Reset All =====
+    function resetAll(){
+      // Clear all state for this FC
+      const st=JSON.parse(sessionStorage.getItem('allConfigState')||'{}');
+      delete st[`${activeFC}-inbound`];
+      delete st[`${activeFC}-inventory`];
+      delete st[`${activeFC}-outbound`];
+      sessionStorage.setItem('allConfigState',JSON.stringify(st));
+      sessionStorage.removeItem('rejReasons');
+      sessionStorage.removeItem('qcInstr');
+      sessionStorage.removeItem('packInstr');
+      sessionStorage.removeItem('zonesData');
+      sessionStorage.removeItem('templateShown_'+activeFC);
+      delete saved[`${activeFC}-inbound`];
+      delete saved[`${activeFC}-inventory`];
+      sessionStorage.setItem('fcSaved',JSON.stringify(saved));
+      // Reset UI
+      activeStep='inbound';
       renderAll();
-      setTimeout(restoreState,150);
+      // Disable reset button
+      const resetBtn=document.getElementById('btnResetAll');
+      if(resetBtn){resetBtn.disabled=true;resetBtn.style.color='var(--t3)';resetBtn.style.cursor='not-allowed';}
+      // Show template modal again
+      setTimeout(showTemplateModal,300);
     }
 
     // ===== Save as Draft =====
@@ -1497,6 +1528,8 @@
       draftDirty = true;
       const btn = document.getElementById('btnSaveDraft');
       if(btn) btn.disabled = false;
+      const resetBtn = document.getElementById('btnResetAll');
+      if(resetBtn){resetBtn.disabled=false;resetBtn.style.color='var(--primary)';resetBtn.style.cursor='pointer';}
     }
     // Listen for any change to mark dirty
     document.addEventListener('click',function(e){
