@@ -877,12 +877,26 @@
       const nextBtn = document.getElementById('btnNext');
       if (state.currentStep === 'fc') {
         nextBtn.textContent = 'Save and proceed';
-        // Require FCs added AND each FC has at least one operating day AND all capacities filled
+        // Require FCs added AND each FC has at least one operating day AND all capacities filled AND orderlineCap > orderCap
         const allValid = state.items.fc.length > 0 && state.items.fc.every(fc => {
           const d = fcData[fc];
-          return d && d.days.length > 0 && d.orderCap && d.orderlineCap && d.qtyCap;
+          if(!d || d.days.length === 0 || !d.orderCap || !d.orderlineCap || !d.qtyCap) return false;
+          if(parseInt(d.orderlineCap) <= parseInt(d.orderCap)) return false;
+          return true;
         });
         nextBtn.disabled = !allValid;
+        // Show/hide validation messages
+        state.items.fc.forEach(fc => {
+          const d = fcData[fc];
+          const errEl = document.getElementById('cap-err-'+fc);
+          if(errEl){
+            if(d && d.orderCap && d.orderlineCap && parseInt(d.orderlineCap) <= parseInt(d.orderCap)){
+              errEl.style.display = 'block';
+            } else {
+              errEl.style.display = 'none';
+            }
+          }
+        });
       } else {
         nextBtn.textContent = 'Next';
         nextBtn.disabled = state.items[state.currentStep].length === 0;
@@ -1003,24 +1017,43 @@
       closeDeleteModal();
     }
 
-    // Hide already-selected options from dropdown, disable if all selected
+    // Mark already-selected options in dropdown with 'Added' subtext instead of hiding them
     function hideSelectedOptions(type) {
       const selectMap = { courier: 'courierSelect', channel: 'channelSelect', fc: 'fcSelect' };
       const wrap = document.getElementById(selectMap[type]);
       const options = wrap.querySelectorAll('.select-option');
-      let visibleCount = 0;
+      let allAdded = true;
       options.forEach(opt => {
         const optName = opt.getAttribute('data-name');
+        const iconEl = opt.querySelector('.add-icon');
+        const addedEl = opt.querySelector('.added-label');
         if (state.items[type].includes(optName)) {
-          opt.style.display = 'none';
+          // Mark as added
+          opt.style.opacity = '0.7';
+          opt.style.cursor = 'default';
+          opt.setAttribute('data-added','true');
+          if(iconEl) iconEl.style.display = 'none';
+          if(!addedEl){
+            const lbl = document.createElement('span');
+            lbl.className = 'added-label';
+            lbl.style.cssText = 'font-size:11px;font-weight:400;color:#0D7A3F;';
+            lbl.textContent = 'Added';
+            opt.appendChild(lbl);
+          } else {
+            addedEl.style.display = '';
+          }
         } else {
-          opt.style.display = '';
-          visibleCount++;
+          opt.style.opacity = '';
+          opt.style.cursor = 'pointer';
+          opt.removeAttribute('data-added');
+          if(iconEl) iconEl.style.display = '';
+          if(addedEl) addedEl.style.display = 'none';
+          allAdded = false;
         }
       });
-      // Disable trigger if all options selected
+      // Disable trigger if all options added
       const trigger = wrap.querySelector('.select-trigger');
-      if (visibleCount === 0) {
+      if (allAdded) {
         trigger.classList.add('disabled');
         trigger.style.opacity = '0.5';
         trigger.style.pointerEvents = 'none';
@@ -1138,7 +1171,7 @@
               <td>${fc}</td>
               <td><div class="day-pills">${dayPillsHtml}</div></td>
               <td><input class="capacity-input" type="number" min="1" step="1" value="${data.orderCap}" placeholder="-" oninput="this.value=this.value.replace(/[^0-9]/g,'');fcData['${fc}'].orderCap=this.value;persistFCData();updateFooterButtons()"></td>
-              <td><input class="capacity-input" type="number" min="1" step="1" value="${data.orderlineCap}" placeholder="-" oninput="this.value=this.value.replace(/[^0-9]/g,'');fcData['${fc}'].orderlineCap=this.value;persistFCData();updateFooterButtons()"></td>
+              <td><div><input class="capacity-input" type="number" min="1" step="1" value="${data.orderlineCap}" placeholder="-" oninput="this.value=this.value.replace(/[^0-9]/g,'');fcData['${fc}'].orderlineCap=this.value;persistFCData();updateFooterButtons()"><div id="cap-err-${fc}" style="display:none;font-size:9px;color:#DC2626;margin-top:2px;white-space:nowrap;">Must be more than order capacity</div></div></td>
               <td><input class="capacity-input" type="number" min="1" step="1" value="${data.qtyCap}" placeholder="-" oninput="this.value=this.value.replace(/[^0-9]/g,'');fcData['${fc}'].qtyCap=this.value;persistFCData();updateFooterButtons()"></td>
               <td style="text-align:center">
                 <button class="btn-delete" onclick="confirmDelete('fc', '${fc}')">

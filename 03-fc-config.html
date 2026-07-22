@@ -1391,7 +1391,7 @@
           <div style="font-size:13px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px;"><input type="radio" name="tplMode" value="clientfc" style="width:16px;height:16px;accent-color:var(--t1);cursor:pointer;" onchange="switchTplMode('clientfc')"> Client - FC combination selection</div>
           <div style="display:flex;gap:12px;opacity:0.4;pointer-events:none;" id="clientFcSection">
             <div style="flex:1;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Select client <span style="color:var(--primary);">*</span></div>
-              <select class="tds-select" style="width:100%;" id="tplClientSelect" onchange="onTplClientChange()">
+              <select class="tds-select" style="width:100%;" id="tplClientSelect" disabled onchange="onTplClientChange()">
                 <option value="">Select an option</option>
                 <option value="Havells India Ltd">Havells India Ltd</option>
                 <option value="Voltas Limited">Voltas Limited</option>
@@ -1400,7 +1400,7 @@
             </div>
             <div style="flex:1;"><div style="font-size:12px;font-weight:500;margin-bottom:6px;">Select FC <span style="color:var(--primary);">*</span></div>
               <select class="tds-select" style="width:100%;" id="tplFCSelect" disabled onchange="onTplFCChange()">
-                <option value="">BLRFC11</option>
+                <option value="">Select FC</option>
               </select>
             </div>
           </div>
@@ -1431,9 +1431,11 @@
         clientFc.style.opacity='1';clientFc.style.pointerEvents='auto';
         selectedTemplate='';
         document.querySelectorAll('.tpl-card').forEach(c=>{c.style.borderColor='var(--border-light)';});
-        // Keep FC disabled until client is selected
-        document.getElementById('tplFCSelect').disabled=true;
+        // Enable client select, keep FC disabled until client is selected
+        document.getElementById('tplClientSelect').disabled=false;
         document.getElementById('tplClientSelect').value='';
+        document.getElementById('tplFCSelect').disabled=true;
+        document.getElementById('tplFCSelect').innerHTML='<option value="">Select FC</option>';
       }
     }
     function selectTemplate(tpl){
@@ -1447,18 +1449,30 @@
     function onTplClientChange(){
       const client=document.getElementById('tplClientSelect').value;
       const fcSel=document.getElementById('tplFCSelect');
+      const btn=document.getElementById('btnSetTemplate');
       if(client){
         fcSel.disabled=false;
         const fcMap={'Havells India Ltd':['BLRFC11','DELFC03'],'Voltas Limited':['MUMFC08','GGNFC16'],'Mahindra & Mahindra':['BLRFC14','GGNFC10']};
-        fcSel.innerHTML=(fcMap[client]||['BLRFC11']).map(f=>`<option value="${f}">${f}</option>`).join('');
+        fcSel.innerHTML=`<option value="">Select FC</option>`+(fcMap[client]||['BLRFC11']).map(f=>`<option value="${f}">${f}</option>`).join('');
+        fcSel.value='';
         selectedTemplate='';
-        document.getElementById('btnSetTemplate').disabled=false;
-        document.getElementById('btnSetTemplate').style.background='var(--t1)';
-        document.getElementById('btnSetTemplate').style.color='#fff';
-        document.getElementById('btnSetTemplate').style.cursor='pointer';
-      } else {fcSel.disabled=true;}
+        // Keep button disabled until FC is selected
+        btn.disabled=true;btn.style.background='var(--border)';btn.style.color='var(--t3)';btn.style.cursor='not-allowed';
+      } else {
+        fcSel.disabled=true;
+        fcSel.innerHTML='<option value="">Select FC</option>';
+        btn.disabled=true;btn.style.background='var(--border)';btn.style.color='var(--t3)';btn.style.cursor='not-allowed';
+      }
     }
-    function onTplFCChange(){}
+    function onTplFCChange(){
+      const fcVal=document.getElementById('tplFCSelect').value;
+      const btn=document.getElementById('btnSetTemplate');
+      if(fcVal){
+        btn.disabled=false;btn.style.background='var(--t1)';btn.style.color='#fff';btn.style.cursor='pointer';
+      } else {
+        btn.disabled=true;btn.style.background='var(--border)';btn.style.color='var(--t3)';btn.style.cursor='not-allowed';
+      }
+    }
 
     function closeTemplateModal(){
       sessionStorage.setItem('templateShown_'+activeFC,'1');
