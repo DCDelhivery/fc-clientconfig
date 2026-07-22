@@ -977,7 +977,7 @@
         btn.disabled=false;btn.style.background='var(--t1)';btn.style.color='#fff';btn.style.cursor='pointer';
         btn.onclick=()=>{
           if(courierKey==='bulk_locations'){
-            zonesData=[{name:'Prime',locations:['A1','A2','A3','B1','B2'],saved:true},{name:'Reserve',locations:['R1','R2','R3','R4'],saved:true},{name:'Staging',locations:['S1','S2'],saved:true}];
+            zonesData=[{name:'Reserve',locations:['R1','R2','R3','R4'],saved:true},{name:'Forward',locations:['F1','F2','F3','B1','B2'],saved:true},{name:'Damage',locations:['D1','D2'],saved:true},{name:'Expiry',locations:['E1','E2'],saved:true}];
             sessionStorage.setItem('zonesData',JSON.stringify(zonesData));
           }
           document.getElementById('uploadModal').remove();renderContent();
@@ -1107,7 +1107,7 @@
             <div style="font-size:12px;font-weight:600;margin-bottom:4px;">SBD courier offset</div>
             <div style="font-size:11px;color:var(--t3);margin-bottom:8px;">Buffer days added per courier for SBD calculation.</div>
             <table style="width:100%;border-collapse:collapse;background:var(--surface);border-radius:4px;"><thead style="background:#F7F8FA;"><tr><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Couriers</th><th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t2);text-align:right;border-bottom:1px solid var(--border);">Offset days</th></tr></thead><tbody>
-              ${selectedCouriersList.map((c,i)=>`<tr><td style="padding:8px 12px;font-size:12px;${i<selectedCouriersList.length-1?'border-bottom:1px solid var(--border-light);':''}">${c}</td><td style="padding:8px 12px;font-size:12px;text-align:right;${i<selectedCouriersList.length-1?'border-bottom:1px solid var(--border-light);':''}">10</td></tr>`).join('')}
+              ${selectedCouriersList.map((c,i)=>`<tr><td style="padding:8px 12px;font-size:12px;${i<selectedCouriersList.length-1?'border-bottom:1px solid var(--border-light);':''}">${c}</td><td style="padding:8px 12px;font-size:12px;text-align:right;${i<selectedCouriersList.length-1?'border-bottom:1px solid var(--border-light);':''}">0</td></tr>`).join('')}
             </tbody></table>
           </div>
         </div>
@@ -1241,7 +1241,7 @@
 
     // SBD Modal
     const sbdCouriersList = JSON.parse(localStorage.getItem('selectedCouriers')||'["LTL","FTL","LOCAL"]');
-    let sbdOffsets = sbdCouriersList.map(c=>({courier:c, days:10, saved:true}));
+    let sbdOffsets = sbdCouriersList.map(c=>({courier:c, days:0, saved:true}));
     let sbdCutoffs = sbdCouriersList.map(c=>({courier:c, p1:'14:00',p2:'14:00',p3:'14:00',p4:'14:00',p5:'14:00', saved:true}));
     let surgePeriod = '10';
     let surgeMultiplier = '1.5';
@@ -1303,7 +1303,7 @@
       tbody.innerHTML=sbdOffsets.map((r,i)=>{
         return `<tr style="border-bottom:1px solid var(--border-light);">
             <td style="padding:8px 14px;font-size:12px;">${r.courier}</td>
-            <td style="padding:8px 14px;"><input class="tds-input" value="${r.days}" style="width:60px;text-align:center;" onchange="sbdOffsets[${i}].days=this.value"></td>
+            <td style="padding:8px 14px;"><input class="tds-input" type="number" min="0" max="2" value="${r.days}" style="width:60px;text-align:center;" oninput="let v=parseInt(this.value)||0;if(v>2){this.value=2;v=2;}if(v<0){this.value=0;v=0;}sbdOffsets[${i}].days=v" onchange="let v=parseInt(this.value)||0;if(v>2)this.value=2;if(v<0)this.value=0;sbdOffsets[${i}].days=parseInt(this.value)||0"></td>
           </tr>`;
       }).join('');
     }
@@ -1358,17 +1358,14 @@
             <div class="tpl-card" data-tpl="FMCD" onclick="selectTemplate('FMCD')" style="flex:1;padding:14px 16px;border:2px solid var(--border-light);border-radius:6px;cursor:pointer;transition:all .15s;">
               <div style="font-size:13px;font-weight:600;">FMCD</div>
               <div style="font-size:11px;color:var(--t3);margin:4px 0 8px;">Fast moving consumer durables</div>
-              <div style="font-size:10px;font-weight:600;color:var(--info);background:var(--info-bg);padding:3px 8px;border-radius:100px;display:inline-block;">16 default settings</div>
             </div>
             <div class="tpl-card" data-tpl="FMCG" onclick="selectTemplate('FMCG')" style="flex:1;padding:14px 16px;border:2px solid var(--border-light);border-radius:6px;cursor:pointer;transition:all .15s;">
               <div style="font-size:13px;font-weight:600;">FMCG</div>
               <div style="font-size:11px;color:var(--t3);margin:4px 0 8px;">Fast moving consumer goods</div>
-              <div style="font-size:10px;font-weight:600;color:var(--info);background:var(--info-bg);padding:3px 8px;border-radius:100px;display:inline-block;">16 default settings</div>
             </div>
             <div class="tpl-card" data-tpl="Auto" onclick="selectTemplate('Auto')" style="flex:1;padding:14px 16px;border:2px solid var(--border-light);border-radius:6px;cursor:pointer;transition:all .15s;">
               <div style="font-size:13px;font-weight:600;">Auto</div>
               <div style="font-size:11px;color:var(--t3);margin:4px 0 8px;">Auto industries</div>
-              <div style="font-size:10px;font-weight:600;color:var(--info);background:var(--info-bg);padding:3px 8px;border-radius:100px;display:inline-block;">16 default settings</div>
             </div>
           </div>
           <div style="text-align:center;font-size:13px;color:var(--t3);margin-bottom:20px;font-weight:500;">Or</div>

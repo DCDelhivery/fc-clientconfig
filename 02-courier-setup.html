@@ -872,9 +872,12 @@
       const nextBtn = document.getElementById('btnNext');
       if (state.currentStep === 'fc') {
         nextBtn.textContent = 'Save and proceed';
-        // Require FCs added AND each FC has at least one operating day
-        const allHaveDays = state.items.fc.length > 0 && state.items.fc.every(fc => fcData[fc] && fcData[fc].days.length > 0);
-        nextBtn.disabled = !allHaveDays;
+        // Require FCs added AND each FC has at least one operating day AND all capacities filled
+        const allValid = state.items.fc.length > 0 && state.items.fc.every(fc => {
+          const d = fcData[fc];
+          return d && d.days.length > 0 && d.orderCap && d.orderlineCap && d.qtyCap;
+        });
+        nextBtn.disabled = !allValid;
       } else {
         nextBtn.textContent = 'Next';
         nextBtn.disabled = state.items[state.currentStep].length === 0;
@@ -1065,16 +1068,17 @@
       if (state.items.fc.includes(name)) return;
       state.items.fc.push(name);
       fcData[name] = {
-        days: [],
-        orderCap: 100,
-        orderlineCap: 100,
-        qtyCap: 100
+        days: ['Mon','Tue','Wed','Thu','Fri','Sat'],
+        orderCap: '',
+        orderlineCap: '',
+        qtyCap: ''
       };
       persistState();
       localStorage.setItem('selectedFCs', JSON.stringify(state.items.fc));
       renderFCTable();
       hideSelectedOptions('fc');
       updateAllStepStatuses();
+      updateFooterButtons();
     }
 
     function removeFCItem(name) {
@@ -1107,7 +1111,7 @@
         empty.style.display = 'block';
       } else {
         empty.style.display = 'none';
-        const allDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const allDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
         tbody.innerHTML = state.items.fc.map((fc, idx) => {
           const data = fcData[fc];
           const dayPillsHtml = allDays.map(d =>
@@ -1118,9 +1122,9 @@
               <td>${idx + 1}</td>
               <td>${fc}</td>
               <td><div class="day-pills">${dayPillsHtml}</div></td>
-              <td><input class="capacity-input" type="number" min="1" step="1" value="${data.orderCap}" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value==='0'||this.value==='')this.value=''" onblur="if(!this.value||parseInt(this.value)<1)this.value=1;fcData['${fc}'].orderCap=this.value"></td>
-              <td><input class="capacity-input" type="number" min="1" step="1" value="${data.orderlineCap}" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value==='0'||this.value==='')this.value=''" onblur="if(!this.value||parseInt(this.value)<1)this.value=1;fcData['${fc}'].orderlineCap=this.value"></td>
-              <td><input class="capacity-input" type="number" min="1" step="1" value="${data.qtyCap}" oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value==='0'||this.value==='')this.value=''" onblur="if(!this.value||parseInt(this.value)<1)this.value=1;fcData['${fc}'].qtyCap=this.value"></td>
+              <td><input class="capacity-input" type="number" min="1" step="1" value="${data.orderCap}" placeholder="-" oninput="this.value=this.value.replace(/[^0-9]/g,'');fcData['${fc}'].orderCap=this.value;updateFooterButtons()"></td>
+              <td><input class="capacity-input" type="number" min="1" step="1" value="${data.orderlineCap}" placeholder="-" oninput="this.value=this.value.replace(/[^0-9]/g,'');fcData['${fc}'].orderlineCap=this.value;updateFooterButtons()"></td>
+              <td><input class="capacity-input" type="number" min="1" step="1" value="${data.qtyCap}" placeholder="-" oninput="this.value=this.value.replace(/[^0-9]/g,'');fcData['${fc}'].qtyCap=this.value;updateFooterButtons()"></td>
               <td style="text-align:center">
                 <button class="btn-delete" onclick="confirmDelete('fc', '${fc}')">
                   <span class="material-icons-outlined">delete_outline</span>
