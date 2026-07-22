@@ -252,6 +252,11 @@
       const source=document.getElementById('cloneSource').value;
       if(!source){alert('Please select an FC to clone from');return;}
       document.getElementById('cloneModal').remove();
+      // Track clone relationship: source -> [cloned FCs]
+      const cloneMap = JSON.parse(sessionStorage.getItem('cloneMap')||'{}');
+      if(!cloneMap[source]) cloneMap[source] = [];
+      if(!cloneMap[source].includes(fc)) cloneMap[source].push(fc);
+      sessionStorage.setItem('cloneMap', JSON.stringify(cloneMap));
       // Copy all settings from source FC to new FC (except zones/serviceability)
       const st = JSON.parse(sessionStorage.getItem('allConfigState')||'{}');
       ['inbound','inventory','outbound'].forEach(step=>{
@@ -1510,6 +1515,15 @@
       // Unmark FC as configured
       delete configuredFCs[activeFC];
       sessionStorage.setItem('configuredFCs',JSON.stringify(configuredFCs));
+      // Remove from clone map (as source)
+      const cloneMap=JSON.parse(sessionStorage.getItem('cloneMap')||'{}');
+      delete cloneMap[activeFC];
+      // Also remove this FC from being a clone target
+      Object.keys(cloneMap).forEach(src=>{
+        cloneMap[src]=cloneMap[src].filter(f=>f!==activeFC);
+        if(cloneMap[src].length===0) delete cloneMap[src];
+      });
+      sessionStorage.setItem('cloneMap',JSON.stringify(cloneMap));
       // Reset UI
       activeStep='inbound';
       renderAll();
@@ -1542,16 +1556,118 @@
       const resetBtn = document.getElementById('btnResetAll');
       if(resetBtn){resetBtn.disabled=false;resetBtn.style.color='var(--primary)';resetBtn.style.cursor='pointer';}
     }
+    // ===== Client Badge Propagation =====
+    function getClonedFCs(fc){
+      const cloneMap = JSON.parse(sessionStorage.getItem('cloneMap')||'{}');
+      return cloneMap[fc] || [];
+    }
+    function isClientBadgeSetting(el){
+      // Walk up from the clicked element to find the parent .cfg-row and check for badge-client
+      let row = el.closest('.cfg-row') || el.closest('[style*="border-bottom"]');
+      if(!row){
+        // Try parent traversal for nested elements
+        let parent = el.parentElement;
+        while(parent && !parent.classList.contains('cfg-row') && parent.id!=='contentArea'){
+          if(parent.querySelector && parent.querySelector('.badge-client')){return true;}
+          parent = parent.parentElement;
+        }
+        if(parent && parent.classList.contains('cfg-row')) row = parent;
+      }
+      if(row && row.querySelector('.badge-client')) return true;
+      return false;
+    }
+    let propagationPending = false;
+    function showPropagationPopup(clonedFCs, settingName){
+      if(propagationPending) return;
+      propagationPending = true;
+      const existing = document.getElementById('propagateModal'); if(existing) existing.remove();
+      const modal = document.createElement('div');
+      modal.id='propagateModal';
+      modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:600;';
+      modal.innerHTML=`<div style="background:#fff;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.15);width:440px;max-width:90vw;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--border-light);">
+          <h3 style="font-size:15px;font-weight:600;">Propagate changes</h3>
+          <button onclick="closePropagateModal(false)" style="border:none;background:none;cursor:pointer;color:var(--t3);"><span class="material-icons-outlined" style="font-size:18px;">close</span></button>
+        </div>
+        <div style="padding:24px;">
+          <div style="font-size:13px;color:var(--t2);line-height:1.5;margin-bottom:16px;">
+            You updated a <strong>Client-level</strong> setting${settingName?' ('+settingName+')':''} on <strong>${activeFC}</strong>. The following FCs were cloned from this FC:
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;">
+            ${clonedFCs.map(f=>`<span style="padding:4px 10px;background:#F0F1F3;border-radius:4px;font-size:12px;font-weight:500;">${f}</span>`).join('')}
+          </div>
+          <div style="font-size:13px;color:var(--t1);font-weight:500;">Do you want to apply this change to all cloned FCs?</div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:14px 24px;border-top:1px solid var(--border-light);">
+          <button onclick="closePropagateModal(false)" style="padding:7px 16px;border:1px solid var(--border);border-radius:4px;background:#fff;font-family:inherit;font-size:12px;font-weight:500;color:var(--t1);cursor:pointer;">No, only this FC</button>
+          <button onclick="closePropagateModal(true)" style="padding:7px 16px;border:none;border-radius:4px;background:var(--t1);font-family:inherit;font-size:12px;font-weight:500;color:#fff;cursor:pointer;">Yes, update all</button>
+        </div>
+      </div>`;
+      document.body.appendChild(modal);
+    }
+    function closePropagateModal(propagate){
+      const modal = document.getElementById('propagateModal');
+      if(modal) modal.remove();
+      if(propagate){
+        // Save current FC state first
+        saveAllState();
+        // Copy client-badge settings from current FC to all cloned FCs
+        const clonedFCs = getClonedFCs(activeFC);
+        const st = JSON.parse(sessionStorage.getItem('allConfigState')||'{}');
+        ['inbound','inventory','outbound'].forEach(step=>{
+          const sourceKey = `${activeFC}-${step}`;
+          const sourceState = st[sourceKey];
+          if(!sourceState) return;
+          clonedFCs.forEach(fc=>{
+            const targetKey = `${fc}-${step}`;
+            if(!st[targetKey]) st[targetKey] = {};
+            // Copy all state entries (seg toggles, inputs) from source to target
+            Object.keys(sourceState).forEach(k=>{
+              st[targetKey][k] = sourceState[k];
+            });
+          });
+        });
+        sessionStorage.setItem('allConfigState', JSON.stringify(st));
+      }
+      propagationPending = false;
+    }
+
     // Listen for any change to mark dirty
     document.addEventListener('click',function(e){
       if(e.target.classList.contains('seg-btn')||e.target.classList.contains('rej-opt')||e.target.classList.contains('day-pill')){
         markDraftDirty();
+        // Check if this is a client-badge setting and current FC has clones
+        if((e.target.classList.contains('seg-btn') || e.target.classList.contains('rej-opt')) && isClientBadgeSetting(e.target)){
+          const cloned = getClonedFCs(activeFC);
+          if(cloned.length > 0){
+            // Save state first so we capture the new value
+            setTimeout(()=>{
+              saveAllState();
+              const settingEl = e.target.closest('.cfg-row');
+              const settingName = settingEl ? (settingEl.querySelector('.cfg-label')||{}).textContent||'' : '';
+              showPropagationPopup(cloned, settingName);
+            },100);
+          }
+        }
       }
     });
     document.addEventListener('input',function(e){
       if(e.target.classList.contains('tds-input')||e.target.classList.contains('tds-select')||e.target.tagName==='SELECT'){
         markDraftDirty();
         setTimeout(checkAllSettingsFilled,50);
+        // Check for client-badge input changes
+        if(isClientBadgeSetting(e.target)){
+          const cloned = getClonedFCs(activeFC);
+          if(cloned.length > 0 && !propagationPending){
+            clearTimeout(window._propDebounce);
+            window._propDebounce = setTimeout(()=>{
+              saveAllState();
+              const settingEl = e.target.closest('.cfg-row');
+              const settingName = settingEl ? (settingEl.querySelector('.cfg-label')||{}).textContent||'' : '';
+              showPropagationPopup(cloned, settingName);
+            },800);
+          }
+        }
       }
     });
   </script>
