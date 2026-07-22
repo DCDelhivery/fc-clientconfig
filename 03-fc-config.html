@@ -278,8 +278,9 @@
       // Mark steps as saved
       saved[`${fc}-inbound`]=true;saved[`${fc}-inventory`]=true;
       sessionStorage.setItem('fcSaved',JSON.stringify(saved));
-      // Clear zones for new FC (must be uploaded fresh)
+      // Clear zones and serviceability for new FC (must be uploaded fresh per FC)
       sessionStorage.removeItem('zonesData');
+      uploadedFiles = {}; // Serviceability files are FC-specific, don't clone
       // Mark template as shown so it doesn't pop up
       sessionStorage.setItem('templateShown_'+fc,'1');
       activeFC=fc;activeStep='inbound';renderAll();
@@ -948,6 +949,8 @@
     // File Upload Modal
     let uploadedFiles = {}; // { 'Platform dispatcher': {name:'file.csv'}, ... }
     function openUploadModal(title, courierKey) {
+      // Save current state before opening modal so it persists after re-render
+      saveAllState();
       const existing=document.getElementById('uploadModal');if(existing)existing.remove();
       const modal=document.createElement('div');modal.id='uploadModal';
       modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:500;';
@@ -993,7 +996,10 @@
             zonesData=[{name:'Reserve',locations:['R1','R2','R3','R4'],saved:true},{name:'Forward',locations:['F1','F2','F3','B1','B2'],saved:true},{name:'Damage',locations:['D1','D2'],saved:true},{name:'Expiry',locations:['E1','E2'],saved:true}];
             sessionStorage.setItem('zonesData',JSON.stringify(zonesData));
           }
-          document.getElementById('uploadModal').remove();renderContent();
+          document.getElementById('uploadModal').remove();
+          suppressPropagation=true;
+          renderContent();
+          setTimeout(()=>{restoreState();setTimeout(()=>{suppressPropagation=false;},300);},100);
         };
       }
     }
@@ -1494,11 +1500,14 @@
         st[`${activeFC}-outbound`]=tplOutbound['FMCG'];
       }
       sessionStorage.setItem('allConfigState',JSON.stringify(st));
+      // Update in-memory allState to match
+      Object.assign(allState, st);
       // Reload page after short delay to ensure clean render
       setTimeout(()=>{
         loader.remove();
+        suppressPropagation=true;
         renderAll();
-        setTimeout(()=>{restoreState();markDraftDirty();},150);
+        setTimeout(()=>{restoreState();markDraftDirty();setTimeout(()=>{suppressPropagation=false;},300);},150);
       },1500);
     }
 

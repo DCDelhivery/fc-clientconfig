@@ -809,6 +809,11 @@
         items: { courier: ['LTL', 'FTL', 'LOCAL'], channel: ['Flipkart', 'Paytm'], fc: ['GGNFC14', 'BLRFC14'] },
         pendingDelete: null
       }));
+      // Also set default fcData for active client
+      localStorage.setItem('fcMappingData', JSON.stringify({
+        'GGNFC14': { days: ['Mon','Tue','Wed','Thu','Fri','Sat'], orderCap: '500', orderlineCap: '1000', qtyCap: '2000' },
+        'BLRFC14': { days: ['Mon','Tue','Wed','Thu','Fri','Sat'], orderCap: '300', orderlineCap: '600', qtyCap: '1200' }
+      }));
     }
 
     // ===== State (persisted in localStorage) =====
@@ -1062,7 +1067,14 @@
     }
 
     // ===== FC Mapping (with day pills and capacity inputs) =====
-    const fcData = {};
+    const fcData = JSON.parse(localStorage.getItem('fcMappingData')||'{}');
+    // Initialize fcData for pre-existing FCs that don't have data yet
+    state.items.fc.forEach(fc=>{
+      if(!fcData[fc]){
+        fcData[fc] = { days: ['Mon','Tue','Wed','Thu','Fri','Sat'], orderCap: '', orderlineCap: '', qtyCap: '' };
+      }
+    });
+    function persistFCData(){ localStorage.setItem('fcMappingData', JSON.stringify(fcData)); }
 
     function addFCItem(name) {
       if (state.items.fc.includes(name)) return;
@@ -1074,6 +1086,7 @@
         qtyCap: ''
       };
       persistState();
+      persistFCData();
       localStorage.setItem('selectedFCs', JSON.stringify(state.items.fc));
       renderFCTable();
       hideSelectedOptions('fc');
@@ -1085,6 +1098,7 @@
       state.items.fc = state.items.fc.filter(n => n !== name);
       delete fcData[name];
       persistState();
+      persistFCData();
       localStorage.setItem('selectedFCs', JSON.stringify(state.items.fc));
       renderFCTable();
       hideSelectedOptions('fc');
@@ -1099,6 +1113,7 @@
       } else {
         days.push(day);
       }
+      persistFCData();
       renderFCTable();
       updateFooterButtons();
     }
@@ -1122,9 +1137,9 @@
               <td>${idx + 1}</td>
               <td>${fc}</td>
               <td><div class="day-pills">${dayPillsHtml}</div></td>
-              <td><input class="capacity-input" type="number" min="1" step="1" value="${data.orderCap}" placeholder="-" oninput="this.value=this.value.replace(/[^0-9]/g,'');fcData['${fc}'].orderCap=this.value;updateFooterButtons()"></td>
-              <td><input class="capacity-input" type="number" min="1" step="1" value="${data.orderlineCap}" placeholder="-" oninput="this.value=this.value.replace(/[^0-9]/g,'');fcData['${fc}'].orderlineCap=this.value;updateFooterButtons()"></td>
-              <td><input class="capacity-input" type="number" min="1" step="1" value="${data.qtyCap}" placeholder="-" oninput="this.value=this.value.replace(/[^0-9]/g,'');fcData['${fc}'].qtyCap=this.value;updateFooterButtons()"></td>
+              <td><input class="capacity-input" type="number" min="1" step="1" value="${data.orderCap}" placeholder="-" oninput="this.value=this.value.replace(/[^0-9]/g,'');fcData['${fc}'].orderCap=this.value;persistFCData();updateFooterButtons()"></td>
+              <td><input class="capacity-input" type="number" min="1" step="1" value="${data.orderlineCap}" placeholder="-" oninput="this.value=this.value.replace(/[^0-9]/g,'');fcData['${fc}'].orderlineCap=this.value;persistFCData();updateFooterButtons()"></td>
+              <td><input class="capacity-input" type="number" min="1" step="1" value="${data.qtyCap}" placeholder="-" oninput="this.value=this.value.replace(/[^0-9]/g,'');fcData['${fc}'].qtyCap=this.value;persistFCData();updateFooterButtons()"></td>
               <td style="text-align:center">
                 <button class="btn-delete" onclick="confirmDelete('fc', '${fc}')">
                   <span class="material-icons-outlined">delete_outline</span>
