@@ -212,7 +212,10 @@
         showClonePrompt(fc);
         return;
       }
+      saveAllState();
+      suppressPropagation=true;
       activeFC=fc;activeStep='inbound';renderAll();
+      setTimeout(()=>{restoreState();setTimeout(()=>{suppressPropagation=false;},500);},100);
     }
     function markFCConfigured(fc){
       configuredFCs[fc]=true;
@@ -265,12 +268,13 @@
         }
       });
       sessionStorage.setItem('allConfigState', JSON.stringify(st));
-      // Also copy rejection reasons, QC instructions, pack instructions
+      // Update in-memory allState to match
+      Object.assign(allState, st);
       const sourceInbound = st[`${source}-inbound`]||{};
-      if(sourceInbound.rejReasons) sessionStorage.setItem('rejReasons', sourceInbound.rejReasons);
-      if(sourceInbound.qcInstr) sessionStorage.setItem('qcInstr', sourceInbound.qcInstr);
+      if(sourceInbound.rejReasons){sessionStorage.setItem('rejReasons', sourceInbound.rejReasons);rejReasons=JSON.parse(sourceInbound.rejReasons);}
+      if(sourceInbound.qcInstr){sessionStorage.setItem('qcInstr', sourceInbound.qcInstr);qcInstr=JSON.parse(sourceInbound.qcInstr);}
       const sourceOutbound = st[`${source}-outbound`]||{};
-      if(sourceOutbound.packInstr) sessionStorage.setItem('packInstr', sourceOutbound.packInstr);
+      if(sourceOutbound.packInstr){sessionStorage.setItem('packInstr', sourceOutbound.packInstr);packInstr=JSON.parse(sourceOutbound.packInstr);}
       // Mark steps as saved
       saved[`${fc}-inbound`]=true;saved[`${fc}-inventory`]=true;
       sessionStorage.setItem('fcSaved',JSON.stringify(saved));
@@ -280,6 +284,7 @@
       sessionStorage.setItem('templateShown_'+fc,'1');
       activeFC=fc;activeStep='inbound';renderAll();
       // Restore with longer delay to ensure DOM is ready, then trigger clicks
+      suppressPropagation = true; // Prevent propagation popup during clone restore
       setTimeout(()=>{
         restoreState();
         // After restore, trigger all active Yes buttons to show reveals
@@ -290,6 +295,7 @@
               activeBtn.click();
             }
           });
+          setTimeout(()=>{ suppressPropagation = false; }, 200);
         },100);
       }, 200);
     }
@@ -453,15 +459,17 @@
     }
     // Save state before navigating away
     const origGoToStep = goToStep;
-    goToStep = function(id){saveAllState();activeStep=id;renderAll();restoreState();}
+    goToStep = function(id){saveAllState();suppressPropagation=true;activeStep=id;renderAll();restoreState();setTimeout(()=>{suppressPropagation=false;},500);}
     const origGoBack = goBack;
-    goBack = function(){saveAllState();const idx=steps.findIndex(s=>s.id===activeStep);if(idx>0){activeStep=steps[idx-1].id;renderAll();restoreState();}}
+    goBack = function(){saveAllState();suppressPropagation=true;const idx=steps.findIndex(s=>s.id===activeStep);if(idx>0){activeStep=steps[idx-1].id;renderAll();restoreState();}setTimeout(()=>{suppressPropagation=false;},500);}
     const origGoNext = goNext;
     goNext = function(){
       saveAllState();
       if(activeStep==='outbound'){showReviewModal();return;}
+      suppressPropagation=true;
       saved[`${activeFC}-${activeStep}`]=true;sessionStorage.setItem('fcSaved',JSON.stringify(saved));
       const idx=steps.findIndex(s=>s.id===activeStep);if(idx<steps.length-1){activeStep=steps[idx+1].id;}renderAll();restoreState();
+      setTimeout(()=>{suppressPropagation=false;},500);
     }
 
     // ===== INBOUND PAGE =====
@@ -1035,9 +1043,9 @@
                       <thead style="background:#F7F8FA;">
                         <tr>
                           <th style="padding:8px 10px;font-size:10px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">External bucket</th>
-                          <th style="padding:8px 10px;font-size:10px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Min shelf life% <span class="material-icons-outlined" style="font-size:12px;color:var(--t3);cursor:help;vertical-align:middle;" title="Minimum remaining shelf life (%) required for inventory to be stored in the Prime location.">info</span></th>
-                          <th style="padding:8px 10px;font-size:10px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Preferred shelf life <span class="material-icons-outlined" style="font-size:12px;color:var(--t3);cursor:help;vertical-align:middle;" title="Inventory with this shelf life or higher is considered fresh and gets priority for Prime locations.">info</span></th>
-                          <th style="padding:8px 10px;font-size:10px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Prime capacity for older inv. <span class="material-icons-outlined" style="font-size:12px;color:var(--t3);cursor:help;vertical-align:middle;" title="Percentage of Prime capacity reserved for inventory with remaining shelf life between the minimum and preferred shelf-life thresholds.">info</span></th>
+                          <th style="padding:8px 10px;font-size:10px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Min shelf life% <span class="material-icons-outlined" style="font-size:12px;color:var(--t3);cursor:pointer;vertical-align:middle;" title="Minimum remaining shelf life (%) required for inventory to be stored in the Prime location.">info</span></th>
+                          <th style="padding:8px 10px;font-size:10px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Preferred shelf life <span class="material-icons-outlined" style="font-size:12px;color:var(--t3);cursor:pointer;vertical-align:middle;" title="Inventory with this shelf life or higher is considered fresh and gets priority for Prime locations.">info</span></th>
+                          <th style="padding:8px 10px;font-size:10px;font-weight:600;color:var(--t2);text-align:left;border-bottom:1px solid var(--border);">Prime capacity for older inv. <span class="material-icons-outlined" style="font-size:12px;color:var(--t3);cursor:pointer;vertical-align:middle;" title="Percentage of Prime capacity reserved for inventory with remaining shelf life between the minimum and preferred shelf-life thresholds.">info</span></th>
                           <th style="padding:8px 10px;font-size:10px;font-weight:600;color:var(--t2);text-align:center;border-bottom:1px solid var(--border);">Action</th>
                         </tr>
                       </thead>
@@ -1557,6 +1565,8 @@
       if(resetBtn){resetBtn.disabled=false;resetBtn.style.color='var(--primary)';resetBtn.style.cursor='pointer';}
     }
     // ===== Client Badge Propagation =====
+    let suppressPropagation = true; // Start suppressed; released after page fully loads
+    setTimeout(()=>{ suppressPropagation = false; }, 1500); // Release after page render stabilizes
     function getClonedFCs(fc){
       const cloneMap = JSON.parse(sessionStorage.getItem('cloneMap')||'{}');
       return cloneMap[fc] || [];
@@ -1565,7 +1575,6 @@
       // Walk up from the clicked element to find the parent .cfg-row and check for badge-client
       let row = el.closest('.cfg-row') || el.closest('[style*="border-bottom"]');
       if(!row){
-        // Try parent traversal for nested elements
         let parent = el.parentElement;
         while(parent && !parent.classList.contains('cfg-row') && parent.id!=='contentArea'){
           if(parent.querySelector && parent.querySelector('.badge-client')){return true;}
@@ -1578,7 +1587,7 @@
     }
     let propagationPending = false;
     function showPropagationPopup(clonedFCs, settingName){
-      if(propagationPending) return;
+      if(propagationPending || suppressPropagation) return;
       propagationPending = true;
       const existing = document.getElementById('propagateModal'); if(existing) existing.remove();
       const modal = document.createElement('div');
@@ -1609,9 +1618,7 @@
       const modal = document.getElementById('propagateModal');
       if(modal) modal.remove();
       if(propagate){
-        // Save current FC state first
         saveAllState();
-        // Copy client-badge settings from current FC to all cloned FCs
         const clonedFCs = getClonedFCs(activeFC);
         const st = JSON.parse(sessionStorage.getItem('allConfigState')||'{}');
         ['inbound','inventory','outbound'].forEach(step=>{
@@ -1621,7 +1628,6 @@
           clonedFCs.forEach(fc=>{
             const targetKey = `${fc}-${step}`;
             if(!st[targetKey]) st[targetKey] = {};
-            // Copy all state entries (seg toggles, inputs) from source to target
             Object.keys(sourceState).forEach(k=>{
               st[targetKey][k] = sourceState[k];
             });
@@ -1636,11 +1642,10 @@
     document.addEventListener('click',function(e){
       if(e.target.classList.contains('seg-btn')||e.target.classList.contains('rej-opt')||e.target.classList.contains('day-pill')){
         markDraftDirty();
-        // Check if this is a client-badge setting and current FC has clones
-        if((e.target.classList.contains('seg-btn') || e.target.classList.contains('rej-opt')) && isClientBadgeSetting(e.target)){
+        // Only show propagation popup for intentional user clicks on client-badge settings
+        if(!suppressPropagation && (e.target.classList.contains('seg-btn') || e.target.classList.contains('rej-opt')) && isClientBadgeSetting(e.target)){
           const cloned = getClonedFCs(activeFC);
           if(cloned.length > 0){
-            // Save state first so we capture the new value
             setTimeout(()=>{
               saveAllState();
               const settingEl = e.target.closest('.cfg-row');
@@ -1655,8 +1660,8 @@
       if(e.target.classList.contains('tds-input')||e.target.classList.contains('tds-select')||e.target.tagName==='SELECT'){
         markDraftDirty();
         setTimeout(checkAllSettingsFilled,50);
-        // Check for client-badge input changes
-        if(isClientBadgeSetting(e.target)){
+        // Only show propagation for intentional user input on client-badge settings
+        if(!suppressPropagation && isClientBadgeSetting(e.target)){
           const cloned = getClonedFCs(activeFC);
           if(cloned.length > 0 && !propagationPending){
             clearTimeout(window._propDebounce);
